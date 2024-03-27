@@ -1,0 +1,66 @@
+package com.quant_socket;
+
+import com.quant_socket.handlers.TelnetServerHandler;
+import com.quant_socket.repos.EquitiesSnapshotRepo;
+import com.quant_socket.repos.SocketLogRepo;
+import com.quant_socket.services.EquitiesSnapshotService;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class TelnetServer implements CommandLineRunner {
+
+    private final SocketLogRepo repo;
+    private final EquitiesSnapshotRepo esRepo;
+    private final EquitiesSnapshotService esService;
+
+    private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904};
+
+    @Override
+    public void run(String... args) throws Exception {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) {
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, esRepo, esService));
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+
+            final List<ChannelFuture> futures = new ArrayList<>();
+
+            for (int port : ports) {
+                futures.add(b.bind(port));
+            }
+
+            for (ChannelFuture future : futures) {
+                future.sync().channel().closeFuture().sync();
+            }
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
+    }
+}
