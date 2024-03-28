@@ -39,10 +39,13 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         try {
             String receivedMessage = in.toString(Charset.defaultCharset());
 
-            log.info("Received message: {}", receivedMessage);
+            for(String splitMsg : receivedMessage.split("�")) {
+                splitMsg += "�";
+                log.info("Received message: {}", splitMsg);
 
-            esHandler(receivedMessage);
-            repo.insert(receivedMessage, this.port, this.remote_url);
+                esHandler(splitMsg);
+                repo.insert(splitMsg, this.port, this.remote_url);
+            }
 
         } finally {
             in.release();
@@ -58,6 +61,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private void esHandler(String msg) {
         final String prodCode = msg.substring(0, 5);
+
+        service.sendMessage(msg+"<br>");
 
         switch (prodCode) {
             case "B201S":
