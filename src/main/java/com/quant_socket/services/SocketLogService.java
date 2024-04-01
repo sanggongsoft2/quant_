@@ -51,7 +51,7 @@ public class SocketLogService {
                 }
             });
             if(result > 0) logs.clear();
-            log.info("INSERT COUNT : {}", result);
+            log.debug("INSERT COUNT : {}", result);
         }
     }
 }

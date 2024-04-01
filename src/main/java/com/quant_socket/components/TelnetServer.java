@@ -2,6 +2,7 @@ package com.quant_socket.components;
 
 import com.quant_socket.handlers.TelnetServerHandler;
 import com.quant_socket.repos.EquitiesSnapshotRepo;
+import com.quant_socket.repos.ProductRepo;
 import com.quant_socket.repos.SocketLogRepo;
 import com.quant_socket.services.EquitiesSnapshotService;
 import com.quant_socket.services.SocketLogService;
@@ -28,13 +29,19 @@ public class TelnetServer implements CommandLineRunner {
 
     private final SocketLogRepo repo;
     private final EquitiesSnapshotRepo esRepo;
+    private final ProductRepo productRepo;
+
     private final EquitiesSnapshotService esService;
     private final SocketLogService socketLogService;
-
     private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904};
-
     @Override
     public void run(String... args) throws Exception {
+        if(esService.addProducts(productRepo.findAll())) {
+            setPorts();
+        }
+    }
+
+    private void setPorts() throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -63,6 +70,7 @@ public class TelnetServer implements CommandLineRunner {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+
         }
     }
 }

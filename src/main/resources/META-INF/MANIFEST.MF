@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.quant_socket.TelnetApplication
+Main-Class: com.quant_socket.QuantSocketApplication
 

@@ -20,6 +20,9 @@ public class SocketLog extends SG_model<SocketLog> {
     @SG_column(dbField = "SL_log")
     private String log;
 
+    @SG_column(dbField = "SL_error")
+    private String error;
+
     @SG_column(dbField = "SL_remote_url")
     private String remote_url;
 

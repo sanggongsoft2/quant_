@@ -9,26 +9,37 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.net.URI;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EquitiesSnapshotHandler extends TextWebSocketHandler {
+public class EquitiesSnapshotDetailsHandler extends TextWebSocketHandler {
 
     private final EquitiesSnapshotService service;
 
-    @Override
-    public void handleMessage(WebSocketSession ws, WebSocketMessage<?> message) throws Exception {
-        final String payload = (String) message.getPayload();
-        log.debug("Received Message: {}", payload);
-    }
+    private String isinCode;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
-        service.addSession(ws);
+        final URI uri = ws.getUri();
+        if(uri != null && uri.getQuery() != null) {
+            isinCode = service.getQueryValue(uri.getQuery(), "isin_code");
+            if(isinCode != null) service.addSession(ws, isinCode);
+            log.debug("CONNECTED ISIN CODE : {}", isinCode);
+        } else {
+            ws.close();
+        }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        service.removeSession(ws);
+        final URI uri = ws.getUri();
+        if(uri != null && uri.getQuery() != null) {
+            if(isinCode != null) service.removeSession(ws, isinCode);
+            log.debug("CLOSED ISIN CODE : {}", isinCode);
+        } else {
+            ws.close();
+        }
     }
 }
