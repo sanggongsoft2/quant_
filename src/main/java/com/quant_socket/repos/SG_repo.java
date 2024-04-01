@@ -2,16 +2,21 @@ package com.quant_socket.repos;
 
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.interfaces.DataSetter;
+import com.quant_socket.models.Logs.SocketLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -63,5 +68,10 @@ public abstract class SG_repo<T> {
         String table = clazz.getSimpleName().toLowerCase();
         if(clazz.isAnnotationPresent(SG_table.class)) table = clazz.getAnnotation(SG_table.class).name();
         return table;
+    }
+
+    public int insertMany(String sql, BatchPreparedStatementSetter setter){
+        jt.batchUpdate(sql, setter);
+        return setter.getBatchSize();
     }
 }

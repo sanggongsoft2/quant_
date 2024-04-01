@@ -1,8 +1,10 @@
 package com.quant_socket.handlers;
 
+import com.quant_socket.models.Logs.SocketLog;
 import com.quant_socket.repos.EquitiesSnapshotRepo;
 import com.quant_socket.repos.SocketLogRepo;
 import com.quant_socket.services.EquitiesSnapshotService;
+import com.quant_socket.services.SocketLogService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -19,6 +21,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     private final SocketLogRepo repo;
     private final EquitiesSnapshotRepo esRepo;
     private final EquitiesSnapshotService service;
+    private final SocketLogService socketLogService;
     private Integer port;
     private String remote_url;
 
@@ -40,11 +43,16 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             String receivedMessage = in.toString(Charset.defaultCharset());
 
             for(String splitMsg : receivedMessage.split("�")) {
-                splitMsg += "�";
-                log.info("Received message: {}", splitMsg);
-
-                esHandler(splitMsg);
-                repo.insert(splitMsg, this.port, this.remote_url);
+                if(!splitMsg.isBlank()) {
+                    final SocketLog sl = new SocketLog();
+                    splitMsg += "�";
+                    log.info("Received message: {}", splitMsg);
+                    esHandler(splitMsg);
+                    sl.setLog(splitMsg);
+                    sl.setPort(this.port);
+                    sl.setRemote_url(remote_url);
+                    socketLogService.addLog(sl);
+                }
             }
 
         } finally {
