@@ -233,7 +233,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case "CA01S":
                 case "CA01Q":
-                    eiiRepo.insert(data -> {
+                    if(msg.length() == 185) eiiRepo.insert(data -> {
                         int index = 0;
                         data.put("eii_data_category", msg.substring(index, index += 2));
                         data.put("eii_info_category", msg.substring(index, index += 3));
