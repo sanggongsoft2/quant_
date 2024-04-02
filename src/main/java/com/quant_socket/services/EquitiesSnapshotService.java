@@ -87,7 +87,34 @@ public class EquitiesSnapshotService {
 
     public Product productFromIsinCode(String isinCode) {
         Product prod = null;
-        for(Product _prod : products) if(_prod.getCode().equals(isinCode)) prod = _prod;
+        for(Product _prod : products) {
+            if(_prod.getCode().equals(isinCode)) {
+                prod = _prod;
+                break;
+            }
+        }
         return prod;
+    }
+
+    public void refreshProducts() {
+        products.forEach(prod -> {
+            prod.setTodayBidCount(0);
+            prod.setTodayAskCount(0);
+        });
+    }
+
+    public void updateProductCount(String isinCode, String type, long count) {
+        for(Product prod : products) if(prod.getCode().equals(isinCode)) {
+            switch (type) {
+                case "0":
+                    break;
+                case "1":
+                    prod.setTodayAskCount(prod.getTodayAskCount() + count);
+                    break;
+                case "2":
+                    prod.setTodayBidCount(prod.getTodayBidCount() + count);
+            }
+            break;
+        }
     }
 }

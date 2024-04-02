@@ -40,10 +40,13 @@ public class Product extends SG_model<Product>{
     @SG_column(dbField = "p_face_value")
     private String face_value;
     @SG_column(dbField = "p_having_count")
-    private String having_count;
+    private Long having_count;
     @SG_crdt
     @SG_column(dbField = "p_crdt")
     private String crdt;
+
+    private long todayBidCount;
+    private long todayAskCount;
 
     public Product(ResultSet rs) {
         super.resultSetToClass(rs);

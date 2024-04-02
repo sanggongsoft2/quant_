@@ -1,10 +1,7 @@
 package com.quant_socket.components;
 
 import com.quant_socket.handlers.TelnetServerHandler;
-import com.quant_socket.repos.EquitiesSnapshotRepo;
-import com.quant_socket.repos.EquityIndexIndicatorRepo;
-import com.quant_socket.repos.ProductRepo;
-import com.quant_socket.repos.SocketLogRepo;
+import com.quant_socket.repos.*;
 import com.quant_socket.services.EquitiesSnapshotService;
 import com.quant_socket.services.SocketLogService;
 import io.netty.bootstrap.ServerBootstrap;
@@ -32,6 +29,7 @@ public class TelnetServer implements CommandLineRunner {
     private final EquitiesSnapshotRepo esRepo;
     private final ProductRepo productRepo;
     private final EquityIndexIndicatorRepo equityIndexIndicatorRepo;
+    private final SecOrderFilledRepo secOrderFilledRepo;
 
     private final EquitiesSnapshotService esService;
     private final SocketLogService socketLogService;
@@ -54,7 +52,7 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, esRepo, equityIndexIndicatorRepo, esService, socketLogService));
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, esRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
