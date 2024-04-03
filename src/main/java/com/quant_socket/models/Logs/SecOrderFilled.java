@@ -109,9 +109,17 @@ public class SecOrderFilled {
         return data;
     }
 
-    public Map<String, Object> toSocket() {
+    private double getTradingRate(Product prod) {
+        double value = 0;
+        if(prod.getTodayBidCount() != 0 && prod.getTodayAskCount() != 0) value = (double) prod.getTodayBidCount() / prod.getTodayAskCount()*100;
+        return value;
+    }
+
+    public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
         response.put("response_type", 2);
+        response.put("trading_rate", getTradingRate(prod));
+        response.put("trading_list", prod.getTradingList());
         return response;
     }
 }

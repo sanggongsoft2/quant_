@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SG_table(name = "product")
 @Getter
@@ -38,7 +41,7 @@ public class Product extends SG_model<Product>{
     @SG_column(dbField = "p_type")
     private String type;
     @SG_column(dbField = "p_face_value")
-    private String face_value;
+    private Double face_value;
     @SG_column(dbField = "p_having_count")
     private Long having_count;
     @SG_crdt
@@ -49,6 +52,8 @@ public class Product extends SG_model<Product>{
     private long todayAskCount;
     private long todayTradingCount = 0;
     private long yesTradingCount = 0;
+
+    private Map<Double, Long> tradingList = new HashMap<>();
 
     public long getTodayTradingCount() {
         return todayBidCount + todayAskCount;
@@ -66,6 +71,19 @@ public class Product extends SG_model<Product>{
                     todayBidCount += count;
             }
         }
+    }
+
+    public void updateTradingList(Double price, long count) {
+        long _count = 0;
+        if(tradingList.get(price) != null) _count = tradingList.get(price);
+        tradingList.put(price, _count + count);
+    }
+
+    public void refreshProduct() {
+        yesTradingCount = getTodayTradingCount();
+        todayBidCount = 0;
+        todayAskCount = 0;
+        tradingList.clear();
     }
 
     public Product(ResultSet rs) {

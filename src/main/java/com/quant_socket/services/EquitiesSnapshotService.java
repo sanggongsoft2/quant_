@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quant_socket.models.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -96,16 +97,21 @@ public class EquitiesSnapshotService {
         return prod;
     }
 
+    @Scheduled(cron = "0 0 9 * * ?")
     public void refreshProducts() {
-        products.forEach(prod -> {
-            prod.setTodayBidCount(0);
-            prod.setTodayAskCount(0);
-        });
+        products.forEach(Product::refreshProduct);
     }
 
     public void updateProductCount(String isinCode, String type, long count) {
         for(Product prod : products) {
             prod.updateTodayCount(isinCode, type, count);
+            break;
+        }
+    }
+
+    public void updateProductTradingList(Double tradingPrice, long tradingCount) {
+        for(Product prod : products) {
+            prod.updateTradingList(tradingPrice, tradingCount);
             break;
         }
     }

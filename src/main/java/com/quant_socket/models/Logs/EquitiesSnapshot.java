@@ -288,7 +288,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         //10. 매도 호가 가격
         response.put("ask_level_1_price", ask_level_1_price);
         response.put("ask_level_2_price", ask_level_2_price);
-        response.put("ask_level__price", ask_level_3_price);
+        response.put("ask_level_3_price", ask_level_3_price);
         response.put("ask_level_4_price", ask_level_4_price);
         response.put("ask_level_5_price", ask_level_5_price);
         response.put("ask_level_6_price", ask_level_6_price);
@@ -323,8 +323,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         //16. 액면가, 전일가
         response.put("face_value", prod.getFace_value());
         response.put("yesterday_price", getYesterdayPrice());
-        //17. 체결강도
-        //18. 체결가격
+        //17. 체결강도 18. 체결가격 = 증권 체결 테이블
         //19. 거래량
         response.put("total_trading_count", accumulated_trading_volume);
 
@@ -342,7 +341,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
         response.put("bid_level_1_price", bid_level_1_price);
         response.put("bid_level_2_price", bid_level_2_price);
-        response.put("bid_level__price", bid_level_3_price);
+        response.put("bid_level_3_price", bid_level_3_price);
         response.put("bid_level_4_price", bid_level_4_price);
         response.put("bid_level_5_price", bid_level_5_price);
         response.put("bid_level_6_price", bid_level_6_price);
@@ -374,7 +373,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
     private double getComparePriceRate(double price) {
         double value = 0;
-        if(current_price != 0 && price != 0) value = (current_price - price) / price * 100;
+        if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
         return value;
     }
 }

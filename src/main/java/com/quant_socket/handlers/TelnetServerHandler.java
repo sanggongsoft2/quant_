@@ -83,6 +83,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private void esHandler(String msg) {
         if(msg.length() >= 5) {
+            log.info(msg);
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
                 case "A001S":
@@ -118,8 +119,12 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             final SecOrderFilled sof = new SecOrderFilled(msg);
             data.putAll(sof.toMap());
 
-            service.sendMessage(sof.toSocket(), sof.getIsin_code());
-            service.sendMessage(sof.toSocket());
+            final Product prod = service.productFromIsinCode(sof.getIsin_code());
+            if(prod != null) {
+                service.updateProductTradingList(sof.getTrading_price(), sof.getTrading_volume());
+                service.sendMessage(sof.toSocket(prod), sof.getIsin_code());
+                service.sendMessage(sof.toSocket(prod));
+            }
         });
     }
 
