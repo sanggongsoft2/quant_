@@ -104,16 +104,8 @@ public class EquitiesSnapshotService {
     }
 
     public void updateProductCount(String isinCode, String type, long count) {
-        for(Product prod : products) if(prod.getCode().equals(isinCode)) {
-            switch (type) {
-                case "0":
-                    break;
-                case "1":
-                    prod.setTodayAskCount(prod.getTodayAskCount() + count);
-                    break;
-                case "2":
-                    prod.setTodayBidCount(prod.getTodayBidCount() + count);
-            }
+        for(Product prod : products) {
+            prod.updateTodayCount(isinCode, type, count);
             break;
         }
     }

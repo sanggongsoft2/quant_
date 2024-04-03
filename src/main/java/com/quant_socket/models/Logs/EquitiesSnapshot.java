@@ -4,11 +4,17 @@ import com.quant_socket.annotations.SG_column;
 import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
+import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
+import lombok.Getter;
 
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 @SG_table(name = "equities_snapshot")
+@Getter
 public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
     @SG_idx
@@ -135,7 +141,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
     @SG_column(dbField = "es_estimated_trading_price")
     private Double estimated_trading_price;
     @SG_column(dbField = "es_estimated_trading_volume")
-    private Double estimated_trading_volume;
+    private Long estimated_trading_volume;
     @SG_column(dbField = "es_closing_price_type_code")
     private String closing_price_type_code;
     @SG_column(dbField = "es_trading_halt")
@@ -146,4 +152,229 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
     @SG_crdt
     @SG_column(dbField = "es_idx")
     private Timestamp createdAt;
+
+    public EquitiesSnapshot(String msg) {
+        int index = 0;
+        data_category = msg.substring(index, index += 2);
+        info_category = msg.substring(index, index += 3);
+        board_id = msg.substring(index, index += 2);
+        session_id = msg.substring(index, index += 2);
+        isin_code = msg.substring(index, index += 12);
+        a_designated_number_for_an_issue = Integer.valueOf(msg.substring(index, index += 6));
+        price_change_against_previous_day = msg.substring(index, index += 1);
+        price_change_against_the_previous_day = Double.valueOf(msg.substring(index, index += 11));
+        upper_limit_price = Double.valueOf(msg.substring(index, index += 11));
+        lower_limit_price = Double.valueOf(msg.substring(index, index += 11));
+        current_price = Double.valueOf(msg.substring(index, index += 11));
+        opening_price = Double.valueOf(msg.substring(index, index += 11));
+        todays_high = Double.valueOf(msg.substring(index, index += 11));
+        todays_low = Double.valueOf(msg.substring(index, index += 11));
+        accumulated_trading_volume = Long.valueOf(msg.substring(index, index += 12));
+        accumulated_trading_value = Float.valueOf(msg.substring(index, index += 22));
+        final_ask_bid_type_code = msg.substring(index, index += 1);
+        ask_level_1_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_1_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_1_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_1_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_2_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_2_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_2_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_2_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_3_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_3_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_3_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_3_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_4_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_4_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_4_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_4_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_5_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_5_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_5_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_5_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_6_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_6_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_6_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_6_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_7_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_7_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_7_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_7_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_8_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_8_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_8_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_8_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_9_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_9_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_9_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_9_volume = Long.valueOf(msg.substring(index, index += 12));
+        ask_level_10_price = Double.valueOf(msg.substring(index, index += 11));
+        bid_level_10_price = Double.valueOf(msg.substring(index, index += 11));
+        ask_level_10_volume = Long.valueOf(msg.substring(index, index += 12));
+        bid_level_10_volume = Long.valueOf(msg.substring(index, index += 12));
+        total_ask_volume = Long.valueOf(msg.substring(index, index += 12));
+        total_bid_volume = Long.valueOf(msg.substring(index, index += 12));
+        estimated_trading_price = Double.valueOf(msg.substring(index, index += 11));
+        estimated_trading_volume = Long.valueOf(msg.substring(index, index += 12));
+        closing_price_type_code = msg.substring(index, index += 1);
+        trading_halt = msg.substring(index, index += 1);
+        end_keyword = msg.substring(index, index + 1);
+    }
+
+    public Map<String, Object> toMap() {
+        final Map<String, Object> data = new HashMap<>();
+        for(final Field f: this.getClass().getDeclaredFields()) {
+            if(f.isAnnotationPresent(SG_column.class)) {
+                final SG_column sc = f.getAnnotation(SG_column.class);
+                try {
+                    data.put(sc.dbField(), f.get(this));
+                } catch (Exception ignore) {
+                }
+            }
+        }
+        return data;
+    }
+
+    public Double getYesterdayPrice() {
+        return current_price + getPrice_change_against_the_previous_day();
+    }
+
+    public Double getComparePriceRate() {
+        double value = 0;
+        if(current_price != 0 && getYesterdayPrice() != 0) value = (current_price - getYesterdayPrice()) / getYesterdayPrice() * 100;
+        return value;
+    }
+
+    public double getCompareYesterdayPrice() {
+        double result;
+        switch (price_change_against_previous_day) {
+            case "4":
+            case "5":
+                result = -price_change_against_the_previous_day;
+                break;
+            default:
+                result = price_change_against_the_previous_day;
+        }
+        return result;
+    }
+
+    public Map<String, Object> toSocket(Product prod) {
+        final Map<String, Object> response = new HashMap<>();
+        response.put("response_type", 1);
+        response.put("isin_code", isin_code);
+        //0: 초기값, 1: 상한, 2: 상승, 3: 보합, 4: 하한, 5: 하락
+        response.put("short_code", prod.getShort_code());
+        //4. 현재가
+        response.put("current_price", current_price);
+        //5. 증감
+        response.put("compare_price", getCompareYesterdayPrice());
+        //6. 증감률
+        response.put("compare_price_percent", getComparePriceRate());
+        //7. 거래량(현재)
+        response.put("trading_count", prod.getTodayTradingCount());
+        //8. 거래량(전일)
+        response.put("yes_trading_count", prod.getYesTradingCount());
+        //9. 매도 호가 수량
+        response.put("ask_level_1_volume", ask_level_1_volume);
+        response.put("ask_level_2_volume", ask_level_2_volume);
+        response.put("ask_level_3_volume", ask_level_3_volume);
+        response.put("ask_level_4_volume", ask_level_4_volume);
+        response.put("ask_level_5_volume", ask_level_5_volume);
+        response.put("ask_level_6_volume", ask_level_6_volume);
+        response.put("ask_level_7_volume", ask_level_7_volume);
+        response.put("ask_level_8_volume", ask_level_8_volume);
+        response.put("ask_level_9_volume", ask_level_9_volume);
+        response.put("ask_level_10_volume", ask_level_10_volume);
+        //10. 매도 호가 가격
+        response.put("ask_level_1_price", ask_level_1_price);
+        response.put("ask_level_2_price", ask_level_2_price);
+        response.put("ask_level__price", ask_level_3_price);
+        response.put("ask_level_4_price", ask_level_4_price);
+        response.put("ask_level_5_price", ask_level_5_price);
+        response.put("ask_level_6_price", ask_level_6_price);
+        response.put("ask_level_7_price", ask_level_7_price);
+        response.put("ask_level_8_price", ask_level_8_price);
+        response.put("ask_level_9_price", ask_level_9_price);
+        response.put("ask_level_10_price", ask_level_10_price);
+        //11. 매도 호가 등락률
+        response.put("ask_level_1_rate", getComparePriceRate(ask_level_1_price));
+        response.put("ask_level_2_rate", getComparePriceRate(ask_level_2_price));
+        response.put("ask_level_3_rate", getComparePriceRate(ask_level_3_price));
+        response.put("ask_level_4_rate", getComparePriceRate(ask_level_4_price));
+        response.put("ask_level_5_rate", getComparePriceRate(ask_level_5_price));
+        response.put("ask_level_6_rate", getComparePriceRate(ask_level_6_price));
+        response.put("ask_level_7_rate", getComparePriceRate(ask_level_7_price));
+        response.put("ask_level_8_rate", getComparePriceRate(ask_level_8_price));
+        response.put("ask_level_9_rate", getComparePriceRate(ask_level_9_price));
+        response.put("ask_level_10_rate", getComparePriceRate(ask_level_10_price));
+        //12. 52주 최고, 52주 최저 -------------------------------- 개발 필요
+        response.put("best_high_from_52week", 0);
+        response.put("best_low_from_52week", 0);
+        //13. 상한가, 하한가
+        response.put("limit_high_price", upper_limit_price);
+        response.put("limit_low_price", lower_limit_price);
+        //14. 시가총액
+        response.put("market_total_price", prod.getHaving_count() * current_price);
+        response.put("today_trading_total_price", accumulated_trading_value);
+        //15. 시가, 고가, 저가
+        response.put("opening_price", opening_price);
+        response.put("today_high_price", todays_high);
+        response.put("today_low_price", todays_low);
+        //16. 액면가, 전일가
+        response.put("face_value", prod.getFace_value());
+        response.put("yesterday_price", getYesterdayPrice());
+        //17. 체결강도
+        //18. 체결가격
+        //19. 거래량
+        response.put("total_trading_count", accumulated_trading_volume);
+
+        //20. 매수 호가 수량, 가격, 등락률
+        response.put("bid_level_1_volume", bid_level_1_volume);
+        response.put("bid_level_2_volume", bid_level_2_volume);
+        response.put("bid_level_3_volume", bid_level_3_volume);
+        response.put("bid_level_4_volume", bid_level_4_volume);
+        response.put("bid_level_5_volume", bid_level_5_volume);
+        response.put("bid_level_6_volume", bid_level_6_volume);
+        response.put("bid_level_7_volume", bid_level_7_volume);
+        response.put("bid_level_8_volume", bid_level_8_volume);
+        response.put("bid_level_9_volume", bid_level_9_volume);
+        response.put("bid_level_10_volume", bid_level_10_volume);
+
+        response.put("bid_level_1_price", bid_level_1_price);
+        response.put("bid_level_2_price", bid_level_2_price);
+        response.put("bid_level__price", bid_level_3_price);
+        response.put("bid_level_4_price", bid_level_4_price);
+        response.put("bid_level_5_price", bid_level_5_price);
+        response.put("bid_level_6_price", bid_level_6_price);
+        response.put("bid_level_7_price", bid_level_7_price);
+        response.put("bid_level_8_price", bid_level_8_price);
+        response.put("bid_level_9_price", bid_level_9_price);
+        response.put("bid_level_10_price", bid_level_10_price);
+
+        response.put("bid_level_1_rate", getComparePriceRate(bid_level_1_price));
+        response.put("bid_level_2_rate", getComparePriceRate(bid_level_2_price));
+        response.put("bid_level_3_rate", getComparePriceRate(bid_level_3_price));
+        response.put("bid_level_4_rate", getComparePriceRate(bid_level_4_price));
+        response.put("bid_level_5_rate", getComparePriceRate(bid_level_5_price));
+        response.put("bid_level_6_rate", getComparePriceRate(bid_level_6_price));
+        response.put("bid_level_7_rate", getComparePriceRate(bid_level_7_price));
+        response.put("bid_level_8_rate", getComparePriceRate(bid_level_8_price));
+        response.put("bid_level_9_rate", getComparePriceRate(bid_level_9_price));
+        response.put("bid_level_10_rate", getComparePriceRate(bid_level_10_price));
+
+        //21. 매도 잔량
+        response.put("ask_total_count", total_ask_volume);
+        //22. 매수 - 매도
+        response.put("bid_count", total_bid_volume - total_ask_volume);
+        //23. 매수 잔량
+        response.put("bid_total_count", total_bid_volume);
+
+        return response;
+    }
+
+    private double getComparePriceRate(double price) {
+        double value = 0;
+        if(current_price != 0 && price != 0) value = (current_price - price) / price * 100;
+        return value;
+    }
 }

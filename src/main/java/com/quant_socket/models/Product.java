@@ -47,6 +47,26 @@ public class Product extends SG_model<Product>{
 
     private long todayBidCount;
     private long todayAskCount;
+    private long todayTradingCount = 0;
+    private long yesTradingCount = 0;
+
+    public long getTodayTradingCount() {
+        return todayBidCount + todayAskCount;
+    }
+
+    public void updateTodayCount(String isinCode, String type, long count) {
+        if (code.equals(isinCode)) {
+            switch (type) {
+                case "0":
+                    break;
+                case "1":
+                    todayAskCount += count;
+                    break;
+                case "2":
+                    todayBidCount += count;
+            }
+        }
+    }
 
     public Product(ResultSet rs) {
         super.resultSetToClass(rs);

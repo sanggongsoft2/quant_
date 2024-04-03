@@ -102,7 +102,7 @@ public abstract class SG_model<T> {
         }
     }
 
-    public Map<String, Object> toMap() {
+    public Map<String, Object> toMap() throws IllegalAccessException {
         Map<String, Object> map = new HashMap<>();
         for (Field field : getClass().getDeclaredFields()) {
             field.setAccessible(true);
