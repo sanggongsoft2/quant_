@@ -70,29 +70,28 @@ public class SecOrderFilled {
     private String createdAt;
 
     public SecOrderFilled(String msg) {
-        int index = 0;
-        data_category = msg.substring(index, index += 2);
-        info_category = msg.substring(index, index += 3);
-        message_seq_number = Integer.parseInt(msg.substring(index, index += 8));
-        board_id = msg.substring(index, index += 2);
-        session_id = msg.substring(index, index += 2);
-        isin_code = msg.substring(index, index += 12);
-        a_des_number_for_an_issue = Integer.parseInt(msg.substring(index, index += 6));
-        processing_time_of_trading_system = msg.substring(index, index += 12);
-        price_change_against_previous_day = msg.substring(index, index += 1);
-        price_change_against_the_pre_day = Double.parseDouble(msg.substring(index, index += 11));
-        trading_price = Double.parseDouble(msg.substring(index, index += 11));
-        trading_volume = Long.parseLong(msg.substring(index, index += 10));
-        opening_price = Double.parseDouble(msg.substring(index, index += 11));
-        todays_high = Double.parseDouble(msg.substring(index, index += 11));
-        todays_low = Double.parseDouble(msg.substring(index, index += 11));
-        accu_trading_volume = Double.parseDouble(msg.substring(index, index += 12));
-        accu_trading_value = Float.parseFloat(msg.substring(index, index += 22));
-        final_askbid_type_code = msg.substring(index, index += 1);
-        lp_holding_quantity = Long.parseLong(msg.substring(index, index += 15));
-        the_best_ask = Double.parseDouble(msg.substring(index, index += 11));
-        the_best_bid = Double.parseDouble(msg.substring(index, index += 11));
-        end_keyword = msg.substring(index, index + 1);
+        data_category = msg.substring(0, 2);
+        info_category = msg.substring(2, 5);
+        if(!msg.substring(5, 13).isBlank()) message_seq_number = Integer.parseInt(msg.substring(5, 13));
+        board_id = msg.substring(13, 15);
+        session_id = msg.substring(15, 17);
+        isin_code = msg.substring(17, 29);
+        if(!msg.substring(29, 35).isBlank()) a_des_number_for_an_issue = Integer.parseInt(msg.substring(29, 35));
+        processing_time_of_trading_system = msg.substring(35, 47);
+        price_change_against_previous_day = msg.substring(47, 48);
+        if(!msg.substring(48, 59).isBlank()) price_change_against_the_pre_day = Double.parseDouble(msg.substring(48, 59));
+        if(!msg.substring(59, 70).isBlank()) trading_price = Double.parseDouble(msg.substring(59, 70));
+        if(!msg.substring(70, 80).isBlank()) trading_volume = Long.parseLong(msg.substring(70, 80));
+        if(!msg.substring(80, 91).isBlank()) opening_price = Double.parseDouble(msg.substring(80, 91));
+        if(!msg.substring(91, 102).isBlank()) todays_high = Double.parseDouble(msg.substring(91, 102));
+        if(!msg.substring(102, 113).isBlank()) todays_low = Double.parseDouble(msg.substring(102, 113));
+        if(!msg.substring(113, 125).isBlank()) accu_trading_volume = Double.parseDouble(msg.substring(113, 125));
+        if(!msg.substring(125, 147).isBlank()) accu_trading_value = Float.parseFloat(msg.substring(125, 147));
+        final_askbid_type_code = msg.substring(147, 148);
+        if(!msg.substring(148, 163).isBlank()) lp_holding_quantity = Long.parseLong(msg.substring(148, 163));
+        if(!msg.substring(163, 174).isBlank()) the_best_ask = Double.parseDouble(msg.substring(163, 174));
+        if(!msg.substring(174, 185).isBlank()) the_best_bid = Double.parseDouble(msg.substring(174, 185));
+        end_keyword = msg.substring(185, 186);
     }
 
     public Map<String, Object> toMap() {
