@@ -59,14 +59,13 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             this.msg = receivedMessage;
 
             if(!receivedMessage.isBlank()) {
-                receivedMessage = receivedMessage.replaceAll(" ", "0");
                 final SocketLog sl = new SocketLog();
-                esHandler(receivedMessage);
 
                 sl.setLog(receivedMessage);
                 sl.setPort(this.port);
                 sl.setRemote_url(remote_url);
                 socketLogService.addLog(sl);
+                esHandler(receivedMessage.replaceAll(" ", "0"));
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
