@@ -1,14 +1,8 @@
 package com.quant_socket.handlers;
 
-import com.quant_socket.models.Logs.EquitiesSnapshot;
-import com.quant_socket.models.Logs.EquityIndexIndicator;
-import com.quant_socket.models.Logs.SecOrderFilled;
-import com.quant_socket.models.Logs.SocketLog;
+import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Product;
-import com.quant_socket.repos.EquitiesSnapshotRepo;
-import com.quant_socket.repos.EquityIndexIndicatorRepo;
-import com.quant_socket.repos.SecOrderFilledRepo;
-import com.quant_socket.repos.SocketLogRepo;
+import com.quant_socket.repos.*;
 import com.quant_socket.services.EquitiesSnapshotService;
 import com.quant_socket.services.SocketLogService;
 import io.netty.buffer.ByteBuf;
@@ -27,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     private final SocketLogRepo repo;
+    private final EquitiesBatchDataRepo equitiesBatchDataRepo;
     private final EquitiesSnapshotRepo esRepo;
     private final EquityIndexIndicatorRepo eiiRepo;
     private final SecOrderFilledRepo secOrderFilledRepo;
@@ -150,7 +145,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         });
     }
 
-    //증권 종목 정보
+    //증권 지수지표
     private void equity_index_indicator_handler(String msg) {
         if(msg.length() == 185) eiiRepo.insert(data -> {
             final EquityIndexIndicator eii = new EquityIndexIndicator(msg);
@@ -158,124 +153,20 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         });
     }
 
+    //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
         if(msg.length() == 620) {
-            final Map<String, Object> data = new HashMap<>();
-            int index = 0;
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+3), msg.substring(index, index += 3));
-            data.put(String.valueOf(index+8), Integer.parseInt(msg.substring(index, index += 8)));
-            data.put(String.valueOf(index+6), Integer.parseInt(msg.substring(index, index += 6)));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+12), msg.substring(index, index += 12));
-            data.put(String.valueOf(index+6), Integer.parseInt(msg.substring(index, index += 6)));
-            data.put(String.valueOf(index+9), msg.substring(index, index += 9));
-            data.put(String.valueOf(index+40), msg.substring(index, index += 40));
-            data.put(String.valueOf(index+40), msg.substring(index, index += 40));
-            data.put(String.valueOf(index+5), msg.substring(index, index += 5));
-            data.put(String.valueOf(index+3), msg.substring(index, index += 3));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+10), msg.substring(index, index += 10));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+12), Long.parseLong(msg.substring(index, index += 12)));
-            data.put(String.valueOf(index+22), Float.parseFloat(msg.substring(index, index += 22)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+16), Long.parseLong(msg.substring(index, index += 16)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+13), Double.parseDouble(msg.substring(index, index += 13)));
-            data.put(String.valueOf(index+22), Float.parseFloat(msg.substring(index, index += 22)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+5), Integer.parseInt(msg.substring(index, index += 5)));
-            data.put(String.valueOf(index+5), Integer.parseInt(msg.substring(index, index += 5)));
-            data.put(String.valueOf(index+5), Integer.parseInt(msg.substring(index, index += 5)));
-            data.put(String.valueOf(index+5), Integer.parseInt(msg.substring(index, index += 5)));
-            data.put(String.valueOf(index+5), Integer.parseInt(msg.substring(index, index += 5)));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Double.parseDouble(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Long.parseLong(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+11), Long.parseLong(msg.substring(index, index += 11)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+12), msg.substring(index, index += 12));
-            data.put(String.valueOf(index+3), msg.substring(index, index += 3));
-            data.put(String.valueOf(index+3), msg.substring(index, index += 3));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+13), Double.parseDouble(msg.substring(index, index += 13)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+13), Double.parseDouble(msg.substring(index, index += 13)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+8), msg.substring(index, index += 8));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+6), msg.substring(index, index += 6));
-            data.put(String.valueOf(index+3), msg.substring(index, index += 3));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+2), msg.substring(index, index += 2));
-            data.put(String.valueOf(index+6), msg.substring(index, index += 6));
-            data.put(String.valueOf(index+6), msg.substring(index, index += 6));
-            data.put(String.valueOf(index+5), msg.substring(index, index += 5));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+23), Float.parseFloat(msg.substring(index, index += 23)));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index += 1));
-            data.put(String.valueOf(index+1), msg.substring(index, index + 1));
+            final EquitiesBatchData ebd = new EquitiesBatchData(msg);
+            equitiesBatchDataRepo.insert(data -> {
+                data.putAll(ebd.toMap());
+            });
 
-            final String isinCode = (String) data.get("39");
+            final Product prod = service.productFromIsinCode(ebd.getIsin_code());
 
-            final Map<String, Object> response = new HashMap<>();
-
-            response.put("isin_code", isinCode);
-
-            service.sendMessage(response);
-            service.sendMessage(response, isinCode);
+            if(prod != null) {
+                service.sendMessage(ebd.toSocket(prod));
+                service.sendMessage(ebd.toSocket(prod), ebd.getIsin_code());
+            }
         }
     }
 }

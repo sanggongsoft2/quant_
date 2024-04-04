@@ -26,6 +26,7 @@ import java.util.List;
 public class TelnetServer implements CommandLineRunner {
 
     private final SocketLogRepo repo;
+    private final EquitiesBatchDataRepo equitiesBatchDataRepo;
     private final EquitiesSnapshotRepo esRepo;
     private final ProductRepo productRepo;
     private final EquityIndexIndicatorRepo equityIndexIndicatorRepo;
@@ -52,7 +53,7 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, esRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesBatchDataRepo, esRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
