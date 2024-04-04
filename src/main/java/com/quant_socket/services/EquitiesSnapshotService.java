@@ -1,9 +1,13 @@
 package com.quant_socket.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.quant_socket.models.Logs.EquitiesBatchData;
 import com.quant_socket.models.Product;
+import com.quant_socket.repos.EquitiesBatchDataRepo;
+import com.quant_socket.repos.ProductRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -11,6 +15,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,6 +26,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @RequiredArgsConstructor
 public class EquitiesSnapshotService {
+
+    private final ProductRepo productRepo;
+
     private final ObjectMapper mapper;
     private final List<Product> products = new CopyOnWriteArrayList<>();
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
@@ -98,14 +107,16 @@ public class EquitiesSnapshotService {
     }
 
     @Scheduled(cron = "0 0 9 * * ?")
-    public void refreshProducts() {
+    public void refreshProductItems() {
         products.forEach(Product::refreshProduct);
     }
 
     public void updateProductCount(String isinCode, String type, long count) {
         for(Product prod : products) {
-            prod.updateTodayCount(isinCode, type, count);
-            break;
+            if(prod.getCode().equals(isinCode)) {
+                prod.updateTodayCount(isinCode, type, count);
+                break;
+            }
         }
     }
 
@@ -113,6 +124,20 @@ public class EquitiesSnapshotService {
         for(Product prod : products) {
             prod.updateTradingList(tradingPrice, tradingCount);
             break;
+        }
+    }
+
+    public void updateProductFromBatchData(EquitiesBatchData ebd) {
+        for(Product prod : products) {
+            if(prod.getCode().equals(ebd.getIsin_code())) {
+                prod.setFace_value(ebd.getPar_value());
+                prod.setHaving_count(ebd.getNumber_of_listed_shares());
+                prod.setYesterday_price(ebd.getYes_closing_price());
+                prod.setYesterday_trading_count(ebd.getYes_accu_trading_amount());
+                prod.setYesterday_value(ebd.getYes_accu_trading_value());
+                productRepo.update(prod);
+                break;
+            }
         }
     }
 }

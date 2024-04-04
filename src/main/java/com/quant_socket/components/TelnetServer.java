@@ -42,6 +42,7 @@ public class TelnetServer implements CommandLineRunner {
         }
     }
 
+
     private void setPorts() throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -53,7 +54,7 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesBatchDataRepo, esRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesBatchDataRepo, esRepo, productRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

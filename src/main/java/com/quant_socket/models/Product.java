@@ -44,6 +44,14 @@ public class Product extends SG_model<Product>{
     private Double face_value;
     @SG_column(dbField = "p_having_count")
     private Long having_count;
+
+    @SG_column(dbField = "p_yesterday_price")
+    private Double yesterday_price;
+    @SG_column(dbField = "p_yesterday_value")
+    private Float yesterday_value;
+    @SG_column(dbField = "p_yesterday_trading_count")
+    private Long yesterday_trading_count;
+
     @SG_crdt
     @SG_column(dbField = "p_crdt")
     private String crdt;
@@ -51,13 +59,11 @@ public class Product extends SG_model<Product>{
     private long todayBidCount;
     private long todayAskCount;
     private long todayTradingCount = 0;
-    private long yesTradingCount = 0;
+
+    private long todayForeignerCount = 0;
+    private long todayFacilityCount = 0;
 
     private Map<Double, Long> tradingList = new HashMap<>();
-
-    public long getTodayTradingCount() {
-        return todayBidCount + todayAskCount;
-    }
 
     public void updateTodayCount(String isinCode, String type, long count) {
         if (code.equals(isinCode)) {
@@ -80,7 +86,6 @@ public class Product extends SG_model<Product>{
     }
 
     public void refreshProduct() {
-        yesTradingCount = getTodayTradingCount();
         todayBidCount = 0;
         todayAskCount = 0;
         tradingList.clear();

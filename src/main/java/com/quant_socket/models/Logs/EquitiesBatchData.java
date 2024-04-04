@@ -7,6 +7,7 @@ import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @SG_table(name = "equities_batch_data")
 @Getter
+@Setter
 public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
 
     @SG_idx
@@ -286,7 +288,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
         maturity_date = msg.substring(index, index+=8);
         exercising_period = msg.substring(index, index+=8);
         expiration_date_for_right = msg.substring(index, index+=8);
-        exercise_price_of_elw_or_bw = Double.parseDouble(msg.substring(index, index+=11));
+        exercise_price_of_elw_or_bw = Double.parseDouble(msg.substring(index, index+=13));
         capital = Float.parseFloat(msg.substring(index, index+=22));
         credit_order_possibillity = msg.substring(index, index+=1);
         limit_order_permission_type_code = Integer.valueOf(msg.substring(index, index+=5));
@@ -362,6 +364,14 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
         response.put("response_type", 3);
+        response.put("face_value", par_value);
+        //상장 주식 수
+        response.put("having_count", number_of_listed_shares);
+        //8. 거래량(전일)
+        response.put("yes_trading_count", prod.getYesterday_trading_count());
+        //16. 액면가, 전일가
+        response.put("face_value", par_value);
+        response.put("yesterday_price", yes_closing_price);
 
         return response;
     }

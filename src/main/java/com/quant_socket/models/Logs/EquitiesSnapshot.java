@@ -259,10 +259,22 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
+        response.put("name_kr", prod.getName_kr());
+        response.put("name_kr_abbr", prod.getName_kr_abbr());
+        response.put("name_en", prod.getName_en());
+        response.put("current_price", current_price);
+        response.put("today_trading_count", accumulated_trading_volume);
+        response.put("compare_yesterday_price", getCompareYesterdayPrice());
+        response.put("compare_yesterday_rate", getComparePriceRate());
+        response.put("market_total_price", prod.getHaving_count() * current_price);
+        return response;
+    }
+    public Map<String, Object> toDetailsSocket() {
+        final Map<String, Object> response = new HashMap<>();
         response.put("response_type", 1);
         response.put("isin_code", isin_code);
         //0: 초기값, 1: 상한, 2: 상승, 3: 보합, 4: 하한, 5: 하락
-        response.put("short_code", prod.getShort_code());
+        response.put("compare_type", final_ask_bid_type_code);
         //4. 현재가
         response.put("current_price", current_price);
         //5. 증감
@@ -270,9 +282,7 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         //6. 증감률
         response.put("compare_price_percent", getComparePriceRate());
         //7. 거래량(현재)
-        response.put("trading_count", prod.getTodayTradingCount());
-        //8. 거래량(전일)
-        response.put("yes_trading_count", prod.getYesTradingCount());
+        response.put("trading_count", accumulated_trading_volume);
         //9. 매도 호가 수량
         response.put("ask_level_1_volume", ask_level_1_volume);
         response.put("ask_level_2_volume", ask_level_2_volume);
@@ -313,16 +323,11 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         response.put("limit_high_price", upper_limit_price);
         response.put("limit_low_price", lower_limit_price);
         //14. 시가총액
-        response.put("market_total_price", prod.getHaving_count() * current_price);
         response.put("today_trading_total_price", accumulated_trading_value);
         //15. 시가, 고가, 저가
         response.put("opening_price", opening_price);
         response.put("today_high_price", todays_high);
         response.put("today_low_price", todays_low);
-        //16. 액면가, 전일가
-        response.put("face_value", prod.getFace_value());
-        response.put("yesterday_price", getYesterdayPrice());
-        //17. 체결강도 18. 체결가격 = 증권 체결 테이블
         //19. 거래량
         response.put("total_trading_count", accumulated_trading_volume);
 

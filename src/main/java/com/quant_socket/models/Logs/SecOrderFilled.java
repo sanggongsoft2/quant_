@@ -118,7 +118,11 @@ public class SecOrderFilled {
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
         response.put("response_type", 2);
+        //17. 체결강도
         response.put("trading_rate", getTradingRate(prod));
+        //18. 체결가격
+        response.put("trading_price", trading_price);
+        //19. 거래량
         response.put("trading_list", prod.getTradingList());
         return response;
     }

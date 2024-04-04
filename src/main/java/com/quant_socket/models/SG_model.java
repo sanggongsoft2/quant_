@@ -56,9 +56,11 @@ public abstract class SG_model<T> {
                             f.set(this, res.getBoolean(sc.dbField()));
                         else if (type.equals(Timestamp.class)) f.set(this, res.getTimestamp(sc.dbField()));
                         else if (type.equals(Date.class)) f.set(this, res.getDate(sc.dbField()));
+                        else if (type.equals(Double.class) || type.equals(double.class)) f.set(this, res.getDouble(sc.dbField()));
+                        else if (type.equals(Float.class) || type.equals(float.class)) f.set(this, res.getFloat(sc.dbField()));
                         else f.set(this, res.getObject(sc.dbField()));
                     }
-                } catch (IllegalAccessException | SQLException e) {
+                } catch (IllegalAccessException | SQLException ignored) {
 
                 }
             }
