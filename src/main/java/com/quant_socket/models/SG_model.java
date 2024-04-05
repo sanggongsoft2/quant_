@@ -3,18 +3,18 @@ package com.quant_socket.models;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quant_socket.annotations.SG_column;
+import com.quant_socket.annotations.SG_crdt;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class SG_model<T> {
@@ -104,7 +104,7 @@ public abstract class SG_model<T> {
         }
     }
 
-    public Map<String, Object> toMap() throws IllegalAccessException {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         for (Field field : getClass().getDeclaredFields()) {
             field.setAccessible(true);

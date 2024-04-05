@@ -1,6 +1,6 @@
-package com.quant_socket.handlers;
+package com.quant_socket.handlers.socket.sec_order_filled;
 
-import com.quant_socket.services.EquitiesSnapshotService;
+import com.quant_socket.services.SecuritiesOrderFilledService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,15 +12,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EquitiesSnapshotHandler extends TextWebSocketHandler {
+public class SecOrderFilledHandler extends TextWebSocketHandler {
 
-    private final EquitiesSnapshotService service;
-
-    @Override
-    public void handleMessage(WebSocketSession ws, WebSocketMessage<?> message) throws Exception {
-        final String payload = (String) message.getPayload();
-        log.debug("Received Message: {}", payload);
-    }
+    private final SecuritiesOrderFilledService service;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {

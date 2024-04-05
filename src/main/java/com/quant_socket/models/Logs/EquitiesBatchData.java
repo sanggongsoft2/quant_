@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +28,15 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_info_category")
     private String info_category;
     @SG_column(dbField = "ebd_msg_seq_number")
-    private int msg_seq_number;
+    private int msg_seq_number = 0;
     @SG_column(dbField = "ebd_total_number_contract")
-    private int total_number_contract;
+    private int total_number_contract = 0;
     @SG_column(dbField = "ebd_business_date")
     private String business_date;
     @SG_column(dbField = "ebd_isin_code")
     private String isin_code;
     @SG_column(dbField = "ebd_a_designated_number_for_an_issue")
-    private int a_designated_number_for_an_issue;
+    private int a_designated_number_for_an_issue = 0;
     @SG_column(dbField = "ebd_abbr_issue_code")
     private String abbr_issue_code;
     @SG_column(dbField = "ebd_abbr_issue_name")
@@ -85,29 +86,29 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_investment_institution_type_code")
     private String investment_institution_type_code;
     @SG_column(dbField = "ebd_base_price")
-    private double base_price;
+    private double base_price = 0;
     @SG_column(dbField = "ebd_yes_closing_price_type_code")
     private String yes_closing_price_type_code;
     @SG_column(dbField = "ebd_yes_closing_price")
-    private double yes_closing_price;
+    private double yes_closing_price = 0;
     @SG_column(dbField = "ebd_yes_accu_trading_amount")
-    private long yes_accu_trading_amount;
+    private long yes_accu_trading_amount = 0;
     @SG_column(dbField = "ebd_yes_accu_trading_value")
-    private float yes_accu_trading_value;
+    private float yes_accu_trading_value = 0;
     @SG_column(dbField = "ebd_upper_limit_price")
-    private double upper_limit_price;
+    private double upper_limit_price = 0;
     @SG_column(dbField = "ebd_lower_limit_price")
-    private double lower_limit_price;
+    private double lower_limit_price = 0;
     @SG_column(dbField = "ebd_sub_price_of_sec")
-    private double sub_price_of_sec;
+    private double sub_price_of_sec = 0;
     @SG_column(dbField = "ebd_par_value")
-    private double par_value;
+    private double par_value = 0;
     @SG_column(dbField = "ebd_issuing_price")
-    private double issuing_price;
+    private double issuing_price = 0;
     @SG_column(dbField = "ebd_listing_date")
     private String listing_date;
     @SG_column(dbField = "ebd_number_of_listed_shares")
-    private long number_of_listed_shares;
+    private long number_of_listed_shares = 0;
     @SG_column(dbField = "ebd_liquidation_trade")
     private String liquidation_trade;
     @SG_column(dbField = "ebd_the_establishment_date")
@@ -119,21 +120,21 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_expiration_date_for_right")
     private String expiration_date_for_right;
     @SG_column(dbField = "ebd_exercise_price_of_elw_or_bw")
-    private double exercise_price_of_elw_or_bw;
+    private double exercise_price_of_elw_or_bw = 0;
     @SG_column(dbField = "ebd_capital")
-    private float capital;
+    private float capital = 0;
     @SG_column(dbField = "ebd_credit_order_possibillity")
     private String credit_order_possibillity;
     @SG_column(dbField = "ebd_limit_order_permission_type_code")
-    private int limit_order_permission_type_code;
+    private int limit_order_permission_type_code = 0;
     @SG_column(dbField = "ebd_market_price_order_permission_type_code")
-    private int market_price_order_permission_type_code;
+    private int market_price_order_permission_type_code = 0;
     @SG_column(dbField = "ebd_conditioned_order_permission_type_code")
-    private int conditioned_order_permission_type_code;
+    private int conditioned_order_permission_type_code = 0;
     @SG_column(dbField = "ebd_best_favorable_order_permission_type_code")
-    private int best_favorable_order_permission_type_code;
+    private int best_favorable_order_permission_type_code = 0;
     @SG_column(dbField = "ebd_first_best_order_permission_type")
-    private int first_best_order_permission_type;
+    private int first_best_order_permission_type = 0;
     @SG_column(dbField = "ebd_capital_increase_type_code")
     private String capital_increase_type_code;
     @SG_column(dbField = "ebd_other_stock_type_code")
@@ -141,15 +142,15 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_national_stock")
     private String national_stock;
     @SG_column(dbField = "ebd_appr_price")
-    private double appr_price;
+    private double appr_price = 0;
     @SG_column(dbField = "ebd_loweest_order_price")
-    private double loweest_order_price;
+    private double loweest_order_price = 0;
     @SG_column(dbField = "ebd_highest_order_price")
-    private double highest_order_price;
+    private double highest_order_price = 0;
     @SG_column(dbField = "ebd_unit_of_valume_in_main_board")
-    private long unit_of_valume_in_main_board;
+    private long unit_of_valume_in_main_board = 0;
     @SG_column(dbField = "ebd_lot_size")
-    private long lot_size;
+    private long lot_size = 0;
     @SG_column(dbField = "ebd_reits_type_code")
     private String reits_type_code;
     @SG_column(dbField = "ebd_target_stock_isin_code")
@@ -173,7 +174,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_short_selling")
     private String short_selling;
     @SG_column(dbField = "ebd_etf_tracking_difference")
-    private double etf_tracking_difference;
+    private double etf_tracking_difference = 0;
     @SG_column(dbField = "ebd_regs")
     private String regs;
     @SG_column(dbField = "ebd_spac")
@@ -181,7 +182,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_tax_type_code")
     private String tax_type_code;
     @SG_column(dbField = "ebd_appr_ratio_of_sub_price")
-    private double appr_ratio_of_sub_price;
+    private double appr_ratio_of_sub_price = 0;
     @SG_column(dbField = "ebd_investment_caution_issue")
     private String investment_caution_issue;
     @SG_column(dbField = "ebd_delisting_date")
@@ -223,7 +224,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_abnormal_rise")
     private String abnormal_rise;
     @SG_column(dbField = "ebd_upper_limit_quantity")
-    private float upper_limit_quantity;
+    private float upper_limit_quantity = 0;
     @SG_column(dbField = "ebd_investment_pre_issue")
     private String investment_pre_issue;
     @SG_column(dbField = "ebd_prefer_sttocks_with_lesser_shares")
@@ -241,11 +242,11 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     public EquitiesBatchData(String msg) {
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
-        if(!msg.substring(5, 13).isBlank()) msg_seq_number = Integer.valueOf(msg.substring(5, 13));
-        if(!msg.substring(13, 19).isBlank()) total_number_contract = Integer.valueOf(msg.substring(13, 19));
+        if(!msg.substring(5, 13).isBlank()) msg_seq_number = Integer.parseInt(msg.substring(5, 13));
+        if(!msg.substring(13, 19).isBlank()) total_number_contract = Integer.parseInt(msg.substring(13, 19));
         business_date = msg.substring(19, 27);
         isin_code = msg.substring(27, 39);
-        if(!msg.substring(39, 45).isBlank()) a_designated_number_for_an_issue = Integer.valueOf(msg.substring(39, 45));
+        if(!msg.substring(39, 45).isBlank()) a_designated_number_for_an_issue = Integer.parseInt(msg.substring(39, 45));
         abbr_issue_code = msg.substring(45, 54);
         abbr_issue_name = msg.substring(54, 94).trim();
         abbr_issue_name_en = msg.substring(94, 134).trim();
@@ -290,11 +291,11 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
         if(!msg.substring(344, 357).isBlank()) exercise_price_of_elw_or_bw = Double.parseDouble(msg.substring(344, 357));
         if(!msg.substring(357, 379).isBlank()) capital = Float.parseFloat(msg.substring(357, 379));
         credit_order_possibillity = msg.substring(379, 380);
-        if(!msg.substring(380, 385).isBlank()) limit_order_permission_type_code = Integer.valueOf(msg.substring(380, 385));
-        if(!msg.substring(385, 390).isBlank()) market_price_order_permission_type_code = Integer.valueOf(msg.substring(385, 390));
-        if(!msg.substring(390, 395).isBlank()) conditioned_order_permission_type_code = Integer.valueOf(msg.substring(390, 395));
-        if(!msg.substring(395, 400).isBlank()) best_favorable_order_permission_type_code = Integer.valueOf(msg.substring(395, 400));
-        if(!msg.substring(400, 405).isBlank()) first_best_order_permission_type = Integer.valueOf(msg.substring(400, 405));
+        if(!msg.substring(380, 385).isBlank()) limit_order_permission_type_code = Integer.parseInt(msg.substring(380, 385));
+        if(!msg.substring(385, 390).isBlank()) market_price_order_permission_type_code = Integer.parseInt(msg.substring(385, 390));
+        if(!msg.substring(390, 395).isBlank()) conditioned_order_permission_type_code = Integer.parseInt(msg.substring(390, 395));
+        if(!msg.substring(395, 400).isBlank()) best_favorable_order_permission_type_code = Integer.parseInt(msg.substring(395, 400));
+        if(!msg.substring(400, 405).isBlank()) first_best_order_permission_type = Integer.parseInt(msg.substring(400, 405));
         capital_increase_type_code = msg.substring(405, 407);
         other_stock_type_code = msg.substring(407, 408);
         national_stock = msg.substring(408, 409);
@@ -365,13 +366,31 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
         response.put("response_type", 3);
         response.put("face_value", par_value);
         //상장 주식 수
-        response.put("having_count", number_of_listed_shares);
+        response.put("having_count", prod.getHaving_count());
         //8. 거래량(전일)
         response.put("yes_trading_count", prod.getYesterday_trading_count());
         //16. 액면가, 전일가
-        response.put("face_value", par_value);
         response.put("yesterday_price", yes_closing_price);
-
         return response;
+    }
+
+    public void setPreparedStatement(PreparedStatement ps) {
+        int index = 1;
+        for (Field field : getClass().getDeclaredFields()) {
+            final Class<?> type = field.getType();
+            field.setAccessible(true);
+            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
+                try {
+                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
+                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
+                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
+                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
+                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
+                } catch (Exception ignore) {
+                } finally {
+                    index++;
+                }
+            }
+        }
     }
 }

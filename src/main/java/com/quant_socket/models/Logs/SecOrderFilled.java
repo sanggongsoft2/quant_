@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class SecOrderFilled {
     @SG_column(dbField = "sof_info_category")
     private String info_category;
     @SG_column(dbField = "sof_message_seq_number")
-    private int message_seq_number;
+    private int message_seq_number = 0;
     @SG_column(dbField = "sof_board_id")
     private String board_id;
     @SG_column(dbField = "sof_session_id")
@@ -34,35 +35,35 @@ public class SecOrderFilled {
     @SG_column(dbField = "sof_isin_code")
     private String isin_code;
     @SG_column(dbField = "sof_a_des_number_for_an_issue")
-    private int a_des_number_for_an_issue;
+    private int a_des_number_for_an_issue = 0;
     @SG_column(dbField = "sof_processing_time_of_trading_system")
     private String processing_time_of_trading_system;
     @SG_column(dbField = "sof_price_change_against_previous_day")
     private String price_change_against_previous_day;
     @SG_column(dbField = "sof_price_change_against_the_pre_day")
-    private double price_change_against_the_pre_day;
+    private double price_change_against_the_pre_day = 0;
     @SG_column(dbField = "sof_trading_price")
-    private double trading_price;
+    private double trading_price = 0;
     @SG_column(dbField = "sof_trading_volume")
-    private long trading_volume;
+    private long trading_volume = 0;
     @SG_column(dbField = "sof_opening_price")
-    private double opening_price;
+    private double opening_price = 0;
     @SG_column(dbField = "sof_todays_high")
-    private double todays_high;
+    private double todays_high = 0;
     @SG_column(dbField = "sof_todays_low")
-    private double todays_low;
+    private double todays_low = 0;
     @SG_column(dbField = "sof_accu_trading_volume")
-    private double accu_trading_volume;
+    private double accu_trading_volume = 0;
     @SG_column(dbField = "sof_accu_trading_value")
-    private float accu_trading_value;
+    private float accu_trading_value = 0;
     @SG_column(dbField = "sof_final_askbid_type_code")
     private String final_askbid_type_code;
     @SG_column(dbField = "sof_lp_holding_quantity")
-    private long lp_holding_quantity;
+    private long lp_holding_quantity = 0;
     @SG_column(dbField = "sof_the_best_ask")
-    private double the_best_ask;
+    private double the_best_ask = 0;
     @SG_column(dbField = "sof_the_best_bid")
-    private double the_best_bid;
+    private double the_best_bid = 0;
     @SG_column(dbField = "sof_end_keyword")
     private String end_keyword;
     @SG_crdt
@@ -124,5 +125,25 @@ public class SecOrderFilled {
         //19. 거래량
         response.put("trading_list", prod.getTradingList());
         return response;
+    }
+
+    public void setPreparedStatement(PreparedStatement ps) {
+        int index = 1;
+        for (Field field : getClass().getDeclaredFields()) {
+            final Class<?> type = field.getType();
+            field.setAccessible(true);
+            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
+                try {
+                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
+                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
+                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
+                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
+                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
+                } catch (Exception ignore) {
+                } finally {
+                    index++;
+                }
+            }
+        }
     }
 }

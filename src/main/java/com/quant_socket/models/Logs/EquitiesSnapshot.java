@@ -7,14 +7,17 @@ import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
 @SG_table(name = "equities_snapshot")
 @Getter
+@Slf4j
 public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
     @SG_idx
@@ -31,117 +34,117 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
     @SG_column(dbField = "es_isin_code")
     private String isin_code;
     @SG_column(dbField = "es_a_designated_number_for_an_issue")
-    private int a_designated_number_for_an_issue;
+    private int a_designated_number_for_an_issue = 0;
     @SG_column(dbField = "es_price_change_against_previous_day")
     private String price_change_against_previous_day;
     @SG_column(dbField = "es_price_change_against_the_previous_day")
-    private double price_change_against_the_previous_day;
+    private double price_change_against_the_previous_day = 0;
     @SG_column(dbField = "es_upper_limit_price")
-    private double upper_limit_price;
+    private double upper_limit_price = 0;
     @SG_column(dbField = "es_lower_limit_price")
-    private double lower_limit_price;
+    private double lower_limit_price = 0;
     @SG_column(dbField = "es_current_price")
-    private double current_price;
+    private double current_price = 0;
     @SG_column(dbField = "es_opening_price")
-    private double opening_price;
+    private double opening_price = 0;
     @SG_column(dbField = "es_todays_high")
-    private double todays_high;
+    private double todays_high = 0;
     @SG_column(dbField = "es_todays_low")
-    private double todays_low;
+    private double todays_low = 0;
     @SG_column(dbField = "es_accumulated_trading_volume")
-    private long accumulated_trading_volume;
+    private long accumulated_trading_volume = 0;
     @SG_column(dbField = "es_accumulated_trading_value")
-    private float accumulated_trading_value;
+    private float accumulated_trading_value = 0;
     @SG_column(dbField = "es_final_ask_bid_type_code")
     private String final_ask_bid_type_code;
     @SG_column(dbField = "es_ask_level_1_price")
-    private double ask_level_1_price;
+    private double ask_level_1_price = 0;
     @SG_column(dbField = "es_bid_level_1_price")
-    private double bid_level_1_price;
+    private double bid_level_1_price = 0;
     @SG_column(dbField = "es_ask_level_1_volume")
-    private long ask_level_1_volume;
+    private long ask_level_1_volume = 0;
     @SG_column(dbField = "es_bid_level_1_volume")
-    private long bid_level_1_volume;
+    private long bid_level_1_volume = 0;
     @SG_column(dbField = "es_ask_level_2_price")
-    private double ask_level_2_price;
+    private double ask_level_2_price = 0;
     @SG_column(dbField = "es_bid_level_2_price")
-    private double bid_level_2_price;
+    private double bid_level_2_price = 0;
     @SG_column(dbField = "es_ask_level_2_volume")
-    private long ask_level_2_volume;
+    private long ask_level_2_volume = 0;
     @SG_column(dbField = "es_bid_level_2_volume")
-    private long bid_level_2_volume;
+    private long bid_level_2_volume = 0;
     @SG_column(dbField = "es_ask_level_3_price")
-    private double ask_level_3_price;
+    private double ask_level_3_price = 0;
     @SG_column(dbField = "es_bid_level_3_price")
-    private double bid_level_3_price;
+    private double bid_level_3_price = 0;
     @SG_column(dbField = "es_ask_level_3_volume")
-    private long ask_level_3_volume;
+    private long ask_level_3_volume = 0;
     @SG_column(dbField = "es_bid_level_3_volume")
-    private long bid_level_3_volume;
+    private long bid_level_3_volume = 0;
     @SG_column(dbField = "es_ask_level_4_price")
-    private double ask_level_4_price;
+    private double ask_level_4_price = 0;
     @SG_column(dbField = "es_bid_level_4_price")
-    private double bid_level_4_price;
+    private double bid_level_4_price = 0;
     @SG_column(dbField = "es_ask_level_4_volume")
-    private long ask_level_4_volume;
+    private long ask_level_4_volume = 0;
     @SG_column(dbField = "es_bid_level_4_volume")
-    private long bid_level_4_volume;
+    private long bid_level_4_volume = 0;
     @SG_column(dbField = "es_ask_level_5_price")
-    private double ask_level_5_price;
+    private double ask_level_5_price = 0;
     @SG_column(dbField = "es_bid_level_5_price")
-    private double bid_level_5_price;
+    private double bid_level_5_price = 0;
     @SG_column(dbField = "es_ask_level_5_volume")
-    private long ask_level_5_volume;
+    private long ask_level_5_volume = 0;
     @SG_column(dbField = "es_bid_level_5_volume")
-    private long bid_level_5_volume;
+    private long bid_level_5_volume = 0;
     @SG_column(dbField = "es_ask_level_6_price")
-    private double ask_level_6_price;
+    private double ask_level_6_price = 0;
     @SG_column(dbField = "es_bid_level_6_price")
-    private double bid_level_6_price;
+    private double bid_level_6_price = 0;
     @SG_column(dbField = "es_ask_level_6_volume")
-    private long ask_level_6_volume;
+    private long ask_level_6_volume = 0;
     @SG_column(dbField = "es_bid_level_6_volume")
-    private long bid_level_6_volume;
+    private long bid_level_6_volume = 0;
     @SG_column(dbField = "es_ask_level_7_price")
-    private double ask_level_7_price;
+    private double ask_level_7_price = 0;
     @SG_column(dbField = "es_bid_level_7_price")
-    private double bid_level_7_price;
+    private double bid_level_7_price = 0;
     @SG_column(dbField = "es_ask_level_7_volume")
-    private long ask_level_7_volume;
+    private long ask_level_7_volume = 0;
     @SG_column(dbField = "es_bid_level_7_volume")
-    private long bid_level_7_volume;
+    private long bid_level_7_volume = 0;
     @SG_column(dbField = "es_ask_level_8_price")
-    private double ask_level_8_price;
+    private double ask_level_8_price = 0;
     @SG_column(dbField = "es_bid_level_8_price")
-    private double bid_level_8_price;
+    private double bid_level_8_price = 0;
     @SG_column(dbField = "es_ask_level_8_volume")
-    private long ask_level_8_volume;
+    private long ask_level_8_volume = 0;
     @SG_column(dbField = "es_bid_level_8_volume")
-    private long bid_level_8_volume;
+    private long bid_level_8_volume = 0;
     @SG_column(dbField = "es_ask_level_9_price")
-    private double ask_level_9_price;
+    private double ask_level_9_price  = 0;
     @SG_column(dbField = "es_bid_level_9_price")
-    private double bid_level_9_price;
+    private double bid_level_9_price  = 0;
     @SG_column(dbField = "es_ask_level_9_volume")
-    private long ask_level_9_volume;
+    private long ask_level_9_volume = 0;
     @SG_column(dbField = "es_bid_level_9_volume")
-    private long bid_level_9_volume;
+    private long bid_level_9_volume = 0;
     @SG_column(dbField = "es_ask_level_10_price")
-    private double ask_level_10_price;
+    private double ask_level_10_price  = 0;
     @SG_column(dbField = "es_bid_level_10_price")
-    private double bid_level_10_price;
+    private double bid_level_10_price  = 0;
     @SG_column(dbField = "es_ask_level_10_volume")
-    private long ask_level_10_volume;
+    private long ask_level_10_volume = 0;
     @SG_column(dbField = "es_bid_level_10_volume")
-    private long bid_level_10_volume;
+    private long bid_level_10_volume = 0;
     @SG_column(dbField = "es_total_ask_volume")
-    private long total_ask_volume;
+    private long total_ask_volume = 0;
     @SG_column(dbField = "es_total_bid_volume")
-    private long total_bid_volume;
+    private long total_bid_volume = 0;
     @SG_column(dbField = "es_estimated_trading_price")
-    private double estimated_trading_price;
+    private double estimated_trading_price = 0;
     @SG_column(dbField = "es_estimated_trading_volume")
-    private long estimated_trading_volume;
+    private long estimated_trading_volume = 0;
     @SG_column(dbField = "es_closing_price_type_code")
     private String closing_price_type_code;
     @SG_column(dbField = "es_trading_halt")
@@ -233,16 +236,19 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         return data;
     }
 
-    public Double getYesterdayPrice() {
+    public double getYesterdayPrice() {
         return current_price + getPrice_change_against_the_previous_day();
     }
-
-    public Double getComparePriceRate() {
+    public double getComparePriceRate() {
         double value = 0;
         if(current_price != 0 && getYesterdayPrice() != 0) value = (current_price - getYesterdayPrice()) / getYesterdayPrice() * 100;
         return value;
     }
-
+    private double getComparePriceRate(double price) {
+        double value = 0;
+        if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
+        return value;
+    }
     public double getCompareYesterdayPrice() {
         double result;
         switch (price_change_against_previous_day) {
@@ -255,12 +261,12 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         }
         return result;
     }
-
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
         response.put("name_kr", prod.getName_kr());
         response.put("name_kr_abbr", prod.getName_kr_abbr());
         response.put("name_en", prod.getName_en());
+        response.put("isin_code", isin_code);
         response.put("current_price", current_price);
         response.put("today_trading_count", accumulated_trading_volume);
         response.put("compare_yesterday_price", getCompareYesterdayPrice());
@@ -268,20 +274,10 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
         response.put("market_total_price", prod.getHaving_count() * current_price);
         return response;
     }
-    public Map<String, Object> toDetailsSocket() {
-        final Map<String, Object> response = new HashMap<>();
-        response.put("response_type", 1);
-        response.put("isin_code", isin_code);
+    public Map<String, Object> toDetailsSocket(Product prod) {
+        final Map<String, Object> response = new HashMap<>(toSocket(prod));
         //0: 초기값, 1: 상한, 2: 상승, 3: 보합, 4: 하한, 5: 하락
         response.put("compare_type", final_ask_bid_type_code);
-        //4. 현재가
-        response.put("current_price", current_price);
-        //5. 증감
-        response.put("compare_price", getCompareYesterdayPrice());
-        //6. 증감률
-        response.put("compare_price_percent", getComparePriceRate());
-        //7. 거래량(현재)
-        response.put("trading_count", accumulated_trading_volume);
         //9. 매도 호가 수량
         response.put("ask_level_1_volume", ask_level_1_volume);
         response.put("ask_level_2_volume", ask_level_2_volume);
@@ -373,10 +369,23 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
         return response;
     }
-
-    private double getComparePriceRate(double price) {
-        double value = 0;
-        if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
-        return value;
+    public void setPreparedStatement(PreparedStatement ps) {
+        int index = 1;
+        for (Field field : getClass().getDeclaredFields()) {
+            final Class<?> type = field.getType();
+            field.setAccessible(true);
+            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
+                try {
+                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
+                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
+                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
+                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
+                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
+                } catch (Exception ignore) {
+                } finally {
+                    index++;
+                }
+            }
+        }
     }
 }

@@ -1,15 +1,19 @@
 package com.quant_socket.models.Logs;
 
 import com.quant_socket.annotations.SG_column;
+import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.SG_model;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Map;
 
 @SG_table(name = "equity_index_indicator")
+@Getter
 public class EquityIndexIndicator extends SG_model<EquityIndexIndicator> {
 
     @SG_idx
@@ -20,31 +24,31 @@ public class EquityIndexIndicator extends SG_model<EquityIndexIndicator> {
     @SG_column(dbField = "eii_info_category")
     private String info_category;
     @SG_column(dbField = "eii_message_seq_number")
-    private int message_seq_number;
+    private int message_seq_number = 0;
     @SG_column(dbField = "eii_isin_code")
     private String isin_code;
     @SG_column(dbField = "eii_a_designated_number_for_an_issue")
-    private int a_designated_number_for_an_issue;
+    private int a_designated_number_for_an_issue = 0;
     @SG_column(dbField = "eii_sec_group_id")
     private String sec_group_id;
     @SG_column(dbField = "eii_eps_calculation")
     private String eps_calculation;
     @SG_column(dbField = "eii_eps")
-    private float eps;
+    private float eps = 0;
     @SG_column(dbField = "eii_loss_category")
     private String loss_category;
     @SG_column(dbField = "eii_per")
-    private double per;
+    private double per = 0;
     @SG_column(dbField = "eii_bps_calculation")
     private String bps_calculation;
     @SG_column(dbField = "eii_bps")
-    private float bps;
+    private float bps = 0;
     @SG_column(dbField = "eii_pbr")
-    private double pbr;
+    private double pbr = 0;
     @SG_column(dbField = "eii_dps_calculation")
     private String dps_calculation;
     @SG_column(dbField = "eii_dps")
-    private float dps;
+    private float dps = 0;
     @SG_column(dbField = "eii_dividend_yield")
     private double dividend_yield;
     @SG_column(dbField = "eii_market_capitalization")
@@ -140,5 +144,25 @@ public class EquityIndexIndicator extends SG_model<EquityIndexIndicator> {
             }
         }
         return data;
+    }
+
+    public void setPreparedStatement(PreparedStatement ps) {
+        int index = 1;
+        for (Field field : getClass().getDeclaredFields()) {
+            final Class<?> type = field.getType();
+            field.setAccessible(true);
+            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
+                try {
+                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
+                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
+                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
+                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
+                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
+                } catch (Exception ignore) {
+                } finally {
+                    index++;
+                }
+            }
+        }
     }
 }

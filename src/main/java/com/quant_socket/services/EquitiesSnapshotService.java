@@ -1,143 +1,134 @@
 package com.quant_socket.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quant_socket.models.Logs.EquitiesBatchData;
+import com.quant_socket.models.Logs.EquitiesSnapshot;
 import com.quant_socket.models.Product;
-import com.quant_socket.repos.EquitiesBatchDataRepo;
-import com.quant_socket.repos.ProductRepo;
+import com.quant_socket.models.response.Response;
+import com.quant_socket.repos.EquitiesSnapshotRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.net.URI;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class EquitiesSnapshotService {
+public class EquitiesSnapshotService extends SocketService{
+    private final List<EquitiesSnapshot> logs = new CopyOnWriteArrayList<>();
+    @Autowired
+    private EquitiesSnapshotRepo repo;
+    @Autowired
+    private ProductService productService;
 
-    private final ProductRepo productRepo;
+    private String insertSql() {
+        final String[] cols = new String[] {
+                "es_data_category",
+                "es_info_category",
+                "es_board_id",
+                "es_session_id",
+                "es_isin_code",
+                "es_a_designated_number_for_an_issue",
+                "es_price_change_against_previous_day",
+                "es_price_change_against_the_previous_day",
+                "es_upper_limit_price",
+                "es_lower_limit_price",
+                "es_current_price",
+                "es_opening_price",
+                "es_todays_high",
+                "es_todays_low",
+                "es_accumulated_trading_volume",
+                "es_accumulated_trading_value",
+                "es_final_ask_bid_type_code",
+                "es_ask_level_1_price",
+                "es_bid_level_1_price",
+                "es_ask_level_1_volume",
+                "es_bid_level_1_volume",
+                "es_ask_level_2_price",
+                "es_bid_level_2_price",
+                "es_ask_level_2_volume",
+                "es_bid_level_2_volume",
+                "es_ask_level_3_price",
+                "es_bid_level_3_price",
+                "es_ask_level_3_volume",
+                "es_bid_level_3_volume",
+                "es_ask_level_4_price",
+                "es_bid_level_4_price",
+                "es_ask_level_4_volume",
+                "es_bid_level_4_volume",
+                "es_ask_level_5_price",
+                "es_bid_level_5_price",
+                "es_ask_level_5_volume",
+                "es_bid_level_5_volume",
+                "es_ask_level_6_price",
+                "es_bid_level_6_price",
+                "es_ask_level_6_volume",
+                "es_bid_level_6_volume",
+                "es_ask_level_7_price",
+                "es_bid_level_7_price",
+                "es_ask_level_7_volume",
+                "es_bid_level_7_volume",
+                "es_ask_level_8_price",
+                "es_bid_level_8_price",
+                "es_ask_level_8_volume",
+                "es_bid_level_8_volume",
+                "es_ask_level_9_price",
+                "es_bid_level_9_price",
+                "es_ask_level_9_volume",
+                "es_bid_level_9_volume",
+                "es_ask_level_10_price",
+                "es_bid_level_10_price",
+                "es_ask_level_10_volume",
+                "es_bid_level_10_volume",
+                "es_total_ask_volume",
+                "es_total_bid_volume",
+                "es_estimated_trading_price",
+                "es_estimated_trading_volume",
+                "es_closing_price_type_code",
+                "es_trading_halt",
+                "es_end_keyword",
+        };
 
-    private final ObjectMapper mapper;
-    private final List<Product> products = new CopyOnWriteArrayList<>();
-    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
-    private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
-
-    public boolean addProducts(List<Product> products) {
-        return this.products.addAll(products);
+        return "INSERT INTO equities_snapshot(" +
+                String.join(",", cols) + ")" +
+                "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
-    public void addSession(WebSocketSession ws) {
-        sessions.add(ws);
-    }
-    public void addSession(WebSocketSession ws, String isinCode) {
-        isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
-        isinSessions.get(isinCode).add(ws);
+    public void addLog(EquitiesSnapshot data) {
+        logs.add(data);
+
+        final Product prod = productService.productFromIsinCode(data.getIsin_code());
+        if(prod != null) {
+            productService.update(data);
+            sendMessage(data.toSocket(prod));
+            sendMessage(data.toDetailsSocket(prod), data.getIsin_code());
+        }
     }
 
-    public void removeSession(WebSocketSession ws) {
-        sessions.remove(ws);
-    }
-    public void removeSession(WebSocketSession ws, String isinCode) {
-        if(isinSessions.get(isinCode) != null) isinSessions.get(isinCode).remove(ws);
-        if(isinSessions.get(isinCode).isEmpty()) isinSessions.remove(isinCode);
-    }
-
-    public <T> void sendMessage(T message){
-        sendMessage(message, this.sessions);
-    }
-    public <T> void sendMessage(T message, Set<WebSocketSession> sessions){
-        sessions.removeIf(ws -> {
-            if(ws.isOpen()) {
-                try {
-                    ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+    @Scheduled(fixedRate = 60000)
+    public void insertLogs() {
+        if(!logs.isEmpty()) {
+            final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) {
+                    final EquitiesSnapshot data = logs.get(i);
+                    data.setPreparedStatement(ps);
                 }
-                return false;
-            } else {
-                return true;
-            }
-        });
-    }
-    public <T> void sendMessage(T message, String isinCode){
-        final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
-        if(sessions != null) sendMessage(message, sessions);
-    }
 
-    public Map<String, String> extractQueryParams(String queryString) {
-        Map<String, String> queryPairs = new HashMap<>();
-        String[] pairs = queryString.split("&");
-
-        for (String pair : pairs) {
-            int idx = pair.indexOf("=");
-            String key = pair.substring(0, idx);
-            String value = pair.substring(idx + 1);
-
-            queryPairs.put(key, value);
-        }
-        return queryPairs;
-    }
-
-    public String getQueryValue(String queryString, String key) {
-        final Map<String, String> data = extractQueryParams(queryString);
-        return data.get(key);
-    }
-
-    public Product productFromIsinCode(String isinCode) {
-        Product prod = null;
-        for(Product _prod : products) {
-            if(_prod.getCode().equals(isinCode)) {
-                prod = _prod;
-                break;
-            }
-        }
-        return prod;
-    }
-
-    @Scheduled(cron = "0 0 9 * * ?")
-    public void refreshProductItems() {
-        products.forEach(Product::refreshProduct);
-    }
-
-    public void updateProductCount(String isinCode, String type, long count) {
-        for(Product prod : products) {
-            if(prod.getCode().equals(isinCode)) {
-                prod.updateTodayCount(isinCode, type, count);
-                break;
-            }
-        }
-    }
-
-    public void updateProductTradingList(Double tradingPrice, long tradingCount) {
-        for(Product prod : products) {
-            prod.updateTradingList(tradingPrice, tradingCount);
-            break;
-        }
-    }
-
-    public void updateProductFromBatchData(EquitiesBatchData ebd) {
-        for(Product prod : products) {
-            if(prod.getCode().equals(ebd.getIsin_code())) {
-                prod.setFace_value(ebd.getPar_value());
-                prod.setHaving_count(ebd.getNumber_of_listed_shares());
-                prod.setYesterday_price(ebd.getYes_closing_price());
-                prod.setYesterday_trading_count(ebd.getYes_accu_trading_amount());
-                prod.setYesterday_value(ebd.getYes_accu_trading_value());
-                productRepo.update(prod);
-                break;
-            }
+                @Override
+                public int getBatchSize() {
+                    return logs.size();
+                }
+            });
+            if(result > 0) logs.clear();
+            log.info("EQUITIES SNAPSHOT INSERT COUNT : {}", result);
         }
     }
 }

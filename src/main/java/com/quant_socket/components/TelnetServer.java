@@ -2,8 +2,7 @@ package com.quant_socket.components;
 
 import com.quant_socket.handlers.TelnetServerHandler;
 import com.quant_socket.repos.*;
-import com.quant_socket.services.EquitiesSnapshotService;
-import com.quant_socket.services.SocketLogService;
+import com.quant_socket.services.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -26,22 +25,18 @@ import java.util.List;
 public class TelnetServer implements CommandLineRunner {
 
     private final SocketLogRepo repo;
-    private final EquitiesBatchDataRepo equitiesBatchDataRepo;
-    private final EquitiesSnapshotRepo esRepo;
-    private final ProductRepo productRepo;
-    private final EquityIndexIndicatorRepo equityIndexIndicatorRepo;
-    private final SecOrderFilledRepo secOrderFilledRepo;
-
-    private final EquitiesSnapshotService esService;
+    private final EquitiesSnapshotService equitiesSnapshotService;
+    private final EquityIndexIndicatorService equityIndexIndicatorService;
     private final SocketLogService socketLogService;
+    private final SecuritiesOrderFilledService securitiesOrderFilledService;
+    private final InvestActivitiesEODService investActivitiesEODService;
+    private final EquitiesBatchDataService equitiesBatchDataService;
+    private final ProductService productService;
     private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904};
     @Override
     public void run(String... args) throws Exception {
-        if(esService.addProducts(productRepo.findAll())) {
-            setPorts();
-        }
+        if(productService.refreshProducts()) setPorts();
     }
-
 
     private void setPorts() throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -54,7 +49,7 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesBatchDataRepo, esRepo, productRepo, equityIndexIndicatorRepo, secOrderFilledRepo, esService, socketLogService));
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesSnapshotService, equityIndexIndicatorService, socketLogService, securitiesOrderFilledService, investActivitiesEODService, equitiesBatchDataService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

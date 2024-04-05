@@ -3,36 +3,30 @@ package com.quant_socket.handlers;
 import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.*;
-import com.quant_socket.services.EquitiesSnapshotService;
-import com.quant_socket.services.SocketLogService;
+import com.quant_socket.services.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     private final SocketLogRepo repo;
-    private final EquitiesBatchDataRepo equitiesBatchDataRepo;
-    private final EquitiesSnapshotRepo esRepo;
-    private final ProductRepo productRepo;
-    private final EquityIndexIndicatorRepo eiiRepo;
-    private final SecOrderFilledRepo secOrderFilledRepo;
-
-    private final EquitiesSnapshotService service;
+    private final EquitiesSnapshotService equitiesSnapshotService;
+    private final EquityIndexIndicatorService equityIndexIndicatorService;
     private final SocketLogService socketLogService;
+    private final SecuritiesOrderFilledService securitiesOrderFilledService;
+    private final InvestActivitiesEODService investActivitiesEODService;
+    private final EquitiesBatchDataService equitiesBatchDataService;
     private Integer port;
     private String remote_url;
     private String msg;
@@ -51,24 +45,19 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         final ByteBuf in = (ByteBuf) msg;
 
-        int len = in.writerIndex();
-        byte[] msgByte = new byte[len];
-        in.readBytes(msgByte);
         try {
-            String receivedMessage = new String(msgByte,"UTF-8");
-            this.msg = receivedMessage;
+            this.msg = in.toString(StandardCharsets.UTF_8);
 
-            if(!receivedMessage.isBlank()) {
+            if(!this.msg.isBlank()) {
                 final SocketLog sl = new SocketLog();
 
-                sl.setLog(receivedMessage);
+                sl.setLog(this.msg);
                 sl.setPort(this.port);
                 sl.setRemote_url(remote_url);
                 socketLogService.addLog(sl);
-                esHandler(receivedMessage);
+
+                esHandler();
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         } finally {
             in.release();
         }
@@ -81,9 +70,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private void esHandler(String msg) {
+    private void esHandler() {
         if(msg.length() >= 5) {
-            log.info("received message : {}", msg);
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
                 case "A001S":
@@ -101,7 +89,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 case "C101Q":
                 case "C101X":
                 case "C101G":
-
+                    investor_activities_per_an_issue_EOD_handler(msg);
                     break;
                 case "A301S":
                 case "A301Q":
@@ -121,66 +109,50 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    //종목별 투자자별 종가통계
+    private void investor_activities_per_an_issue_EOD_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{96})")) {
+            if (chunk.length() >= 96) {
+                final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
+                investActivitiesEODService.addLog(iae);
+            }
+        }
+    }
+
     //증권 체결
     private void securities_order_filled_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{186})")) {
-            if(chunk.length() == 186) {
-                secOrderFilledRepo.insert(data -> {
-
-                    final SecOrderFilled sof = new SecOrderFilled(chunk);
-                    data.putAll(sof.toMap());
-
-                    final Product prod = service.productFromIsinCode(sof.getIsin_code());
-                    if(prod != null) {
-                        service.updateProductTradingList(sof.getTrading_price(), sof.getTrading_volume());
-                        service.sendMessage(sof.toSocket(prod), sof.getIsin_code());
-                        service.sendMessage(sof.toSocket(prod));
-                    }
-                });
-            }
+        for(String chunk : msg.split("(?<=\\\\G.{186})")) if(chunk.length() >= 186) {
+            final SecOrderFilled sef = new SecOrderFilled(msg);
+            securitiesOrderFilledService.addLog(sef);
         }
     }
 
     //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{650})")) if(chunk.length() == 650) esRepo.insert(data -> {
-            final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
-            data.putAll(es.toMap());
-
-            if(data.get("es_accumulated_trading_value") != null) {
-                service.updateProductCount(es.getIsin_code(), es.getFinal_ask_bid_type_code(), es.getAccumulated_trading_volume());
+        for(String chunk : msg.split("(?<=\\\\G.{650})")) {
+            if(chunk.length() >= 650) {
+                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
+                equitiesSnapshotService.addLog(es);
             }
-
-            final Product prod = service.productFromIsinCode(es.getIsin_code());
-            if(prod != null) service.sendMessage(es.toSocket(prod));
-            service.sendMessage(es.toDetailsSocket(), es.getIsin_code());
-
-            log.debug("DATA : {}", es.toMap());
-        });
+        }
     }
 
     //증권 지수지표
     private void equity_index_indicator_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{185})")) if(chunk.length() == 185) eiiRepo.insert(data -> {
-            final EquityIndexIndicator eii = new EquityIndexIndicator(chunk);
-            data.putAll(eii.toMap());
-        });
+        for(String chunk : msg.split("(?<=\\\\G.{185})")) {
+            if (chunk.length() >= 185) {
+                final EquityIndexIndicator eii = new EquityIndexIndicator(chunk);
+                equityIndexIndicatorService.addLog(eii);
+            }
+        }
     }
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{620})")) {
-            if(chunk.length() == 620) {
+            if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
-                equitiesBatchDataRepo.insert(data -> data.putAll(ebd.toMap()));
-
-                final Product prod = service.productFromIsinCode(ebd.getIsin_code());
-
-                if(prod != null) {
-                    service.updateProductFromBatchData(ebd);
-                    service.sendMessage(ebd.toSocket(prod));
-                    service.sendMessage(ebd.toSocket(prod), ebd.getIsin_code());
-                }
+                equitiesBatchDataService.addLog(ebd);
             }
         }
     }
