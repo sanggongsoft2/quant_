@@ -26,7 +26,7 @@ public class SecOrderFilled {
     @SG_column(dbField = "sof_info_category")
     private String info_category;
     @SG_column(dbField = "sof_message_seq_number")
-    private Integer message_seq_number;
+    private int message_seq_number;
     @SG_column(dbField = "sof_board_id")
     private String board_id;
     @SG_column(dbField = "sof_session_id")
@@ -34,35 +34,35 @@ public class SecOrderFilled {
     @SG_column(dbField = "sof_isin_code")
     private String isin_code;
     @SG_column(dbField = "sof_a_des_number_for_an_issue")
-    private Integer a_des_number_for_an_issue;
+    private int a_des_number_for_an_issue;
     @SG_column(dbField = "sof_processing_time_of_trading_system")
     private String processing_time_of_trading_system;
     @SG_column(dbField = "sof_price_change_against_previous_day")
     private String price_change_against_previous_day;
     @SG_column(dbField = "sof_price_change_against_the_pre_day")
-    private Double price_change_against_the_pre_day;
+    private double price_change_against_the_pre_day;
     @SG_column(dbField = "sof_trading_price")
-    private Double trading_price;
+    private double trading_price;
     @SG_column(dbField = "sof_trading_volume")
-    private Long trading_volume;
+    private long trading_volume;
     @SG_column(dbField = "sof_opening_price")
-    private Double opening_price;
+    private double opening_price;
     @SG_column(dbField = "sof_todays_high")
-    private Double todays_high;
+    private double todays_high;
     @SG_column(dbField = "sof_todays_low")
-    private Double todays_low;
+    private double todays_low;
     @SG_column(dbField = "sof_accu_trading_volume")
-    private Double accu_trading_volume;
+    private double accu_trading_volume;
     @SG_column(dbField = "sof_accu_trading_value")
-    private Float accu_trading_value;
+    private float accu_trading_value;
     @SG_column(dbField = "sof_final_askbid_type_code")
     private String final_askbid_type_code;
     @SG_column(dbField = "sof_lp_holding_quantity")
-    private Long lp_holding_quantity;
+    private long lp_holding_quantity;
     @SG_column(dbField = "sof_the_best_ask")
-    private Double the_best_ask;
+    private double the_best_ask;
     @SG_column(dbField = "sof_the_best_bid")
-    private Double the_best_bid;
+    private double the_best_bid;
     @SG_column(dbField = "sof_end_keyword")
     private String end_keyword;
     @SG_crdt

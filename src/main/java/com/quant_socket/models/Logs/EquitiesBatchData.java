@@ -27,15 +27,15 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_info_category")
     private String info_category;
     @SG_column(dbField = "ebd_msg_seq_number")
-    private Integer msg_seq_number;
+    private int msg_seq_number;
     @SG_column(dbField = "ebd_total_number_contract")
-    private Integer total_number_contract;
+    private int total_number_contract;
     @SG_column(dbField = "ebd_business_date")
     private String business_date;
     @SG_column(dbField = "ebd_isin_code")
     private String isin_code;
     @SG_column(dbField = "ebd_a_designated_number_for_an_issue")
-    private Integer a_designated_number_for_an_issue;
+    private int a_designated_number_for_an_issue;
     @SG_column(dbField = "ebd_abbr_issue_code")
     private String abbr_issue_code;
     @SG_column(dbField = "ebd_abbr_issue_name")
@@ -85,29 +85,29 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_investment_institution_type_code")
     private String investment_institution_type_code;
     @SG_column(dbField = "ebd_base_price")
-    private Double base_price;
+    private double base_price;
     @SG_column(dbField = "ebd_yes_closing_price_type_code")
     private String yes_closing_price_type_code;
     @SG_column(dbField = "ebd_yes_closing_price")
-    private Double yes_closing_price;
+    private double yes_closing_price;
     @SG_column(dbField = "ebd_yes_accu_trading_amount")
-    private Long yes_accu_trading_amount;
+    private long yes_accu_trading_amount;
     @SG_column(dbField = "ebd_yes_accu_trading_value")
-    private Float yes_accu_trading_value;
+    private float yes_accu_trading_value;
     @SG_column(dbField = "ebd_upper_limit_price")
-    private Double upper_limit_price;
+    private double upper_limit_price;
     @SG_column(dbField = "ebd_lower_limit_price")
-    private Double lower_limit_price;
+    private double lower_limit_price;
     @SG_column(dbField = "ebd_sub_price_of_sec")
-    private Double sub_price_of_sec;
+    private double sub_price_of_sec;
     @SG_column(dbField = "ebd_par_value")
-    private Double par_value;
+    private double par_value;
     @SG_column(dbField = "ebd_issuing_price")
-    private Double issuing_price;
+    private double issuing_price;
     @SG_column(dbField = "ebd_listing_date")
     private String listing_date;
     @SG_column(dbField = "ebd_number_of_listed_shares")
-    private Long number_of_listed_shares;
+    private long number_of_listed_shares;
     @SG_column(dbField = "ebd_liquidation_trade")
     private String liquidation_trade;
     @SG_column(dbField = "ebd_the_establishment_date")
@@ -119,21 +119,21 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_expiration_date_for_right")
     private String expiration_date_for_right;
     @SG_column(dbField = "ebd_exercise_price_of_elw_or_bw")
-    private Double exercise_price_of_elw_or_bw;
+    private double exercise_price_of_elw_or_bw;
     @SG_column(dbField = "ebd_capital")
-    private Float capital;
+    private float capital;
     @SG_column(dbField = "ebd_credit_order_possibillity")
     private String credit_order_possibillity;
     @SG_column(dbField = "ebd_limit_order_permission_type_code")
-    private Integer limit_order_permission_type_code;
+    private int limit_order_permission_type_code;
     @SG_column(dbField = "ebd_market_price_order_permission_type_code")
-    private Integer market_price_order_permission_type_code;
+    private int market_price_order_permission_type_code;
     @SG_column(dbField = "ebd_conditioned_order_permission_type_code")
-    private Integer conditioned_order_permission_type_code;
+    private int conditioned_order_permission_type_code;
     @SG_column(dbField = "ebd_best_favorable_order_permission_type_code")
-    private Integer best_favorable_order_permission_type_code;
+    private int best_favorable_order_permission_type_code;
     @SG_column(dbField = "ebd_first_best_order_permission_type")
-    private Integer first_best_order_permission_type;
+    private int first_best_order_permission_type;
     @SG_column(dbField = "ebd_capital_increase_type_code")
     private String capital_increase_type_code;
     @SG_column(dbField = "ebd_other_stock_type_code")
@@ -141,15 +141,15 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_national_stock")
     private String national_stock;
     @SG_column(dbField = "ebd_appr_price")
-    private Double appr_price;
+    private double appr_price;
     @SG_column(dbField = "ebd_loweest_order_price")
-    private Double loweest_order_price;
+    private double loweest_order_price;
     @SG_column(dbField = "ebd_highest_order_price")
-    private Double highest_order_price;
+    private double highest_order_price;
     @SG_column(dbField = "ebd_unit_of_valume_in_main_board")
-    private Long unit_of_valume_in_main_board;
+    private long unit_of_valume_in_main_board;
     @SG_column(dbField = "ebd_lot_size")
-    private Long lot_size;
+    private long lot_size;
     @SG_column(dbField = "ebd_reits_type_code")
     private String reits_type_code;
     @SG_column(dbField = "ebd_target_stock_isin_code")
@@ -173,7 +173,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_short_selling")
     private String short_selling;
     @SG_column(dbField = "ebd_etf_tracking_difference")
-    private Double etf_tracking_difference;
+    private double etf_tracking_difference;
     @SG_column(dbField = "ebd_regs")
     private String regs;
     @SG_column(dbField = "ebd_spac")
@@ -181,7 +181,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_tax_type_code")
     private String tax_type_code;
     @SG_column(dbField = "ebd_appr_ratio_of_sub_price")
-    private Double appr_ratio_of_sub_price;
+    private double appr_ratio_of_sub_price;
     @SG_column(dbField = "ebd_investment_caution_issue")
     private String investment_caution_issue;
     @SG_column(dbField = "ebd_delisting_date")
@@ -223,7 +223,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
     @SG_column(dbField = "ebd_abnormal_rise")
     private String abnormal_rise;
     @SG_column(dbField = "ebd_upper_limit_quantity")
-    private Float upper_limit_quantity;
+    private float upper_limit_quantity;
     @SG_column(dbField = "ebd_investment_pre_issue")
     private String investment_pre_issue;
     @SG_column(dbField = "ebd_prefer_sttocks_with_lesser_shares")

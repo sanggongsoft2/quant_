@@ -20,33 +20,33 @@ public class EquityIndexIndicator extends SG_model<EquityIndexIndicator> {
     @SG_column(dbField = "eii_info_category")
     private String info_category;
     @SG_column(dbField = "eii_message_seq_number")
-    private Integer message_seq_number;
+    private int message_seq_number;
     @SG_column(dbField = "eii_isin_code")
     private String isin_code;
     @SG_column(dbField = "eii_a_designated_number_for_an_issue")
-    private Integer a_designated_number_for_an_issue;
+    private int a_designated_number_for_an_issue;
     @SG_column(dbField = "eii_sec_group_id")
     private String sec_group_id;
     @SG_column(dbField = "eii_eps_calculation")
     private String eps_calculation;
     @SG_column(dbField = "eii_eps")
-    private Float eps;
+    private float eps;
     @SG_column(dbField = "eii_loss_category")
     private String loss_category;
     @SG_column(dbField = "eii_per")
-    private Double per;
+    private double per;
     @SG_column(dbField = "eii_bps_calculation")
     private String bps_calculation;
     @SG_column(dbField = "eii_bps")
-    private Float bps;
+    private float bps;
     @SG_column(dbField = "eii_pbr")
-    private Double pbr;
+    private double pbr;
     @SG_column(dbField = "eii_dps_calculation")
     private String dps_calculation;
     @SG_column(dbField = "eii_dps")
-    private Float dps;
+    private float dps;
     @SG_column(dbField = "eii_dividend_yield")
-    private Double dividend_yield;
+    private double dividend_yield;
     @SG_column(dbField = "eii_market_capitalization")
     private String market_capitalization;
     @SG_column(dbField = "eii_manufacturing")

@@ -65,7 +65,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 sl.setPort(this.port);
                 sl.setRemote_url(remote_url);
                 socketLogService.addLog(sl);
-                esHandler(receivedMessage.replaceAll(" ", "0"));
+                esHandler(receivedMessage);
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
