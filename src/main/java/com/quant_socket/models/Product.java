@@ -103,6 +103,7 @@ public class Product extends SG_model<Product>{
             yesterday_trading_count = data.getYes_accu_trading_amount();
             yesterday_value = data.getYes_accu_trading_value();
             having_count = data.getNumber_of_listed_shares();
+            name_en = data.getAbbr_issue_name_en();
         }
     }
 

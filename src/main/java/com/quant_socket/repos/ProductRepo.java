@@ -14,8 +14,14 @@ public class ProductRepo extends SG_repo<Product>{
     }
 
     public boolean update(Product prod) {
-        final String sql = "UPDATE product SET p_face_value = ?, p_having_count = ?, p_yesterday_price = ?, p_yesterday_trading_count = ?, p_yesterday_value = ?" +
+        final String sql = "UPDATE product SET " +
+                "p_face_value = ?, " +
+                "p_having_count = ?, " +
+                "p_yesterday_price = ?, " +
+                "p_yesterday_trading_count = ?, " +
+                "p_yesterday_value = ?, " +
+                "p_name_en = ?" +
                 " WHERE p_idx = ?";
-        return super.jt.update(sql, prod.getFace_value(), prod.getHaving_count(), prod.getYesterday_price(), prod.getYesterday_trading_count(), prod.getYesterday_value(), prod.getIdx()) > 0;
+        return super.jt.update(sql, prod.getFace_value(), prod.getHaving_count(), prod.getYesterday_price(), prod.getYesterday_trading_count(), prod.getYesterday_value(), prod.getName_en(), prod.getIdx()) > 0;
     }
 }
