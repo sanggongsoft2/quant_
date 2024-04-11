@@ -4,6 +4,7 @@ import com.quant_socket.annotations.*;
 import com.quant_socket.models.SG_model;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 @Data
 @SG_table(name = "socket_log")
 @RequiredArgsConstructor
+@ToString
 public class SocketLog extends SG_model<SocketLog> {
 
     @SG_idx
@@ -32,13 +34,6 @@ public class SocketLog extends SG_model<SocketLog> {
     @SG_crdt
     @SG_column(dbField = "SL_crdt")
     private Timestamp createdAt;
-
-    @SG_column(dbField = "SL_updt")
-    private Timestamp updatedAt;
-
-    @SG_dldt
-    @SG_column(dbField = "SL_dldt")
-    private Timestamp deletedAt;
 
     public SocketLog(ResultSet res) {
         super.resultSetToClass(res);

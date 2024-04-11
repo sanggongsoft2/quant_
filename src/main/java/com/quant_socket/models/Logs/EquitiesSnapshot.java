@@ -7,6 +7,7 @@ import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -18,6 +19,7 @@ import java.util.Map;
 @SG_table(name = "equities_snapshot")
 @Getter
 @Slf4j
+@ToString
 public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
     @SG_idx

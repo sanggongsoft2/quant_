@@ -371,6 +371,7 @@ public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
         response.put("yes_trading_count", prod.getYesterday_trading_count());
         //16. 액면가, 전일가
         response.put("yesterday_price", yes_closing_price);
+        response.put("isin_code", isin_code);
         return response;
     }
 

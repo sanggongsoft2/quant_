@@ -1,6 +1,10 @@
 package com.quant_socket.services;
 
+import com.quant_socket.models.Logs.EquitiesBatchData;
+import com.quant_socket.models.Logs.EquitiesSnapshot;
+import com.quant_socket.models.Logs.SecOrderFilled;
 import com.quant_socket.models.Logs.SocketLog;
+import com.quant_socket.models.Product;
 import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -22,7 +27,22 @@ public class SocketLogService {
     @Autowired
     private SocketLogRepo repo;
 
+    @Autowired
+    private EquitiesSnapshotService equitiesSnapshotService;
+
+    @Autowired
+    private SecuritiesOrderFilledService securitiesOrderFilledService;
+
+    @Autowired
+    private EquitiesBatchDataService equitiesBatchDataService;
+
+    @Autowired
+    private ProductService productService;
+
     private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
+    private AtomicInteger snapshotIdx = new AtomicInteger(12285033);
+    private AtomicInteger secorderIdx = new AtomicInteger(12285033);
+    private AtomicInteger batchDataIdx = new AtomicInteger(12285033);
 
     public void addLog(SocketLog sl) {
         logs.add(sl);
@@ -51,7 +71,79 @@ public class SocketLogService {
                 }
             });
             if(result > 0) logs.clear();
-            log.debug("INSERT COUNT : {}", result);
+            log.info("INSERT COUNT : {}", result);
+        }
+    }
+
+    @Scheduled(fixedRate = 100)
+    public void sendMessage() {
+        snapshotHandler();
+        secOrderHandler();
+        batchDataHandler();
+    }
+
+    private void snapshotHandler() {
+        final SocketLog data = repo.findOne("B2", snapshotIdx.longValue());
+        if(data != null) {
+            log.info(data.toString());
+            try {
+                final EquitiesSnapshot es = new EquitiesSnapshot(data.getLog());
+                final Product prod = productService.productFromIsinCode(es.getIsin_code());
+                if(prod != null) {
+                    equitiesSnapshotService.sendMessage(es.toSocket(prod));
+                    equitiesSnapshotService.sendMessage(es.toDetailsSocket(prod), es.getIsin_code());
+                }
+            } catch (Exception ignore) {
+
+            } finally {
+                snapshotIdx.set(Math.toIntExact(data.getIdx()));
+            }
+        } else {
+            snapshotIdx.set(12285033);
+        }
+    }
+
+    private void secOrderHandler() {
+        final SocketLog data = repo.findOne("A3", secorderIdx.longValue());
+
+        if(data != null) {
+            log.info(data.toString());
+            try {
+                final SecOrderFilled sof = new SecOrderFilled(data.getLog());
+                final Product prod = productService.productFromIsinCode(sof.getIsin_code());
+                if(prod != null) {
+                    securitiesOrderFilledService.sendMessage(sof.toSocket(prod));
+                    securitiesOrderFilledService.sendMessage(sof.toSocket(prod), sof.getIsin_code());
+                }
+            } catch (Exception ignore) {
+
+            } finally {
+                secorderIdx.set(Math.toIntExact(data.getIdx()));
+            }
+        } else {
+            secorderIdx.set(12285033);
+        }
+    }
+
+    private void batchDataHandler() {
+        final SocketLog data = repo.findOne("A00", batchDataIdx.longValue());
+
+        if(data != null) {
+            log.info(data.toString());
+            try {
+                final EquitiesBatchData ebd = new EquitiesBatchData(data.getLog());
+                final Product prod = productService.productFromIsinCode(ebd.getIsin_code());
+                if(prod != null) {
+                    equitiesBatchDataService.sendMessage(ebd.toSocket(prod));
+                    equitiesBatchDataService.sendMessage(ebd.toSocket(prod), ebd.getIsin_code());
+                }
+            } catch (Exception ignore) {
+
+            } finally {
+                batchDataIdx.set(Math.toIntExact(data.getIdx()));
+            }
+        } else {
+            batchDataIdx.set(12285033);
         }
     }
 }

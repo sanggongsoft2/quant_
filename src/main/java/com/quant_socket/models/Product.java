@@ -68,8 +68,6 @@ public class Product extends SG_model<Product>{
     private long facilityAskCount = 0;
     private long facilityBidCount = 0;
 
-    private Map<Double, Long> tradingList = new HashMap<>();
-
     public void updateTodayCount(String isinCode, String type, long count) {
         if (code.equals(isinCode)) {
             switch (type) {
@@ -84,16 +82,9 @@ public class Product extends SG_model<Product>{
         }
     }
 
-    private void updateTradingList(Double price, long count) {
-        long _count = 0;
-        if(tradingList.get(price) != null) _count = tradingList.get(price);
-        tradingList.put(price, _count + count);
-    }
-
     public void refresh() {
         todayBidCount = 0;
         todayAskCount = 0;
-        tradingList.clear();
     }
 
     public void update(EquitiesBatchData data) {
@@ -132,7 +123,6 @@ public class Product extends SG_model<Product>{
 
     public void update(SecOrderFilled data) {
         currentPrice = data.getTrading_price();
-        updateTradingList(currentPrice, data.getTrading_volume());
     }
 
     public Product(ResultSet rs) {

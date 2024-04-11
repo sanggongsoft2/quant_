@@ -47,6 +47,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
         try {
             this.msg = in.toString(StandardCharsets.UTF_8);
+            log.info("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
 
             if(!this.msg.isBlank()) {
                 final SocketLog sl = new SocketLog();
@@ -127,7 +128,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    //증권 Snapshot (MM/LP호가 제외)
+    //증권 Snapshot (MM/LP호가 제외)s
     private void equities_snapshot_handler(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{650})")) {
             if(chunk.length() >= 650) {

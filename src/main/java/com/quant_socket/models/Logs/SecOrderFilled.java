@@ -8,9 +8,18 @@ import com.quant_socket.models.Product;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
 
+import javax.swing.text.DateFormatter;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +27,7 @@ import java.util.Map;
 @Setter
 @RequiredArgsConstructor
 @SG_table(name = "sec_order_filled")
+@ToString
 public class SecOrderFilled {
     @SG_idx
     @SG_column(dbField = "sof_idx")
@@ -68,7 +78,7 @@ public class SecOrderFilled {
     private String end_keyword;
     @SG_crdt
     @SG_column(dbField = "sof_crdt")
-    private String createdAt;
+    private Timestamp createdAt;
 
     public SecOrderFilled(String msg) {
         data_category = msg.substring(0, 2);
@@ -93,6 +103,7 @@ public class SecOrderFilled {
         if(!msg.substring(163, 174).isBlank()) the_best_ask = Double.parseDouble(msg.substring(163, 174));
         if(!msg.substring(174, 185).isBlank()) the_best_bid = Double.parseDouble(msg.substring(174, 185));
         end_keyword = msg.substring(185, 186);
+        createdAt = Timestamp.from(Instant.now());
     }
 
     public Map<String, Object> toMap() {
@@ -117,14 +128,35 @@ public class SecOrderFilled {
 
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new HashMap<>();
-        response.put("response_type", 2);
         //17. 체결강도
         response.put("trading_rate", getTradingRate(prod));
         //18. 체결가격
         response.put("trading_price", trading_price);
         //19. 거래량
-        response.put("trading_list", prod.getTradingList());
+        response.put("isin_code", isin_code);
+        response.put("compare_price", price_change_against_the_pre_day);
+        response.put("trading_count", trading_volume);
+        response.put("opening_price", opening_price);
+        response.put("trading_type", bidTypeToString());
+        response.put("trading_time", tradingTimeToString());
         return response;
+    }
+
+    private String bidTypeToString() {
+        return switch (final_askbid_type_code) {
+            case " " -> "단일가";
+            case "1" -> "매도";
+            case "2" -> "매수";
+            default -> null;
+        };
+    }
+
+    private String tradingTimeToString() {
+        final long milliseconds = Long.parseLong(processing_time_of_trading_system);
+        final Instant instant = Instant.ofEpochMilli(milliseconds);
+        final LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Seoul"));
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return dateTime.format(formatter);
     }
 
     public void setPreparedStatement(PreparedStatement ps) {
