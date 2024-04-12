@@ -20,7 +20,14 @@ public class SocketLogRepo extends SG_repo<SocketLog> {
     }
 
     public SocketLog findOne(String startKeyword, Long idx) {
-        final String sql = "SELECT * FROM socket_log WHERE SL_idx > " + idx + " AND SL_log LIKE '"+startKeyword+"%' ORDER BY SL_idx ASC LIMIT 1";
+        return findOne(startKeyword, null, idx);
+    }
+
+    public SocketLog findOne(String startKeyword, String isinCode, Long idx) {
+        String where = "WHERE SL_idx > " + idx + " AND SL_log LIKE '"+startKeyword+"%'";
+        if(isinCode != null) where += " AND SL_log like '%"+isinCode+"%'";
+        final String sql = "SELECT * FROM socket_log "+where+" ORDER BY SL_idx ASC LIMIT 1";
+
         try {
             return super.jt.queryForObject(sql, (rs, rn) -> new SocketLog(rs));
         } catch (Exception e) {

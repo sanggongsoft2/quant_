@@ -76,6 +76,7 @@ public class InvestorActivitiesEOD extends SG_model<InvestorActivitiesEOD> {
 
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> res = new HashMap<>();
+        res.put("isin_code", isin_code);
         res.put("name_kr", prod.getName_kr());
         res.put("name_kr_abbr", prod.getName_kr_abbr());
         res.put("name_en", prod.getName_en());

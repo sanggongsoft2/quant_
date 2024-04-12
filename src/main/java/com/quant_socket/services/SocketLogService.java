@@ -1,9 +1,6 @@
 package com.quant_socket.services;
 
-import com.quant_socket.models.Logs.EquitiesBatchData;
-import com.quant_socket.models.Logs.EquitiesSnapshot;
-import com.quant_socket.models.Logs.SecOrderFilled;
-import com.quant_socket.models.Logs.SocketLog;
+import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +34,16 @@ public class SocketLogService {
     private EquitiesBatchDataService equitiesBatchDataService;
 
     @Autowired
+    private InvestActivitiesEODService investActivitiesEODService;
+
+    @Autowired
     private ProductService productService;
 
     private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
     private AtomicInteger snapshotIdx = new AtomicInteger(12285033);
     private AtomicInteger secorderIdx = new AtomicInteger(12285033);
     private AtomicInteger batchDataIdx = new AtomicInteger(12285033);
+    private AtomicInteger investorEODIdx = new AtomicInteger(12285033);
 
     public void addLog(SocketLog sl) {
         logs.add(sl);
@@ -75,7 +76,7 @@ public class SocketLogService {
         }
     }
 
-    @Scheduled(fixedRate = 100)
+    @Scheduled(fixedRate = 2000)
     public void sendMessage() {
         snapshotHandler();
         secOrderHandler();
@@ -83,7 +84,7 @@ public class SocketLogService {
     }
 
     private void snapshotHandler() {
-        final SocketLog data = repo.findOne("B2", snapshotIdx.longValue());
+        final SocketLog data = repo.findOne("B2", "KR7005930003", snapshotIdx.longValue());
         if(data != null) {
             log.info(data.toString());
             try {
@@ -144,6 +145,27 @@ public class SocketLogService {
             }
         } else {
             batchDataIdx.set(12285033);
+        }
+    }
+
+    private void investorEODHandler() {
+        final SocketLog data = repo.findOne("C10", investorEODIdx.longValue());
+
+        if(data != null) {
+            try {
+                final InvestorActivitiesEOD eod = new InvestorActivitiesEOD(data.getLog());
+                final Product prod = productService.productFromIsinCode(eod.getIsin_code());
+                if(prod != null) {
+                    investActivitiesEODService.sendMessage(eod.toSocket(prod));
+                    investActivitiesEODService.sendMessage(eod.toSocket(prod), eod.getIsin_code());
+                }
+            } catch (Exception ignore) {
+
+            } finally {
+                investorEODIdx.set(Math.toIntExact(data.getIdx()));
+            }
+        } else {
+            investorEODIdx.set(12285033);
         }
     }
 }
