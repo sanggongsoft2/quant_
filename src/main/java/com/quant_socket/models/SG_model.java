@@ -105,15 +105,17 @@ public abstract class SG_model<T> {
     }
 
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        for (Field field : getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                map.put(field.getName(), field.get(this));
-            } catch (IllegalAccessException ignored) {
-
+        final Map<String, Object> data = new HashMap<>();
+        for(final Field f: this.getClass().getDeclaredFields()) {
+            if(f.isAnnotationPresent(SG_column.class)) {
+                f.setAccessible(true);
+                final SG_column sc = f.getAnnotation(SG_column.class);
+                try {
+                    data.put(sc.dbField(), f.get(this));
+                } catch (Exception ignore) {
+                }
             }
         }
-        return map;
+        return data;
     }
 }

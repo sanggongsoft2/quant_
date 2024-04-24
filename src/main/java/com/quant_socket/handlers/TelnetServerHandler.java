@@ -27,6 +27,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     private final SecuritiesOrderFilledService securitiesOrderFilledService;
     private final InvestActivitiesEODService investActivitiesEODService;
     private final EquitiesBatchDataService equitiesBatchDataService;
+    private final SeqQuoteService seqQuoteService;
     private Integer port;
     private String remote_url;
     private String msg;
@@ -106,6 +107,11 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 case "CA01Q":
                     equity_index_indicator_handler(msg);
                     break;
+                case "B601S":
+                case "B601Q":
+                case "B601X":
+                    seq_quote_handler(msg);
+                    break;
             }
         }
     }
@@ -154,6 +160,15 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
                 equitiesBatchDataService.addLog(ebd);
+            }
+        }
+    }
+
+    private void seq_quote_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{555})")) {
+            if(chunk.length() >= 555) {
+                final SeqQuote data = new SeqQuote(chunk);
+                seqQuoteService.addLog(data);
             }
         }
     }

@@ -32,6 +32,7 @@ public class TelnetServer implements CommandLineRunner {
     private final InvestActivitiesEODService investActivitiesEODService;
     private final EquitiesBatchDataService equitiesBatchDataService;
     private final ProductService productService;
+    private final SeqQuoteService seqQuoteService;
     private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904};
     @Override
     public void run(String... args) throws Exception {
@@ -49,7 +50,7 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesSnapshotService, equityIndexIndicatorService, socketLogService, securitiesOrderFilledService, investActivitiesEODService, equitiesBatchDataService));
+                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesSnapshotService, equityIndexIndicatorService, socketLogService, securitiesOrderFilledService, investActivitiesEODService, equitiesBatchDataService, seqQuoteService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -67,7 +68,6 @@ public class TelnetServer implements CommandLineRunner {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-
         }
     }
 }
