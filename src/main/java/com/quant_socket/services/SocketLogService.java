@@ -76,12 +76,13 @@ public class SocketLogService {
         }
     }
 
-    @Scheduled(fixedRate = 2000)
+    /*@Scheduled(fixedRate = 2000)
     public void sendMessage() {
         snapshotHandler();
         secOrderHandler();
         batchDataHandler();
-    }
+    }*/
+
 
     private void snapshotHandler() {
         final SocketLog data = repo.findOne("B2", "KR7005930003", snapshotIdx.longValue());
