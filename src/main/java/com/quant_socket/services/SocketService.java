@@ -3,10 +3,12 @@ package com.quant_socket.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,39 +26,31 @@ public abstract class SocketService {
     public void addSession(WebSocketSession ws) {
         sessions.add(ws);
     }
-    public void addSession(WebSocketSession ws, String isinCode) {
-        isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
-        isinSessions.get(isinCode).add(ws);
+    public void addSession(WebSocketSession ws, String... isinCodes) {
+        for(String isinCode : isinCodes) {
+            isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
+            isinSessions.get(isinCode).add(ws);
+        }
     }
 
     public void removeSession(WebSocketSession ws) {
         sessions.remove(ws);
     }
-    public void removeSession(WebSocketSession ws, String isinCode) {
-        if(isinSessions.get(isinCode) != null) isinSessions.get(isinCode).remove(ws);
-        if(isinSessions.get(isinCode).isEmpty()) isinSessions.remove(isinCode);
+    public void removeSession(WebSocketSession ws, String... isinCodes) {
+        for(String isinCode : isinCodes) {
+            if(isinSessions.get(isinCode) != null) isinSessions.get(isinCode).remove(ws);
+            if(isinSessions.get(isinCode).isEmpty()) isinSessions.remove(isinCode);
+        }
     }
 
     public <T> void sendMessage(T message){
         sendMessage(message, this.sessions);
     }
-    private <T> void sendMessage(T message, Set<WebSocketSession> sessions){
-        sessions.removeIf(ws -> {
-            if(ws.isOpen()) {
-                try {
-                    ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return false;
-            } else {
-                return true;
-            }
-        });
-    }
-    public <T> void sendMessage(T message, String isinCode){
-        final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
-        if(sessions != null) sendMessage(message, sessions);
+    public <T> void sendMessage(T message, String... isinCodes){
+        for(String isinCode : isinCodes) {
+            Set<WebSocketSession> sessions = isinSessions.get(isinCode);
+            if(sessions != null) sendMessage(message, sessions);
+        }
     }
 
     public Map<String, String> extractQueryParams(String queryString) {
@@ -76,5 +70,45 @@ public abstract class SocketService {
     public String getQueryValue(String queryString, String key) {
         final Map<String, String> data = extractQueryParams(queryString);
         return data.get(key);
+    }
+
+    private <T> void sendMessage(T message, Set<WebSocketSession> sessions){
+        sessions.removeIf(ws -> {
+            if(ws.isOpen()) {
+                try {
+                    ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    public void afterConnectionEstablished(WebSocketSession ws) throws IOException {
+        final URI uri = ws.getUri();
+        if(uri != null && uri.getQuery() != null) {
+            final String isinCodeString = getQueryValue(uri.getQuery(), "isin_code");
+            if(isinCodeString != null) {
+                final String[] isinCodes = isinCodeString.split(",");
+                addSession(ws, isinCodes);
+            }
+        } else {
+            ws.close();
+        }
+    }
+
+    public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
+        final URI uri = ws.getUri();
+        if(uri != null && uri.getQuery() != null) {
+            final String isinCodeString = getQueryValue(uri.getQuery(), "isin_code");
+            if(isinCodeString != null) {
+                final String[] isinCodes = isinCodeString.split(",");
+                if (isinCodes.length > 0) removeSession(ws, isinCodes);
+
+            }
+        }
     }
 }

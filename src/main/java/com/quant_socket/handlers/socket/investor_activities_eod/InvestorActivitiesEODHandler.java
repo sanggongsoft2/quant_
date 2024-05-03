@@ -9,20 +9,21 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.net.URI;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class InvestorActivitiesEODHandler extends TextWebSocketHandler {
 
     private final InvestActivitiesEODService service;
-
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
-        service.addSession(ws);
+        service.afterConnectionEstablished(ws);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        service.removeSession(ws);
+        service.afterConnectionClosed(ws, status);
     }
 }

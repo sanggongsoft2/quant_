@@ -1,6 +1,5 @@
 package com.quant_socket.handlers.socket.seq_quote;
 
-import com.quant_socket.services.SecuritiesOrderFilledService;
 import com.quant_socket.services.SeqQuoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +14,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class SeqQuoteHandler extends TextWebSocketHandler {
 
     private final SeqQuoteService service;
-
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
-        service.addSession(ws);
+        service.afterConnectionEstablished(ws);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        service.removeSession(ws);
+        service.afterConnectionClosed(ws, status);
     }
 }
