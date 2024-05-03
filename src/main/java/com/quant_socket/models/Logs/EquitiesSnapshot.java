@@ -371,23 +371,4 @@ public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
 
         return response;
     }
-    public void setPreparedStatement(PreparedStatement ps) {
-        int index = 1;
-        for (Field field : getClass().getDeclaredFields()) {
-            final Class<?> type = field.getType();
-            field.setAccessible(true);
-            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
-                try {
-                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
-                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
-                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
-                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
-                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
-                } catch (Exception ignore) {
-                } finally {
-                    index++;
-                }
-            }
-        }
-    }
 }

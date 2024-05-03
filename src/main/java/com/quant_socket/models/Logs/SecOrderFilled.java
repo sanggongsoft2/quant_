@@ -5,6 +5,7 @@ import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
+import com.quant_socket.models.SG_model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,7 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @SG_table(name = "sec_order_filled")
 @ToString
-public class SecOrderFilled {
+public class SecOrderFilled extends SG_model<SecOrderFilled> {
     @SG_idx
     @SG_column(dbField = "sof_idx")
     private Long idx;
@@ -159,23 +160,4 @@ public class SecOrderFilled {
         return dateTime.format(formatter);
     }
 
-    public void setPreparedStatement(PreparedStatement ps) {
-        int index = 1;
-        for (Field field : getClass().getDeclaredFields()) {
-            final Class<?> type = field.getType();
-            field.setAccessible(true);
-            if(field.isAnnotationPresent(com.quant_socket.annotations.SG_column.class) && !field.isAnnotationPresent(com.quant_socket.annotations.SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
-                try {
-                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
-                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
-                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
-                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
-                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
-                } catch (Exception ignore) {
-                } finally {
-                    index++;
-                }
-            }
-        }
-    }
 }

@@ -12,8 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -224,25 +223,5 @@ public class SeqQuote extends SG_model<SeqQuote> {
     public Map<String, Object> toSocket() {
         final Map<String, Object> response = new HashMap<>();
         return response;
-    }
-
-    public void setPreparedStatement(PreparedStatement ps) {
-        int index = 1;
-        for (Field field : getClass().getDeclaredFields()) {
-            final Class<?> type = field.getType();
-            field.setAccessible(true);
-            if(field.isAnnotationPresent(SG_column.class) && !field.isAnnotationPresent(SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
-                try {
-                    if(type.equals(String.class)) ps.setString(index, (String) field.get(this));
-                    else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) field.get(this));
-                    else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (float) field.get(this));
-                    else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (double) field.get(this));
-                    else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (long) field.get(this));
-                } catch (Exception ignore) {
-                } finally {
-                    index++;
-                }
-            }
-        }
     }
 }
