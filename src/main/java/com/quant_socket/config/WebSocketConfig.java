@@ -10,6 +10,8 @@ import com.quant_socket.handlers.socket.investor_activities_eod.InvestorActiviti
 import com.quant_socket.handlers.socket.investor_activities_eod.InvestorActivitiesEODHandler;
 import com.quant_socket.handlers.socket.sec_order_filled.SecOrderFilledDetailsHandler;
 import com.quant_socket.handlers.socket.sec_order_filled.SecOrderFilledHandler;
+import com.quant_socket.handlers.socket.seq_quote.SeqQuoteDetailsHandler;
+import com.quant_socket.handlers.socket.seq_quote.SeqQuoteHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +41,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final SecOrderFilledHandler secOrderFilledHandler;
     private final SecOrderFilledDetailsHandler secOrderFilledDetailsHandler;
 
+    private final SeqQuoteHandler seqQuoteHandler;
+    private final SeqQuoteDetailsHandler seqQuoteDetailsHandler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(equitiesBatchDataHandler, "/ws/equities_batch_data").setAllowedOrigins("*");
@@ -55,5 +60,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         registry.addHandler(secOrderFilledHandler, "/ws/sec_order_filled").setAllowedOrigins("*");
         registry.addHandler(secOrderFilledDetailsHandler, "/ws/sec_order_filled/details").setAllowedOrigins("*");
+
+        registry.addHandler(seqQuoteHandler, "/ws/seq_quote").setAllowedOrigins("*");
+        registry.addHandler(seqQuoteDetailsHandler, "/ws/seq_quote/details").setAllowedOrigins("*");
     }
 }
