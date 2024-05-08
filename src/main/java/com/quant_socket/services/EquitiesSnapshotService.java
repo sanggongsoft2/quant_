@@ -1,5 +1,4 @@
 package com.quant_socket.services;
-
 import com.quant_socket.models.Logs.EquitiesSnapshot;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.response.Response;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -51,54 +49,80 @@ public class EquitiesSnapshotService extends SocketService{
                 "es_bid_level_1_price",
                 "es_ask_level_1_volume",
                 "es_bid_level_1_volume",
+                "es_lp_ask_level_1_volume",
+                "es_lp_bid_level_1_volume",
                 "es_ask_level_2_price",
                 "es_bid_level_2_price",
                 "es_ask_level_2_volume",
                 "es_bid_level_2_volume",
+                "es_lp_bid_level_2_volume",
+                "es_lp_ask_level_2_volume",
                 "es_ask_level_3_price",
                 "es_bid_level_3_price",
                 "es_ask_level_3_volume",
                 "es_bid_level_3_volume",
+                "es_lp_ask_level_3_volume",
+                "es_lp_bid_level_3_volume",
                 "es_ask_level_4_price",
                 "es_bid_level_4_price",
                 "es_ask_level_4_volume",
                 "es_bid_level_4_volume",
+                "es_lp_ask_level_4_volume",
+                "es_lp_bid_level_4_volume",
                 "es_ask_level_5_price",
                 "es_bid_level_5_price",
                 "es_ask_level_5_volume",
                 "es_bid_level_5_volume",
+                "es_lp_ask_level_5_volume",
+                "es_lp_bid_level_5_volume",
                 "es_ask_level_6_price",
                 "es_bid_level_6_price",
                 "es_ask_level_6_volume",
                 "es_bid_level_6_volume",
+                "es_lp_ask_level_6_volume",
+                "es_lp_bid_level_6_volume",
                 "es_ask_level_7_price",
                 "es_bid_level_7_price",
                 "es_ask_level_7_volume",
                 "es_bid_level_7_volume",
+                "es_lp_ask_level_7_volume",
+                "es_lp_bid_level_7_volume",
                 "es_ask_level_8_price",
                 "es_bid_level_8_price",
                 "es_ask_level_8_volume",
                 "es_bid_level_8_volume",
+                "es_lp_ask_level_8_volume",
+                "es_lp_bid_level_8_volume",
                 "es_ask_level_9_price",
                 "es_bid_level_9_price",
                 "es_ask_level_9_volume",
                 "es_bid_level_9_volume",
+                "es_lp_ask_level_9_volume",
+                "es_lp_bid_level_9_volume",
                 "es_ask_level_10_price",
                 "es_bid_level_10_price",
                 "es_ask_level_10_volume",
                 "es_bid_level_10_volume",
+                "es_lp_ask_level_10_volume",
+                "es_lp_bid_level_10_volume",
                 "es_total_ask_volume",
                 "es_total_bid_volume",
                 "es_estimated_trading_price",
                 "es_estimated_trading_volume",
                 "es_closing_price_type_code",
                 "es_trading_halt",
-                "es_end_keyword",
+                "es_is_fast_close",
+                "es_fast_close_time",
+                "es_end_keyword"
         };
+
+        String[] questionMarks = new String[cols.length];
+        Arrays.fill(questionMarks, "?");
 
         return "INSERT INTO equities_snapshot(" +
                 String.join(",", cols) + ")" +
-                "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
+                "VALUES(" + String.join(",", questionMarks) + ")";
+
     }
 
     public void addLog(EquitiesSnapshot data) {
@@ -112,7 +136,7 @@ public class EquitiesSnapshotService extends SocketService{
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 3000)
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {

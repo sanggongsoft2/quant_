@@ -101,15 +101,18 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 case "B201X":
                 case "B201Q":
                 case "B201S":
+                case "B202S":
+                case "B203S":
+                case "B204S":
                     equities_snapshot_handler(msg);
                     break;
                 case "CA01S":
                 case "CA01Q":
                     equity_index_indicator_handler(msg);
                     break;
-                case "B601S":
-                case "B601Q":
-                case "B601X":
+                case "B702S":
+                case "B703S":
+                case "B704S":
                     seq_quote_handler(msg);
                     break;
             }
@@ -165,8 +168,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void seq_quote_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{555})")) {
-            if(chunk.length() >= 555) {
+        for(String chunk : msg.split("(?<=\\\\G.{795})")) {
+            if(chunk.length() >= 795) {
                 final SeqQuote data = new SeqQuote(chunk);
                 seqQuoteService.addLog(data);
             }
