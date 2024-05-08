@@ -39,7 +39,6 @@ public class ProductService extends SocketService{
         return prod;
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
     public void refreshProductItems() {
         products.forEach(Product::refresh);
     }

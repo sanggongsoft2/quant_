@@ -54,7 +54,6 @@ public class SocketLogService {
                 "VALUES(?, ?, ?)";
     }
 
-    @Scheduled(fixedRate = 60000)
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {

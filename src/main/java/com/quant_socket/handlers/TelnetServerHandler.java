@@ -139,7 +139,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    //증권 Snapshot (MM/LP호가 제외)s
+    //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{650})")) {
             if(chunk.length() >= 650) {
@@ -148,7 +148,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             }
         }
     }
-
+    //증권 Snapshot (MM/LP호가 포함)
     private void equities_snapshot_handler2(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{900})")) {
             if(chunk.length() >= 900) {

@@ -136,7 +136,6 @@ public class EquitiesSnapshotService extends SocketService{
         }
     }
 
-    @Scheduled(fixedRate = 3000)
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {

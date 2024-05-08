@@ -59,7 +59,6 @@ public class InvestActivitiesEODService extends SocketService{
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {

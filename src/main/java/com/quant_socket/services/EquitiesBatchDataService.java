@@ -139,7 +139,7 @@ public class EquitiesBatchDataService extends SocketService{
                 "ebd_end_keyword",
         };
 
-        return "INSERT INTO equities_snapshot(" +
+        return "INSERT INTO equities_batch_data(" +
                 String.join(",", cols) + ")" +
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
@@ -155,7 +155,6 @@ public class EquitiesBatchDataService extends SocketService{
         }
     }
 
-    @Scheduled(fixedRate = 60000)
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {

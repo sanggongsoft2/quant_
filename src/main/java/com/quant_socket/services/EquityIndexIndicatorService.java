@@ -80,7 +80,6 @@ public class EquityIndexIndicatorService extends SocketService{
         }
     }
 
-    @Scheduled(fixedRate = 60000)
     public void insertLogs() {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
