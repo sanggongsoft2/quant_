@@ -101,10 +101,12 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 case "B201X":
                 case "B201Q":
                 case "B201S":
+                    equities_snapshot_handler(msg);
+                    break;
                 case "B202S":
                 case "B203S":
                 case "B204S":
-                    equities_snapshot_handler(msg);
+                    equities_snapshot_handler2(msg);
                     break;
                 case "CA01S":
                 case "CA01Q":
@@ -141,6 +143,15 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     private void equities_snapshot_handler(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{650})")) {
             if(chunk.length() >= 650) {
+                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
+                equitiesSnapshotService.addLog(es);
+            }
+        }
+    }
+
+    private void equities_snapshot_handler2(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{900})")) {
+            if(chunk.length() >= 900) {
                 final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
                 equitiesSnapshotService.addLog(es);
             }
