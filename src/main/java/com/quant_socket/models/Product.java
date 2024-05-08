@@ -52,6 +52,9 @@ public class Product extends SG_model<Product>{
     @SG_column(dbField = "p_yesterday_trading_count")
     private Long yesterday_trading_count;
 
+    @SG_column(dbField = "p_status")
+    private String status;
+
     @SG_crdt
     @SG_column(dbField = "p_crdt")
     private String crdt;
