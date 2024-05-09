@@ -41,7 +41,7 @@ public abstract class SG_repo<T> {
                 .append(data.values().stream().map((value) -> "?").collect(Collectors.joining(",")))
                 .append(")");
 
-        log.info("INSERT SQL = {}", sb);
+        log.debug("INSERT SQL = {}", sb);
 
         final int rows = this.jt.update(sb.toString(), data.values().toArray());
         return rows > 0;

@@ -151,7 +151,7 @@ public class EquitiesSnapshotService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.info("EQUITIES SNAPSHOT INSERT COUNT : {}", result);
+            log.debug("EQUITIES SNAPSHOT INSERT COUNT : {}", result);
         }
     }
 }

@@ -95,7 +95,7 @@ public class EquityIndexIndicatorService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.info("EQUITY INDEX INDICATOR INSERT COUNT : {}", result);
+            log.debug("EQUITY INDEX INDICATOR INSERT COUNT : {}", result);
         }
     }
 }

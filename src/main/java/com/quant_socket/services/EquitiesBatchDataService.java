@@ -167,7 +167,7 @@ public class EquitiesBatchDataService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.info("EQUITIES BATCH DATA INSERT COUNT : {}", result);
+            log.debug("EQUITIES BATCH DATA INSERT COUNT : {}", result);
         }
     }
 }

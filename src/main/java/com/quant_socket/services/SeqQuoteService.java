@@ -107,7 +107,7 @@ public class SeqQuoteService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.info("SEQ QUOTE INSERT COUNT : {}", result);
+            log.debug("SEQ QUOTE INSERT COUNT : {}", result);
         }
     }
 }

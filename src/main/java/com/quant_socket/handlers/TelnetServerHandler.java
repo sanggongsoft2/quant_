@@ -41,7 +41,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             in.readBytes(msgByte);
             this.msg = new String(msgByte, StandardCharsets.UTF_8);
 //            this.msg = in.toString(StandardCharsets.UTF_8);
-            log.info("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
+            log.debug("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
 
             if(!this.msg.isBlank()) {
                 final SocketLog sl = new SocketLog();

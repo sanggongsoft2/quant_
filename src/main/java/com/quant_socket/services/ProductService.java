@@ -132,7 +132,7 @@ public class ProductService extends SocketService{
                 insertProducts.clear();
                 refreshProducts();
             }
-            log.info("PRODUCT INSERT COUNT : {}", result);
+            log.debug("PRODUCT INSERT COUNT : {}", result);
         }
     }
 

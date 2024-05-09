@@ -83,7 +83,7 @@ public class SecuritiesOrderFilledService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.info("SEC ORDER FILLED INSERT COUNT : {}", result);
+            log.debug("SEC ORDER FILLED INSERT COUNT : {}", result);
         }
     }
 }

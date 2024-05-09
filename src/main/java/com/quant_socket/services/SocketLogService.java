@@ -59,6 +59,7 @@ public class SocketLogService {
                     ps.setString(1, sl.getLog());
                     ps.setString(2, sl.getRemote_url());
                     ps.setInt(3, sl.getPort());
+                    ps.setString(4, sl.getError());
                 }
 
                 @Override
@@ -67,7 +68,7 @@ public class SocketLogService {
                 }
             });
             if(result > 0) logs.clear();
-            log.info("INSERT COUNT : {}", result);
+            log.debug("INSERT COUNT : {}", result);
         }
     }
 
@@ -169,7 +170,7 @@ public class SocketLogService {
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
-        log.info("MSG LENGTH: {}", msg.length());
+        log.debug("MSG LENGTH: {}", msg.length());
         for(String chunk : msg.split("(?<=\\\\G.{620})")) {
             if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
