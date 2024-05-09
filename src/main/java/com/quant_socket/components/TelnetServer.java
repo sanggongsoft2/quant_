@@ -4,10 +4,8 @@ import com.quant_socket.handlers.TelnetServerHandler;
 import com.quant_socket.repos.*;
 import com.quant_socket.services.*;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -16,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,8 @@ public class TelnetServer implements CommandLineRunner {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new TelnetServerHandler(repo, equitiesSnapshotService, equityIndexIndicatorService, socketLogService, securitiesOrderFilledService, investActivitiesEODService, equitiesBatchDataService, seqQuoteService));
+                            ch.pipeline()
+                                    .addLast(new TelnetServerHandler(socketLogService));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

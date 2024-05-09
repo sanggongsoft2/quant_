@@ -74,7 +74,7 @@ public class InvestActivitiesEODService extends SocketService{
                 }
             });
             if(result > 0) logs.clear();
-            log.debug("INSERT COUNT : {}", result);
+            log.info("INSERT COUNT : {}", result);
         }
     }
 }

@@ -37,6 +37,12 @@ public class SocketLogService {
     private InvestActivitiesEODService investActivitiesEODService;
 
     @Autowired
+    private EquityIndexIndicatorService equityIndexIndicatorService;
+
+    @Autowired
+    private SeqQuoteService seqQuoteService;
+
+    @Autowired
     private ProductService productService;
 
     private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
@@ -50,8 +56,8 @@ public class SocketLogService {
     }
 
     private String insertSql() {
-        return "INSERT INTO socket_log(SL_log, SL_remote_url, SL_port)" +
-                "VALUES(?, ?, ?)";
+        return "INSERT INTO socket_log(SL_log, SL_remote_url, SL_port, SL_error)" +
+                "VALUES(?, ?, ?, ?)";
     }
 
     public void insertLogs() {
@@ -75,97 +81,119 @@ public class SocketLogService {
         }
     }
 
-    /*@Scheduled(fixedRate = 2000)
-    public void sendMessage() {
-        snapshotHandler();
-        secOrderHandler();
-        batchDataHandler();
-    }*/
-
-
-    private void snapshotHandler() {
-        final SocketLog data = repo.findOne("B2", "KR7005930003", snapshotIdx.longValue());
-        if(data != null) {
-            log.info(data.toString());
-            try {
-                final EquitiesSnapshot es = new EquitiesSnapshot(data.getLog());
-                final Product prod = productService.productFromIsinCode(es.getIsin_code());
-                if(prod != null) {
-                    equitiesSnapshotService.sendMessage(es.toSocket(prod));
-                    equitiesSnapshotService.sendMessage(es.toDetailsSocket(prod), es.getIsin_code());
-                }
-            } catch (Exception ignore) {
-
-            } finally {
-                snapshotIdx.set(Math.toIntExact(data.getIdx()));
+    public void esHandler(String msg) {
+        if(msg.length() >= 5) {
+            final String prodCode = msg.substring(0, 5);
+            switch (prodCode) {
+                case "A001S":
+                case "A002S":
+                case "A003S":
+                case "A004S":
+                case "A001Q":
+                case "A001X":
+                    equities_batch_data_handler(msg);
+                    break;
+                case "C101S":
+                case "C102S":
+                case "C103S":
+                case "C104S":
+                case "C101Q":
+                case "C101X":
+                case "C101G":
+                    investor_activities_per_an_issue_EOD_handler(msg);
+                    break;
+                case "A301S":
+                case "A301Q":
+                case "A301X":
+                    securities_order_filled_handler(msg);
+                    break;
+                case "B201X":
+                case "B201Q":
+                case "B201S":
+                    equities_snapshot_handler(msg);
+                    break;
+                case "B202S":
+                case "B203S":
+                case "B204S":
+                    equities_snapshot_handler2(msg);
+                    break;
+                case "CA01S":
+                case "CA01Q":
+                    equity_index_indicator_handler(msg);
+                    break;
+                case "B702S":
+                case "B703S":
+                case "B704S":
+                    seq_quote_handler(msg);
+                    break;
             }
-        } else {
-            snapshotIdx.set(12285033);
         }
     }
 
-    private void secOrderHandler() {
-        final SocketLog data = repo.findOne("A3", secorderIdx.longValue());
-
-        if(data != null) {
-            log.info(data.toString());
-            try {
-                final SecOrderFilled sof = new SecOrderFilled(data.getLog());
-                final Product prod = productService.productFromIsinCode(sof.getIsin_code());
-                if(prod != null) {
-                    securitiesOrderFilledService.sendMessage(sof.toSocket(prod));
-                    securitiesOrderFilledService.sendMessage(sof.toSocket(prod), sof.getIsin_code());
-                }
-            } catch (Exception ignore) {
-
-            } finally {
-                secorderIdx.set(Math.toIntExact(data.getIdx()));
+    //종목별 투자자별 종가통계
+    private void investor_activities_per_an_issue_EOD_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{96})")) {
+            if (chunk.length() >= 96) {
+                final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
+                investActivitiesEODService.addLog(iae);
             }
-        } else {
-            secorderIdx.set(12285033);
         }
     }
 
-    private void batchDataHandler() {
-        final SocketLog data = repo.findOne("A00", batchDataIdx.longValue());
-
-        if(data != null) {
-            log.info(data.toString());
-            try {
-                final EquitiesBatchData ebd = new EquitiesBatchData(data.getLog());
-                final Product prod = productService.productFromIsinCode(ebd.getIsin_code());
-                if(prod != null) {
-                    equitiesBatchDataService.sendMessage(ebd.toSocket(prod));
-                    equitiesBatchDataService.sendMessage(ebd.toSocket(prod), ebd.getIsin_code());
-                }
-            } catch (Exception ignore) {
-
-            } finally {
-                batchDataIdx.set(Math.toIntExact(data.getIdx()));
-            }
-        } else {
-            batchDataIdx.set(12285033);
+    //증권 체결
+    private void securities_order_filled_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{186})")) if(chunk.length() >= 186) {
+            final SecOrderFilled sef = new SecOrderFilled(msg);
+            securitiesOrderFilledService.addLog(sef);
         }
     }
 
-    private void investorEODHandler() {
-        final SocketLog data = repo.findOne("C10", investorEODIdx.longValue());
-
-        if(data != null) {
-            try {
-                final InvestorActivitiesEOD eod = new InvestorActivitiesEOD(data.getLog());
-                final Product prod = productService.productFromIsinCode(eod.getIsin_code());
-                if(prod != null) {
-                    investActivitiesEODService.sendMessage(eod.toSocket(prod));
-                    investActivitiesEODService.sendMessage(eod.toSocket(prod), eod.getIsin_code());
-                }
-            } catch (Exception ignore) {
-
-            } finally {
-                investorEODIdx.set(Math.toIntExact(data.getIdx()));
+    //증권 Snapshot (MM/LP호가 제외)
+    private void equities_snapshot_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{650})")) {
+            if(chunk.length() >= 650) {
+                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
+                equitiesSnapshotService.addLog(es);
             }
-        } else {
-            investorEODIdx.set(12285033);
+        }
+    }
+    //증권 Snapshot (MM/LP호가 포함)
+    private void equities_snapshot_handler2(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{900})")) {
+            if(chunk.length() >= 900) {
+                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
+                equitiesSnapshotService.addLog(es);
+            }
+        }
+    }
+
+    //증권 지수지표
+    private void equity_index_indicator_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{185})")) {
+            if (chunk.length() >= 185) {
+                final EquityIndexIndicator eii = new EquityIndexIndicator(chunk);
+                equityIndexIndicatorService.addLog(eii);
+            }
+        }
+    }
+
+    //증권 종목 정보
+    private void equities_batch_data_handler(String msg) {
+        log.info("MSG LENGTH: {}", msg.length());
+        for(String chunk : msg.split("(?<=\\\\G.{620})")) {
+            if(chunk.length() >= 620) {
+                final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
+                equitiesBatchDataService.addLog(ebd);
+            }
+        }
+    }
+
+    private void seq_quote_handler(String msg) {
+        for(String chunk : msg.split("(?<=\\\\G.{795})")) {
+            if(chunk.length() >= 795) {
+                final SeqQuote data = new SeqQuote(chunk);
+                seqQuoteService.addLog(data);
+            }
         }
     }
 }
