@@ -1,22 +1,17 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.EquitiesBatchData;
-import com.quant_socket.models.Logs.EquitiesSnapshot;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.EquitiesBatchDataRepo;
-import com.quant_socket.repos.EquitiesSnapshotRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
@@ -152,6 +147,8 @@ public class EquitiesBatchDataService extends SocketService{
             productService.update(data);
             sendMessage(data.toSocket(prod));
             sendMessage(data.toSocket(prod), data.getIsin_code());
+        } else {
+            productService.addProduct(new Product(data));
         }
     }
 

@@ -1,20 +1,17 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.*;
-import com.quant_socket.models.Product;
 import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -42,14 +39,7 @@ public class SocketLogService {
     @Autowired
     private SeqQuoteService seqQuoteService;
 
-    @Autowired
-    private ProductService productService;
-
     private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
-    private AtomicInteger snapshotIdx = new AtomicInteger(12285033);
-    private AtomicInteger secorderIdx = new AtomicInteger(12285033);
-    private AtomicInteger batchDataIdx = new AtomicInteger(12285033);
-    private AtomicInteger investorEODIdx = new AtomicInteger(12285033);
 
     public void addLog(SocketLog sl) {
         logs.add(sl);

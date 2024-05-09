@@ -131,4 +131,78 @@ public class Product extends SG_model<Product>{
     public Product(ResultSet rs) {
         super.resultSetToClass(rs);
     }
+
+    public Product(EquitiesBatchData data) {
+        this.code = data.getIsin_code();
+        this.name_kr = data.getAbbr_issue_name();
+        this.name_kr_abbr = data.getAbbr_issue_name();
+        this.name_en = data.getAbbr_issue_name();
+        this.gubun = infoCategoryToClass(data.getInfo_category());
+        this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
+        this.team = sectionTypeCodeToTeam(data.getSection_type_code());
+        this.type = stockTypeToType(data.getOther_stock_type_code());
+        this.face_value = data.getPar_value();
+        this.having_count = data.getNumber_of_listed_shares();
+        this.yesterday_price = data.getYes_closing_price();
+        this.yesterday_value = data.getYes_accu_trading_value();
+    }
+
+    private String infoCategoryToClass(String value) {
+        return switch (value) {
+            case "01S" -> "KOSPI";
+            case "01X" -> "KONEX";
+            case "01Q" -> "KOSDAQ";
+            case "A002S","A003S","A004S" -> "ETF";
+            default -> null;
+        };
+    }
+
+    private String groupIdToSeqClass(String value) {
+        return switch (value) {
+            case "MF" -> "투자회사";
+            case "RT" -> "부동산투자회사";
+            case "SC" -> "선박투자회사";
+            case "IF" -> "사회간접자본투융자회사";
+            case "BC" -> "수익증권";
+            case "ST" -> "주권";
+            case "FS" -> "외국주권";
+            case "DR" -> "주식예탁증권";
+            default -> null;
+        };
+    }
+
+    private String sectionTypeCodeToTeam(String value) {
+        return switch (value) {
+            case "1" -> "우량기업부";
+            case "2" -> "벤처기업부";
+            case "3" -> "중견기업부";
+            case "4" -> "신성장기업부";
+            case "A" -> "외국기업(소속부없음)";
+            case "B" -> "투자회사(소속부없음)";
+            case "C" -> "SPAC(소속부없음)";
+            case "D" -> "ETF(소속부없음)";
+            case "E" -> "관리종목(소속부없음)";
+            case "F" -> "투자주의환기종목(소속부없음)";
+            case "J" -> "일반(구 소속부)";
+            case "K" -> "벤처(구 소속부)";
+            case "L" -> "MF(구 소속부)";
+            case "M" -> "ETF(구 소속부)";
+            case "N" -> "외국기업(구 소속부)";
+            case "W" -> "크라우드펀딩기업부";
+            case "X" -> "일반기업부";
+            case "Y" -> "스타트업기업부";
+            case "Z" -> "기타(소속부없음)";
+            default -> null;
+        };
+    }
+
+    private String stockTypeToType(String value) {
+        return switch (value) {
+            case "0" -> "보통주";
+            case "1" -> "구형우선주";
+            case "2" -> "신형우선주";
+            case "9" -> "종류주권";
+            default -> null;
+        };
+    }
 }

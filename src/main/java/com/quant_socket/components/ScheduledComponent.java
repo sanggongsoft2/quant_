@@ -30,6 +30,7 @@ public class ScheduledComponent {
         investActivitiesEODService.insertLogs();
         equitiesBatchDataService.insertLogs();
         seqQuoteService.insertLogs();
+        productService.insertProducts();;
     }
 
     @Scheduled(cron = "0 0 1 * * ?")
