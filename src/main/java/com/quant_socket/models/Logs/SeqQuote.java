@@ -191,7 +191,7 @@ public class SeqQuote extends SG_model {
     @SG_column(dbField = "sq_crdt")
     private Timestamp createdAt;
 
-    public SeqQuote(String msg) {
+    public SeqQuote(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         if(!msg.substring(5, 13).isBlank()) message_seq_number = Integer.parseInt(msg.substring(5, 13));
@@ -283,5 +283,83 @@ public class SeqQuote extends SG_model {
     public Map<String, Object> toSocket() {
         final Map<String, Object> response = new HashMap<>();
         return response;
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "sq_data_category",
+                "sq_info_category",
+                "sq_message_seq_number",
+                "sq_board_id",
+                "sq_session_id",
+                "sq_isin_code",
+                "sq_a_designated_number_for_an_issue",
+                "sq_processing_time_of_trading_system",
+                "sq_ask_level1_price",
+                "sq_bid_level1_price",
+                "sq_ask_level1_volume",
+                "sq_bid_level1_volume",
+                "sq_lp_ask_level1_volume",
+                "sq_lp_bid_level1_volume",
+                "sq_ask_level2_price",
+                "sq_bid_level2_price",
+                "sq_ask_level2_volume",
+                "sq_bid_level2_volume",
+                "sq_lp_ask_level2_volume",
+                "sq_lp_bid_level2_volume",
+                "sq_ask_level3_price",
+                "sq_bid_level3_price",
+                "sq_ask_level3_volume",
+                "sq_bid_level3_volume",
+                "sq_lp_ask_level3_volume",
+                "sq_lp_bid_level3_volume",
+                "sq_ask_level4_price",
+                "sq_bid_level4_price",
+                "sq_ask_level4_volume",
+                "sq_bid_level4_volume",
+                "sq_lp_ask_level4_volume",
+                "sq_lp_bid_level4_volume",
+                "sq_ask_level5_price",
+                "sq_bid_level5_price",
+                "sq_ask_level5_volume",
+                "sq_bid_level5_volume",
+                "sq_lp_ask_level5_volume",
+                "sq_lp_bid_level5_volume",
+                "sq_ask_level6_price",
+                "sq_bid_level6_price",
+                "sq_ask_level6_volume",
+                "sq_bid_level6_volume",
+                "sq_lp_ask_level6_volume",
+                "sq_lp_bid_level6_volume",
+                "sq_ask_level7_price",
+                "sq_bid_level7_price",
+                "sq_ask_level7_volume",
+                "sq_bid_level7_volume",
+                "sq_lp_ask_level7_volume",
+                "sq_lp_bid_level7_volume",
+                "sq_ask_level8_price",
+                "sq_bid_level8_price",
+                "sq_ask_level8_volume",
+                "sq_bid_level8_volume",
+                "sq_lp_ask_level8_volume",
+                "sq_lp_bid_level8_volume",
+                "sq_ask_level9_price",
+                "sq_bid_level9_price",
+                "sq_ask_level9_volume",
+                "sq_bid_level9_volume",
+                "sq_lp_ask_level9_volume",
+                "sq_lp_bid_level9_volume",
+                "sq_ask_level10_price",
+                "sq_bid_level10_price",
+                "sq_ask_level10_volume",
+                "sq_bid_level10_volume",
+                "sq_lp_ask_level10_volume",
+                "sq_lp_bid_level10_volume",
+                "sq_total_ask_volume",
+                "sq_total_bid_volume",
+                "sq_estimated_tading_price",
+                "sq_estimated_trading_volume",
+                "sq_end_keyword",
+        };
     }
 }

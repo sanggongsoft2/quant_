@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +33,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf in = (ByteBuf) msg;
 
         try {
@@ -40,8 +41,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             byte[] msgByte = new byte[len];
             in.readBytes(msgByte);
             this.msg = new String(msgByte, StandardCharsets.UTF_8);
-//            this.msg = in.toString(StandardCharsets.UTF_8);
-            log.info("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
+            log.debug("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
 
             if(!this.msg.isBlank()) {
                 final SocketLog sl = new SocketLog();
@@ -53,6 +53,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
                 socketLogService.esHandler(this.msg);
             }
+        } catch (Exception ignore) {
         } finally {
             in.release();
         }

@@ -5,11 +5,13 @@ import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Logs.*;
+import com.quant_socket.models.Logs.prod.ProductMinute;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,10 @@ public class Product extends SG_model{
 
     private double currentPrice = 0;
     private double comparePriceRate = 0;
+    private double highPrice = 0;
+    private double lowPrice = 0;
+    private double openPrice = 0;
+    private long tradingVolume = 0;
 
     private long todayBidCount = 0;
     private long todayAskCount = 0;
@@ -83,6 +89,10 @@ public class Product extends SG_model{
                     todayBidCount += count;
             }
         }
+    }
+
+    public void refreshTradingVolumeFrom1Minute() {
+        tradingVolume = 0;
     }
 
     public void refresh() {
@@ -108,6 +118,9 @@ public class Product extends SG_model{
         this.currentPrice = data.getCurrent_price();
         this.comparePriceRate = data.getComparePriceRate();
         this.yesterday_price = data.getYesterdayPrice();
+        this.highPrice = data.getTodays_high();
+        this.lowPrice = data.getTodays_low();
+        this.openPrice = data.getOpening_price();
     }
 
     public void update(EquityIndexIndicator data) {
@@ -128,7 +141,11 @@ public class Product extends SG_model{
     }
 
     public void update(SecOrderFilled data) {
-        currentPrice = data.getTrading_price();
+        this.currentPrice = data.getTrading_price();
+        this.highPrice = data.getTodays_high();
+        this.lowPrice = data.getTodays_low();
+        this.openPrice = data.getOpening_price();
+        this.tradingVolume += data.getTrading_volume();
     }
 
     public Product(ResultSet rs) {
@@ -206,6 +223,25 @@ public class Product extends SG_model{
             case "2" -> "신형우선주";
             case "9" -> "종류주권";
             default -> null;
+        };
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "p_code",
+                "p_short_code",
+                "p_name_kr",
+                "p_name_kr_abbr",
+                "p_name_en",
+                "p_class",
+                "p_seq_class",
+                "p_team",
+                "p_type",
+                "p_face_value",
+                "p_having_count",
+                "p_yesterday_price",
+                "p_yesterday_value",
+                "p_yesterday_trading_count",
         };
     }
 }

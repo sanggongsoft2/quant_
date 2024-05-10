@@ -22,10 +22,7 @@ public class ProductAVGService extends SocketService<ProductAVG> {
     public void dataHandler(ProductAVG data) {
         super.addLog(data);
 
-        final Product product = productService.productFromIsinCode(data.getIsinCode());
-        if(product != null) {
-            sendMessage(data);
-            sendMessage(data, data.getIsinCode());
-        }
+        sendMessage(data);
+        sendMessage(data, data.getIsinCode());
     }
 }

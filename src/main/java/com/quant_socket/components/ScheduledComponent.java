@@ -31,16 +31,17 @@ public class ScheduledComponent {
     private final ProductRepo productRepo;
     private final SeqQuoteRepo seqQuoteRepo;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 * * * * *")
     public void everyMinute() {
-        equitiesSnapshotService.insertLogs(EquitiesSnapshot.class, equitiesSnapshotRepo);
-        equityIndexIndicatorService.insertLogs(EquityIndexIndicator.class, equityIndexIndicatorRepo);
-        socketLogService.insertLogs(SocketLog.class, socketLogRepo);
-        securitiesOrderFilledService.insertLogs(SecOrderFilled.class, secOrderFilledRepo);
-        investActivitiesEODService.insertLogs(InvestorActivitiesEOD.class, investActivitiesEODRepo);
-        equitiesBatchDataService.insertLogs(EquitiesBatchData.class, equitiesBatchDataRepo);
-        seqQuoteService.insertLogs(SeqQuote.class, seqQuoteRepo);
-        productService.insertLogs(Product.class, productRepo);;
+        socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
+        equitiesSnapshotService.insertLogs(EquitiesSnapshot.insertCols(), EquitiesSnapshot.class, equitiesSnapshotRepo);
+        equityIndexIndicatorService.insertLogs(EquityIndexIndicator.insertCols(), EquityIndexIndicator.class, equityIndexIndicatorRepo);
+        securitiesOrderFilledService.insertLogs(SecOrderFilled.insertCols(), SecOrderFilled.class, secOrderFilledRepo);
+        investActivitiesEODService.insertLogs(InvestorActivitiesEOD.insertCols(), InvestorActivitiesEOD.class, investActivitiesEODRepo);
+        equitiesBatchDataService.insertLogs(EquitiesBatchData.insertCols(), EquitiesBatchData.class, equitiesBatchDataRepo);
+        seqQuoteService.insertLogs(SeqQuote.insertCols(), SeqQuote.class, seqQuoteRepo);
+        productService.insertLogs(Product.insertCols(), Product.class, productRepo);
+        productService.updateProductMinute();
     }
 
     @Scheduled(cron = "0 0 1 * * ?")

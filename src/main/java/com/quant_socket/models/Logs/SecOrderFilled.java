@@ -81,7 +81,7 @@ public class SecOrderFilled extends SG_model{
     @SG_column(dbField = "sof_crdt")
     private Timestamp createdAt;
 
-    public SecOrderFilled(String msg) {
+    public SecOrderFilled(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         if(!msg.substring(5, 13).isBlank()) message_seq_number = Integer.parseInt(msg.substring(5, 13));
@@ -158,6 +158,33 @@ public class SecOrderFilled extends SG_model{
         final LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Seoul"));
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return dateTime.format(formatter);
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "sof_data_category",
+                "sof_info_category",
+                "sof_message_seq_number",
+                "sof_board_id",
+                "sof_session_id",
+                "sof_isin_code",
+                "sof_a_des_number_for_an_issue",
+                "sof_processing_time_of_trading_system",
+                "sof_price_change_against_previous_day",
+                "sof_price_change_against_the_pre_day",
+                "sof_trading_price",
+                "sof_trading_volume",
+                "sof_opening_price",
+                "sof_todays_high",
+                "sof_todays_low",
+                "sof_accu_trading_volume",
+                "sof_accu_trading_value",
+                "sof_final_askbid_type_code",
+                "sof_lp_holding_quantity",
+                "sof_the_best_ask",
+                "sof_the_best_bid",
+                "sof_end_keyword"
+        };
     }
 
 }

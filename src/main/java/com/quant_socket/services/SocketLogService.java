@@ -138,7 +138,7 @@ public class SocketLogService extends SocketService<SocketLog>{
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
-        log.info("MSG LENGTH: {}", msg.length());
+        log.debug("MSG LENGTH: {}", msg.length());
         for(String chunk : msg.split("(?<=\\\\G.{620})")) {
             if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);

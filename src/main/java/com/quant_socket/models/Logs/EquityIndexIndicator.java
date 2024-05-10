@@ -92,7 +92,7 @@ public class EquityIndexIndicator extends SG_model{
     @SG_column(dbField = "eii_end_keyword")
     private String end_keyword;
 
-    public EquityIndexIndicator(String msg) {
+    public EquityIndexIndicator(String msg) throws NumberFormatException {
         int index = 0;
         data_category = msg.substring(index, index += 2);
         info_category = msg.substring(index, index += 3);
@@ -144,6 +144,47 @@ public class EquityIndexIndicator extends SG_model{
             }
         }
         return data;
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "eii_data_category",
+                "eii_info_category",
+                "eii_message_seq_number",
+                "eii_isin_code",
+                "eii_a_designated_number_for_an_issue",
+                "eii_sec_group_id",
+                "eii_eps_calculation",
+                "eii_eps",
+                "eii_loss_category",
+                "eii_per",
+                "eii_bps_calculation",
+                "eii_bps",
+                "eii_pbr",
+                "eii_dps_calculation",
+                "eii_dps",
+                "eii_dividend_yield",
+                "eii_market_capitalization",
+                "eii_manufacturing",
+                "eii_index_classification_level1",
+                "eii_index_classification_level2",
+                "eii_index_classification_level3",
+                "eii_kospi200_sector_code1",
+                "eii_kospi200_sector_code2",
+                "eii_is_kospi",
+                "eii_is_kosdaq",
+                "eii_is_kospi100",
+                "eii_is_kospi50",
+                "eii_kosdaq150",
+                "eii_krx100",
+                "eii_krx300",
+                "eii_kospi200_high_dividend_yield_index",
+                "eii_krx_bbig_knew_deal_index",
+                "eii_krx_second_battery_knew_deal_index",
+                "eii_krx_bio_knew_deal_index",
+                "eii_filler",
+                "eii_end_keyword",
+        };
     }
 
 }

@@ -18,13 +18,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class SecuritiesOrderFilledService extends SocketService<SecOrderFilled>{
+    @Autowired
+    private ProductService productService;
     public void dataHandler(SecOrderFilled data) {
         super.addLog(data);
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) {
+            product.update(data);
             sendMessage(data.toSocket(product));
             sendMessage(data.toSocket(product), data.getIsin_code());
         }

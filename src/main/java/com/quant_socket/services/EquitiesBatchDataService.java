@@ -17,15 +17,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class EquitiesBatchDataService extends SocketService<EquitiesBatchData>{
+    @Autowired
+    private ProductService productService;
     public void dataHandler(EquitiesBatchData data) {
         super.addLog(data);
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) {
+            productService.update(data);
             sendMessage(data.toSocket(product));
             sendMessage(data.toSocket(product), data.getIsin_code());
+        } else {
+            productService.addLog(new Product(data));
         }
     }
 }

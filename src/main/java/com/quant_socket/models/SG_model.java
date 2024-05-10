@@ -98,7 +98,7 @@ public abstract class SG_model {
         try {
             final ObjectMapper om = new ObjectMapper();
             final SG_model sm = om.readValue(json, this.getClass());
-            log.info("SM = {}", sm.toJson());
+            log.debug("SM = {}", sm.toJson());
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

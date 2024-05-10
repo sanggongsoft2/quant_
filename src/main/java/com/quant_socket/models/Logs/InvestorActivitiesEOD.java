@@ -47,7 +47,7 @@ public class InvestorActivitiesEOD extends SG_model {
     @SG_column(dbField = "iae_end_keyword")
     private String end_keyword;
 
-    public InvestorActivitiesEOD(String msg) {
+    public InvestorActivitiesEOD(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         isin_code = msg.substring(5, 17);
@@ -87,6 +87,21 @@ public class InvestorActivitiesEOD extends SG_model {
         res.put("facility_ask_count", prod.getFacilityAskCount());
         res.put("facility_bid_count", prod.getFacilityBidCount());
         return res;
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "iae_data_category",
+                "iae_info_category",
+                "iae_isin_code",
+                "iae_a_designated_number_for_an_issue",
+                "iae_investor_code",
+                "iae_accu_ask_trading_volume",
+                "iae_accu_ask_trading_value",
+                "iae_accu_bid_trading_volume",
+                "iae_accu_bid_trading_value",
+                "iae_end_keyword"
+        };
     }
 
 }

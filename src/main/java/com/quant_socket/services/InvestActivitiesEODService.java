@@ -23,14 +23,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class InvestActivitiesEODService extends SocketService<InvestorActivitiesEOD>{
-
+    @Autowired
+    private ProductService productService;
     public void dataHandler(InvestorActivitiesEOD data) {
         super.addLog(data);
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) {
+            productService.update(data);
             sendMessage(data.toSocket(product));
             sendMessage(data.toSocket(product), data.getIsin_code());
         }

@@ -28,9 +28,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public abstract class SocketService<T extends SG_model>{
-    protected ProductService productService;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
@@ -125,24 +123,12 @@ public abstract class SocketService<T extends SG_model>{
         }
     }
 
-    protected String insertSql(Class<? extends SG_model> clazz) {
-        final String[] cols = getColumns(clazz);
+    protected String insertSql(Class<? extends SG_model> clazz, String[] cols) {
         final String tableName = getTableName(clazz);
 
         return "INSERT INTO "+tableName+"(" +
                 String.join(",", cols) + ")" +
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
-    }
-
-    private String[] getColumns(Class<? extends SG_model> clazz) {
-        final List<String> cols = new ArrayList<>();
-        for (Field field : clazz.getDeclaredFields()) {
-            if(field.isAnnotationPresent(SG_column.class) && !field.isAnnotationPresent(SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
-                final SG_column sgColumn = field.getAnnotation(SG_column.class);
-                cols.add(sgColumn.dbField());
-            }
-        }
-        return new String[cols.size()];
     }
 
     protected String getTableName(Class<? extends SG_model> clazz) {
@@ -154,9 +140,9 @@ public abstract class SocketService<T extends SG_model>{
         return tableName;
     }
 
-    public void insertLogs(Class<T> clazz, SG_repo<T> repo) {
+    public void insertLogs(String[] cols, Class<T> clazz, SG_repo<T> repo) {
         if(!logs.isEmpty()) {
-            final int result = repo.insertMany(insertSql(clazz), new BatchPreparedStatementSetter() {
+            final int result = repo.insertMany(insertSql(clazz, cols), new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) {
                     final T data = logs.get(i);
@@ -169,7 +155,7 @@ public abstract class SocketService<T extends SG_model>{
                 }
             });
             if(result > 0) logs.clear();
-            log.info(getTableName(SeqQuote.class).toUpperCase()+" INSERT COUNT : {}", result);
+            log.debug(getTableName(clazz).toUpperCase()+" INSERT COUNT : {}", result);
         }
     }
 

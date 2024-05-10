@@ -18,15 +18,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class EquityIndexIndicatorService extends SocketService<EquityIndexIndicator>{
+    @Autowired
+    private ProductService productService;
     public void dataHandler(EquityIndexIndicator data) {
         super.addLog(data);
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
-        if(product != null) {
-            sendMessage(data);
-            sendMessage(data, data.getIsin_code());
-        }
+        if(product != null) productService.update(data);
+        sendMessage(data);
+        sendMessage(data, data.getIsin_code());
     }
 }
