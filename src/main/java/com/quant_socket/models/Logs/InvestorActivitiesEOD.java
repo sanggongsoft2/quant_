@@ -21,7 +21,7 @@ import java.util.Map;
 @SG_table(name = "equities_batch_data")
 @Getter
 @Setter
-public class InvestorActivitiesEOD extends SG_model<InvestorActivitiesEOD> {
+public class InvestorActivitiesEOD extends SG_model {
 
     @SG_idx
     @SG_column(dbField = "iae_idx")

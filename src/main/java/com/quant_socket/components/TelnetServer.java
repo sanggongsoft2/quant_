@@ -23,19 +23,13 @@ import java.util.List;
 @Slf4j
 public class TelnetServer implements CommandLineRunner {
 
-    private final SocketLogRepo repo;
-    private final EquitiesSnapshotService equitiesSnapshotService;
-    private final EquityIndexIndicatorService equityIndexIndicatorService;
     private final SocketLogService socketLogService;
-    private final SecuritiesOrderFilledService securitiesOrderFilledService;
-    private final InvestActivitiesEODService investActivitiesEODService;
-    private final EquitiesBatchDataService equitiesBatchDataService;
     private final ProductService productService;
-    private final SeqQuoteService seqQuoteService;
+    private final ProductRepo productRepo;
     private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904, 24103, 24102, 24104, 24902, 24904, 24903};
     @Override
     public void run(String... args) throws Exception {
-        if(productService.refreshProducts()) setPorts();
+        if(productService.refreshProducts(productRepo)) setPorts();
     }
 
     private void setPorts() throws InterruptedException {

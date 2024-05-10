@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @SG_table(name = "seq_quote")
 @ToString
-public class SeqQuote extends SG_model<SeqQuote> {
+public class SeqQuote extends SG_model {
     @SG_idx
     @SG_column(dbField = "sq_idx")
     private Long idx;

@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @SG_table(name = "socket_log")
 @RequiredArgsConstructor
 @ToString
-public class SocketLog extends SG_model<SocketLog> {
+public class SocketLog extends SG_model {
 
     @SG_idx
     @SG_column(dbField = "SL_idx")

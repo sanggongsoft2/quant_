@@ -1,27 +1,40 @@
 package com.quant_socket.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.quant_socket.annotations.SG_column;
+import com.quant_socket.annotations.SG_crdt;
+import com.quant_socket.annotations.SG_idx;
+import com.quant_socket.annotations.SG_table;
+import com.quant_socket.models.Logs.SeqQuote;
+import com.quant_socket.models.SG_model;
+import com.quant_socket.repos.SG_repo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.sql.PreparedStatement;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public abstract class SocketService {
+public abstract class SocketService<T extends SG_model>{
+    protected ProductService productService;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
+    private final List<T> logs = new CopyOnWriteArrayList<>();
 
     public void addSession(WebSocketSession ws) {
         sessions.add(ws);
@@ -110,5 +123,57 @@ public abstract class SocketService {
 
             }
         }
+    }
+
+    protected String insertSql(Class<? extends SG_model> clazz) {
+        final String[] cols = getColumns(clazz);
+        final String tableName = getTableName(clazz);
+
+        return "INSERT INTO "+tableName+"(" +
+                String.join(",", cols) + ")" +
+                "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
+    }
+
+    private String[] getColumns(Class<? extends SG_model> clazz) {
+        final List<String> cols = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            if(field.isAnnotationPresent(SG_column.class) && !field.isAnnotationPresent(SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
+                final SG_column sgColumn = field.getAnnotation(SG_column.class);
+                cols.add(sgColumn.dbField());
+            }
+        }
+        return new String[cols.size()];
+    }
+
+    protected String getTableName(Class<? extends SG_model> clazz) {
+        String tableName = clazz.getName();
+        if(clazz.isAnnotationPresent(SG_table.class)) {
+            final SG_table sgTable = clazz.getAnnotation(SG_table.class);
+            tableName = sgTable.name();
+        }
+        return tableName;
+    }
+
+    public void insertLogs(Class<T> clazz, SG_repo<T> repo) {
+        if(!logs.isEmpty()) {
+            final int result = repo.insertMany(insertSql(clazz), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) {
+                    final T data = logs.get(i);
+                    data.setPreparedStatement(ps);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return logs.size();
+                }
+            });
+            if(result > 0) logs.clear();
+            log.info(getTableName(SeqQuote.class).toUpperCase()+" INSERT COUNT : {}", result);
+        }
+    }
+
+    protected void addLog(T log) {
+        logs.add(log);
     }
 }

@@ -16,10 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SocketLogService {
-
-    @Autowired
-    private SocketLogRepo repo;
+public class SocketLogService extends SocketService<SocketLog>{
 
     @Autowired
     private EquitiesSnapshotService equitiesSnapshotService;
@@ -39,37 +36,8 @@ public class SocketLogService {
     @Autowired
     private SeqQuoteService seqQuoteService;
 
-    private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
-
-    public void addLog(SocketLog sl) {
-        logs.add(sl);
-    }
-
-    private String insertSql() {
-        return "INSERT INTO socket_log(SL_log, SL_remote_url, SL_port, SL_error)" +
-                "VALUES(?, ?, ?, ?)";
-    }
-
-    public void insertLogs() {
-        if(!logs.isEmpty()) {
-            final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    final SocketLog sl = logs.get(i);
-                    ps.setString(1, sl.getLog());
-                    ps.setString(2, sl.getRemote_url());
-                    ps.setInt(3, sl.getPort());
-                    ps.setString(4, sl.getError());
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return logs.size();
-                }
-            });
-            if(result > 0) logs.clear();
-            log.debug("INSERT COUNT : {}", result);
-        }
+    public void addLog(SocketLog log) {
+        super.addLog(log);
     }
 
     public void esHandler(String msg) {
@@ -126,7 +94,7 @@ public class SocketLogService {
         for(String chunk : msg.split("(?<=\\\\G.{96})")) {
             if (chunk.length() >= 96) {
                 final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
-                investActivitiesEODService.addLog(iae);
+                investActivitiesEODService.dataHandler(iae);
             }
         }
     }
@@ -135,7 +103,7 @@ public class SocketLogService {
     private void securities_order_filled_handler(String msg) {
         for(String chunk : msg.split("(?<=\\\\G.{186})")) if(chunk.length() >= 186) {
             final SecOrderFilled sef = new SecOrderFilled(msg);
-            securitiesOrderFilledService.addLog(sef);
+            securitiesOrderFilledService.dataHandler(sef);
         }
     }
 
@@ -144,7 +112,7 @@ public class SocketLogService {
         for(String chunk : msg.split("(?<=\\\\G.{650})")) {
             if(chunk.length() >= 650) {
                 final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
-                equitiesSnapshotService.addLog(es);
+                equitiesSnapshotService.dataHandler(es);
             }
         }
     }
@@ -153,7 +121,7 @@ public class SocketLogService {
         for(String chunk : msg.split("(?<=\\\\G.{900})")) {
             if(chunk.length() >= 900) {
                 final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
-                equitiesSnapshotService.addLog(es);
+                equitiesSnapshotService.dataHandler(es);
             }
         }
     }
@@ -163,18 +131,18 @@ public class SocketLogService {
         for(String chunk : msg.split("(?<=\\\\G.{185})")) {
             if (chunk.length() >= 185) {
                 final EquityIndexIndicator eii = new EquityIndexIndicator(chunk);
-                equityIndexIndicatorService.addLog(eii);
+                equityIndexIndicatorService.dataHandler(eii);
             }
         }
     }
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
-        log.debug("MSG LENGTH: {}", msg.length());
+        log.info("MSG LENGTH: {}", msg.length());
         for(String chunk : msg.split("(?<=\\\\G.{620})")) {
             if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
-                equitiesBatchDataService.addLog(ebd);
+                equitiesBatchDataService.dataHandler(ebd);
             }
         }
     }
@@ -183,7 +151,7 @@ public class SocketLogService {
         for(String chunk : msg.split("(?<=\\\\G.{795})")) {
             if(chunk.length() >= 795) {
                 final SeqQuote data = new SeqQuote(chunk);
-                seqQuoteService.addLog(data);
+                seqQuoteService.dataHandler(data);
             }
         }
     }

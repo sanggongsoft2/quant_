@@ -29,7 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @SG_table(name = "sec_order_filled")
 @ToString
-public class SecOrderFilled extends SG_model<SecOrderFilled> {
+public class SecOrderFilled extends SG_model{
     @SG_idx
     @SG_column(dbField = "sof_idx")
     private Long idx;

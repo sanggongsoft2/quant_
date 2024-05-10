@@ -18,7 +18,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Product extends SG_model<Product>{
+public class Product extends SG_model{
 
     @SG_idx
     @SG_column(dbField = "p_idx")

@@ -20,7 +20,7 @@ import java.util.Map;
 @Getter
 @Slf4j
 @ToString
-public class EquitiesSnapshot extends SG_model<EquitiesSnapshot> {
+public class EquitiesSnapshot extends SG_model{
 
     @SG_idx
     @SG_column(dbField = "es_idx")

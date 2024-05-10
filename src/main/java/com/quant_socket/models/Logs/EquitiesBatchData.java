@@ -18,7 +18,7 @@ import java.util.Map;
 @SG_table(name = "equities_batch_data")
 @Getter
 @Setter
-public class EquitiesBatchData extends SG_model<EquitiesBatchData> {
+public class EquitiesBatchData extends SG_model{
 
     @SG_idx
     @SG_column(dbField = "ebd_idx")

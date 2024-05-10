@@ -17,15 +17,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService extends SocketService{
-    @Autowired
-    private final ProductRepo repo;
+public class ProductService extends SocketService<Product>{
 
     private final List<Product> products = new CopyOnWriteArrayList<>();
 
-    private final List<Product> insertProducts = new CopyOnWriteArrayList<>();
-
-    public boolean refreshProducts() {
+    public boolean refreshProducts(ProductRepo repo) {
         products.clear();
         return this.products.addAll(repo.findAll());
     }
@@ -47,8 +43,8 @@ public class ProductService extends SocketService{
     public void update(EquitiesBatchData data) {
         for(Product prod : products) {
             if(prod.getCode().equals(data.getIsin_code())) {
+                addLog(new Product(data));
                 prod.update(data);
-                repo.update(prod);
                 break;
             }
         }
@@ -85,58 +81,5 @@ public class ProductService extends SocketService{
                 break;
             }
         }
-    }
-
-    private String insertSql() {
-        final String[] cols = new String[] {
-                "p_code",
-                "p_short_code",
-                "p_name_kr",
-                "p_name_kr_abbr",
-                "p_name_en",
-                "p_class",
-                "p_seq_class",
-                "p_team",
-                "p_type",
-                "p_face_value",
-                "p_having_count",
-                "p_yesterday_price",
-                "p_yesterday_value",
-                "p_yesterday_trading_count",
-                "p_status"
-        };
-
-        String[] questionMarks = new String[cols.length];
-        Arrays.fill(questionMarks, "?");
-
-        return "INSERT INTO product(" +
-                String.join(",", cols) + ")" +
-                "VALUES(" + String.join(",", questionMarks) + ")";
-    }
-
-    public void insertProducts() {
-        if(!insertProducts.isEmpty()) {
-            final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) {
-                    final Product data = insertProducts.get(i);
-                    data.setPreparedStatement(ps);
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return insertProducts.size();
-                }
-            });
-            if(result > 0) {
-                insertProducts.clear();
-                refreshProducts();
-            }
-            log.debug("PRODUCT INSERT COUNT : {}", result);
-        }
-    }
-
-    public void addProduct(Product product) {
-        insertProducts.add(product);
     }
 }

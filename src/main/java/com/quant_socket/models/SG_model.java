@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class SG_model<T> {
+public abstract class SG_model {
     private Long row_num;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -98,7 +98,7 @@ public abstract class SG_model<T> {
         try {
             final ObjectMapper om = new ObjectMapper();
             final SG_model sm = om.readValue(json, this.getClass());
-            log.debug("SM = {}", sm.toJson());
+            log.info("SM = {}", sm.toJson());
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

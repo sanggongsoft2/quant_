@@ -14,7 +14,7 @@ import java.util.Map;
 
 @SG_table(name = "equity_index_indicator")
 @Getter
-public class EquityIndexIndicator extends SG_model<EquityIndexIndicator> {
+public class EquityIndexIndicator extends SG_model{
 
     @SG_idx
     @SG_column(dbField = "eii_idx")
