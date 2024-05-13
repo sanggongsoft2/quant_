@@ -5,16 +5,11 @@ import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Logs.*;
-import com.quant_socket.models.Logs.prod.ProductMinute;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @SG_table(name = "product")
 @Getter

@@ -153,6 +153,8 @@ public abstract class SG_model {
                         else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (Double) value);
                         else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (Long) value);
                         else if(type.equals(Boolean.class) || type.equals(boolean.class)) ps.setBoolean(index, (Boolean) value);
+                        else if(type.equals(Date.class)) ps.setDate(index, (Date) value);
+                        else if(type.equals(Time.class)) ps.setTime(index, (Time) value);
                     }
                 } catch (Exception ignore) {
                 } finally {

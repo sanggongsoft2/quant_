@@ -46,6 +46,7 @@ public class ScheduledComponent {
 
     @Scheduled(cron = "0 0 1 * * ?")
     public void everyday1PM() {
+        productService.updateProducts();
         productService.refreshProductItems();
     }
 }

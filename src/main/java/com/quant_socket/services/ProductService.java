@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -24,6 +25,8 @@ public class ProductService extends SocketService<Product>{
 
     @Autowired
     private ProductMinuteRepo productMinuteRepo;
+    @Autowired
+    private ProductRepo repo;
 
     private final List<Product> products = new CopyOnWriteArrayList<>();
 
@@ -43,9 +46,18 @@ public class ProductService extends SocketService<Product>{
         return prod;
     }
 
+    @Transactional
+    public void updateProducts() {
+        for(final Product prod: products) {
+            repo.update(prod);
+        }
+    }
+
+    @Transactional
     public void updateProductMinute() {
         final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
-        final int result = productMinuteRepo.insertMany(insertSql(ProductMinute.class, ProductMinute.insertCols()), new BatchPreparedStatementSetter() {
+        final String sql = insertSql(ProductMinute.class, ProductMinute.insertCols());
+        final int result = productMinuteRepo.insertMany(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 final ProductMinute pm = minutes.get(i);

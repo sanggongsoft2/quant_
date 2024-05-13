@@ -6,13 +6,22 @@ import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @SG_table(name = "product_minute")
+@Getter
+@Setter
+@ToString
 public class ProductMinute extends SG_model {
     @SG_idx
     @SG_column(dbField = "m_idx")
@@ -52,10 +61,16 @@ public class ProductMinute extends SG_model {
                 "m_open",
                 "m_volume",
                 "m_pre_close",
+                "m_date",
+                "m_time",
         };
     }
 
     public ProductMinute(Product prod) {
+        final LocalDateTime localDateTime = LocalDateTime.now();
+        final ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime now = ZonedDateTime.of(localDateTime, zoneId);
+        now = now.minusMinutes(1).withSecond(0);
         this.isinCode = prod.getCode();
         this.close = prod.getCurrentPrice();
         this.high = prod.getHighPrice();
@@ -63,5 +78,7 @@ public class ProductMinute extends SG_model {
         this.open = prod.getOpenPrice();
         this.volume = prod.getTradingVolume();
         this.pre_close = prod.getCurrentPrice();
+        this.date = Date.valueOf(now.toLocalDate());
+        this.time = Time.valueOf(now.toLocalTime());
     }
 }

@@ -13,7 +13,4 @@ import java.util.Arrays;
 @Repository
 @Slf4j
 public class ProductMinuteRepo extends SG_repo<ProductMinute>{
-    public boolean insert(DataSetter setter) {
-        return super.insert(ProductMinute.class, setter);
-    }
 }

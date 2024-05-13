@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -140,6 +141,7 @@ public abstract class SocketService<T extends SG_model>{
         return tableName;
     }
 
+    @Transactional
     public void insertLogs(String[] cols, Class<T> clazz, SG_repo<T> repo) {
         if(!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(clazz, cols), new BatchPreparedStatementSetter() {
