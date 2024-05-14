@@ -2,6 +2,7 @@ package com.quant_socket.repos;
 
 import com.quant_socket.models.Product;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class ProductRepo extends SG_repo<Product>{
         return super.jt.query(sql, (rs, rn) -> new Product(rs));
     }
 
+    @Transactional
     public boolean update(Product prod) {
         final String sql = "UPDATE product SET " +
                 "p_face_value = ?, " +

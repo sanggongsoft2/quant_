@@ -46,7 +46,6 @@ public class ProductService extends SocketService<Product>{
         return prod;
     }
 
-    @Transactional
     public void updateProducts() {
         for(final Product prod: products) {
             repo.update(prod);

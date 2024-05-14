@@ -41,12 +41,16 @@ public class ScheduledComponent {
         equitiesBatchDataService.insertLogs(EquitiesBatchData.insertCols(), EquitiesBatchData.class, equitiesBatchDataRepo);
         seqQuoteService.insertLogs(SeqQuote.insertCols(), SeqQuote.class, seqQuoteRepo);
         productService.insertLogs(Product.insertCols(), Product.class, productRepo);
-        productService.updateProductMinute();
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void everyday1PM() {
         productService.updateProducts();
         productService.refreshProductItems();
+    }
+
+    @Scheduled(cron = "0 * 10-15 * * ?")
+    public void everyMinuteFrom10To15() {
+        productService.updateProductMinute();
     }
 }
