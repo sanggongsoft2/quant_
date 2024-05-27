@@ -16,7 +16,7 @@ public class EquitiesSnapshotService extends SocketService<EquitiesSnapshot>{
         if(product != null) {
             productService.update(data);
             sendMessage(data.toSocket(product));
-            sendMessage(data.toSocket(product), data.getIsin_code());
+            sendMessage(data.toDetailsSocket(product), data.getIsin_code());
         }
     }
 }

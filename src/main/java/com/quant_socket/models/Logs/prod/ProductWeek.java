@@ -9,6 +9,7 @@ import com.quant_socket.models.SG_model;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @SG_table(name = "product_week")
 public class ProductWeek extends SG_model {
@@ -31,9 +32,8 @@ public class ProductWeek extends SG_model {
     private Integer pre_close;
     @SG_column(dbField = "w_date")
     private Date date;
-    @SG_crdt
     @SG_column(dbField = "w_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductWeek(ResultSet rs) {
         resultSetToClass(rs);

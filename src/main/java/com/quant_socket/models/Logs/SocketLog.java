@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Data
 @SG_table(name = "socket_log")
@@ -31,9 +32,9 @@ public class SocketLog extends SG_model {
     @SG_column(dbField = "SL_error")
     private String error;
 
-    @SG_crdt
+
     @SG_column(dbField = "SL_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public SocketLog(ResultSet res) {
         super.resultSetToClass(res);
@@ -44,7 +45,8 @@ public class SocketLog extends SG_model {
                 "SL_log",
                 "SL_remote_url",
                 "SL_port",
-                "SL_error"
+                "SL_error",
+                "SL_crdt",
         };
     }
 }

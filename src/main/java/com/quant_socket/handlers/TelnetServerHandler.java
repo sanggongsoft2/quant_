@@ -36,27 +36,24 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf in = (ByteBuf) msg;
 
-        try {
-            int len = in.writerIndex();
-            byte[] msgByte = new byte[len];
-            in.readBytes(msgByte);
-            this.msg = new String(msgByte, StandardCharsets.UTF_8);
-            log.debug("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
+        int len = in.writerIndex();
+        byte[] msgByte = new byte[len];
+        in.readBytes(msgByte);
+        this.msg = new String(msgByte, StandardCharsets.UTF_8);
+        log.debug("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
 
-            if(!this.msg.isBlank()) {
-                final SocketLog sl = new SocketLog();
+        if(!this.msg.isBlank()) {
+            final SocketLog sl = new SocketLog();
 
-                sl.setLog(this.msg);
-                sl.setPort(this.port);
-                sl.setRemote_url(remote_url);
-                socketLogService.addLog(sl);
+            sl.setLog(this.msg);
+            sl.setPort(this.port);
+            sl.setRemote_url(remote_url);
+            socketLogService.addLog(sl);
 
-                socketLogService.esHandler(this.msg);
-            }
-        } catch (Exception ignore) {
-        } finally {
-            in.release();
+            socketLogService.esHandler(this.msg);
         }
+
+        in.release();
     }
 
     @Override

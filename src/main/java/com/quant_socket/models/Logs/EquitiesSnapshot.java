@@ -13,6 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -208,9 +212,9 @@ public class EquitiesSnapshot extends SG_model{
     private String fast_close_time;
     @SG_column(dbField = "es_end_keyword")
     private String end_keyword;
-    @SG_crdt
-    @SG_column(dbField = "es_idx")
-    private Timestamp createdAt;
+
+    @SG_column(dbField = "es_crdt")
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public EquitiesSnapshot(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -598,6 +602,7 @@ public class EquitiesSnapshot extends SG_model{
                 "es_is_fast_close",
                 "es_fast_close_time",
                 "es_end_keyword",
+                "es_crdt",
         };
     }
 }

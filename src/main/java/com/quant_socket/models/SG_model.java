@@ -155,6 +155,7 @@ public abstract class SG_model {
                         else if(type.equals(Boolean.class) || type.equals(boolean.class)) ps.setBoolean(index, (Boolean) value);
                         else if(type.equals(Date.class)) ps.setDate(index, (Date) value);
                         else if(type.equals(Time.class)) ps.setTime(index, (Time) value);
+                        else if(type.equals(Timestamp.class)) ps.setTimestamp(index, (Timestamp) value);
                     }
                 } catch (Exception ignore) {
                 } finally {

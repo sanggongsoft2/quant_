@@ -9,6 +9,7 @@ import com.quant_socket.models.SG_model;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @SG_table(name = "product_month")
 public class ProductMonth extends SG_model {
@@ -31,9 +32,8 @@ public class ProductMonth extends SG_model {
     private Integer pre_close;
     @SG_column(dbField = "m_date")
     private Date date;
-    @SG_crdt
     @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductMonth(ResultSet rs) {
         resultSetToClass(rs);

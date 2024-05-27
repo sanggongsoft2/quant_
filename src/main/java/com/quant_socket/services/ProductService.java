@@ -1,6 +1,7 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.*;
+import com.quant_socket.models.Logs.prod.ProductDay;
 import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.ProductMinuteRepo;
@@ -69,6 +70,25 @@ public class ProductService extends SocketService<Product>{
                 return minutes.size();
             }
         });
+    }
+
+    @Transactional
+    public void updateProductDay() {
+        final List<ProductDay> days = products.stream().map(ProductDay::new).toList();
+        final String sql = insertSql(ProductDay.class, ProductDay.insertCols());
+        final int result = productMinuteRepo.insertMany(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                final ProductDay pm = days.get(i);
+                pm.setPreparedStatement(ps);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return days.size();
+            }
+        });
+        if(result > 0) refreshProductItems();
     }
 
     public void refreshProductItems() {

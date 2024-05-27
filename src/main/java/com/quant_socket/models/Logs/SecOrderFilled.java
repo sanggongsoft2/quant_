@@ -77,9 +77,9 @@ public class SecOrderFilled extends SG_model{
     private double the_best_bid = 0;
     @SG_column(dbField = "sof_end_keyword")
     private String end_keyword;
-    @SG_crdt
+
     @SG_column(dbField = "sof_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public SecOrderFilled(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -183,7 +183,8 @@ public class SecOrderFilled extends SG_model{
                 "sof_lp_holding_quantity",
                 "sof_the_best_ask",
                 "sof_the_best_bid",
-                "sof_end_keyword"
+                "sof_end_keyword",
+                "sof_crdt",
         };
     }
 

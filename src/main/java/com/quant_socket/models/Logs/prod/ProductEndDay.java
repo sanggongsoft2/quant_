@@ -9,6 +9,7 @@ import com.quant_socket.models.SG_model;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @SG_table(name = "product_end_day")
 public class ProductEndDay extends SG_model {
@@ -21,9 +22,8 @@ public class ProductEndDay extends SG_model {
     private Integer price;
     @SG_column(dbField = "e_end_date")
     private Date endDate;
-    @SG_crdt
     @SG_column(dbField = "e_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductEndDay(ResultSet rs) {
         resultSetToClass(rs);

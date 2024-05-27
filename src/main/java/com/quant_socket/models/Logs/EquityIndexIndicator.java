@@ -1,14 +1,14 @@
 package com.quant_socket.models.Logs;
 
 import com.quant_socket.annotations.SG_column;
-import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +91,8 @@ public class EquityIndexIndicator extends SG_model{
     private String filler;
     @SG_column(dbField = "eii_end_keyword")
     private String end_keyword;
+    @SG_column(dbField = "eii_crdt")
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public EquityIndexIndicator(String msg) throws NumberFormatException {
         int index = 0;
@@ -184,6 +186,7 @@ public class EquityIndexIndicator extends SG_model{
                 "eii_krx_bio_knew_deal_index",
                 "eii_filler",
                 "eii_end_keyword",
+                "eii_crdt",
         };
     }
 

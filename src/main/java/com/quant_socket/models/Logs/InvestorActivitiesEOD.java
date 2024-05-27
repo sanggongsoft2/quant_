@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,8 @@ public class InvestorActivitiesEOD extends SG_model {
     private float accu_bid_trading_value = 0;
     @SG_column(dbField = "iae_end_keyword")
     private String end_keyword;
+    @SG_column(dbField = "iae_crdt")
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public InvestorActivitiesEOD(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -100,8 +103,8 @@ public class InvestorActivitiesEOD extends SG_model {
                 "iae_accu_ask_trading_value",
                 "iae_accu_bid_trading_volume",
                 "iae_accu_bid_trading_value",
-                "iae_end_keyword"
+                "iae_end_keyword",
+                "iae_crdt",
         };
     }
-
 }

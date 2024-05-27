@@ -31,7 +31,7 @@ public class ScheduledComponent {
     private final ProductRepo productRepo;
     private final SeqQuoteRepo seqQuoteRepo;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
         equitiesSnapshotService.insertLogs(EquitiesSnapshot.insertCols(), EquitiesSnapshot.class, equitiesSnapshotRepo);
@@ -46,11 +46,16 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 0 0 * * ?")
     public void everyday1PM() {
         productService.updateProducts();
-        productService.refreshProductItems();
+        productService.updateProductDay();
     }
 
-    @Scheduled(cron = "0 * 10-15 * * ?")
+    @Scheduled(cron = "0 0-59 10-14 * * *")
     public void everyMinuteFrom10To15() {
+        productService.updateProductMinute();
+    }
+
+    @Scheduled(cron = "0 0-1 15 * * *")
+    public void at15() {
         productService.updateProductMinute();
     }
 }

@@ -12,6 +12,7 @@ import lombok.Setter;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -237,9 +238,8 @@ public class EquitiesBatchData extends SG_model{
     private String segment_type_code;
     @SG_column(dbField = "ebd_end_keyword")
     private String end_keyword;
-    @SG_crdt
-    @SG_column(dbField = "ebd_idx")
-    private Timestamp createdAt;
+    @SG_column(dbField = "ebd_crdt")
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public EquitiesBatchData(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -484,7 +484,8 @@ public class EquitiesBatchData extends SG_model{
                 "ebd_prefer_sttocks_with_lesser_shares",
                 "ebd_spac_merger",
                 "ebd_segment_type_code",
-                "ebd_end_keyword"
+                "ebd_end_keyword",
+                "ebd_crdt",
         };
     }
 }

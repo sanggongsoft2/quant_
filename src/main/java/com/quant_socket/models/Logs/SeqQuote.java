@@ -187,9 +187,9 @@ public class SeqQuote extends SG_model {
 
     @SG_column(dbField = "sq_end_keyword")
     private String end_keyword;
-    @SG_crdt
+
     @SG_column(dbField = "sq_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public SeqQuote(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -360,6 +360,7 @@ public class SeqQuote extends SG_model {
                 "sq_estimated_tading_price",
                 "sq_estimated_trading_volume",
                 "sq_end_keyword",
+                "sq_crdt",
         };
     }
 }

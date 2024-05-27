@@ -14,6 +14,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -44,9 +45,8 @@ public class ProductMinute extends SG_model {
     private Date date;
     @SG_column(dbField = "m_time")
     private Time time;
-    @SG_crdt
     @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductMinute(ResultSet rs) {
         resultSetToClass(rs);
@@ -63,6 +63,7 @@ public class ProductMinute extends SG_model {
                 "m_pre_close",
                 "m_date",
                 "m_time",
+                "m_crdt",
         };
     }
 

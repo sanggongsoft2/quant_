@@ -12,6 +12,7 @@ import lombok.ToString;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -29,9 +30,8 @@ public class ProductAVG extends SG_model {
     private Integer price20;
     @SG_column(dbField = "a_avg_date")
     private Date avg_date;
-    @SG_crdt
     @SG_column(dbField = "a_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductAVG(ResultSet rs) {
         resultSetToClass(rs);

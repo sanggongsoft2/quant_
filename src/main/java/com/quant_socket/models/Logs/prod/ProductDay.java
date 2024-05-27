@@ -4,11 +4,17 @@ import com.quant_socket.annotations.SG_column;
 import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
+import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @SG_table(name = "product_day")
 public class ProductDay extends SG_model {
@@ -16,26 +22,54 @@ public class ProductDay extends SG_model {
     @SG_column(dbField = "d_idx")
     private Long idx;
     @SG_column(dbField = "p_code")
-    private String p_code;
+    private String isinCode;
     @SG_column(dbField = "d_close")
-    private Integer close;
+    private Double close;
     @SG_column(dbField = "d_high")
-    private Integer high;
+    private Double high;
     @SG_column(dbField = "d_low")
-    private Integer low;
+    private Double low;
     @SG_column(dbField = "d_open")
-    private Integer open;
+    private Double open;
     @SG_column(dbField = "d_volume")
-    private Integer volume;
+    private Long volume;
     @SG_column(dbField = "d_pre_close")
-    private Integer pre_close;
+    private Double pre_close;
     @SG_column(dbField = "d_date")
     private Date date;
-    @SG_crdt
     @SG_column(dbField = "d_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductDay(ResultSet rs) {
         resultSetToClass(rs);
+    }
+
+    static public String[] insertCols() {
+        return new String[] {
+                "p_code",
+                "d_close",
+                "d_high",
+                "d_low",
+                "d_open",
+                "d_volume",
+                "d_pre_close",
+                "d_date",
+                "d_crdt",
+        };
+    }
+
+    public ProductDay(Product prod) {
+        final LocalDateTime localDateTime = LocalDateTime.now();
+        final ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime now = ZonedDateTime.of(localDateTime, zoneId);
+        now = now.minusMinutes(1).withSecond(0);
+        this.isinCode = prod.getCode();
+        this.close = prod.getCurrentPrice();
+        this.high = prod.getHighPrice();
+        this.low = prod.getLowPrice();
+        this.open = prod.getOpenPrice();
+        this.volume = prod.getTradingVolume();
+        this.pre_close = prod.getCurrentPrice();
+        this.date = Date.valueOf(now.toLocalDate());
     }
 }
