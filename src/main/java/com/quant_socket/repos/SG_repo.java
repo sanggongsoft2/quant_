@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public abstract class SG_repo<T> {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    protected JdbcTemplate jt;
+    public JdbcTemplate jt;
 
     protected boolean insert(Class<T> clazz, DataSetter setter) {
         final Map<String, Object> data = new HashMap<>();

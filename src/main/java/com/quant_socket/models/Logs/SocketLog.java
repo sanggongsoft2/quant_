@@ -9,6 +9,8 @@ import lombok.ToString;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Data
 @SG_table(name = "socket_log")
@@ -32,11 +34,15 @@ public class SocketLog extends SG_model {
     @SG_column(dbField = "SL_error")
     private String error;
 
-
     @SG_column(dbField = "SL_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SocketLog(ResultSet res) {
+
+        Instant now = Instant.now();
+        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
+        createdAt = Timestamp.from(koreaTime.toInstant());
+
         super.resultSetToClass(res);
     }
 

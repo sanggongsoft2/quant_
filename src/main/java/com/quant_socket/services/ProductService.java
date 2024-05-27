@@ -47,6 +47,7 @@ public class ProductService extends SocketService<Product>{
         return prod;
     }
 
+    @Transactional
     public void updateProducts() {
         for(final Product prod: products) {
             repo.update(prod);
@@ -70,25 +71,31 @@ public class ProductService extends SocketService<Product>{
                 return minutes.size();
             }
         });
+        if(result > 0) refreshProductItems();
     }
 
     @Transactional
     public void updateProductDay() {
-        final List<ProductDay> days = products.stream().map(ProductDay::new).toList();
-        final String sql = insertSql(ProductDay.class, ProductDay.insertCols());
-        final int result = productMinuteRepo.insertMany(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                final ProductDay pm = days.get(i);
-                pm.setPreparedStatement(ps);
-            }
+        final String sql = "INSERT INTO product_day (p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date)\n" +
+                "SELECT p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date FROM product_minute pm\n" +
+                "WHERE (p_code, m_idx) IN (\n" +
+                "    SELECT p_code, MAX(m_idx)\n" +
+                "    FROM product_minute pm2\n" +
+                "    GROUP BY p_code\n" +
+                ")";
+        repo.jt.update(sql);
+    }
 
-            @Override
-            public int getBatchSize() {
-                return days.size();
-            }
-        });
-        if(result > 0) refreshProductItems();
+    @Transactional
+    public void updateProductWeek() {
+        final String sql = "INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)\n" +
+                "SELECT p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date FROM product_day\n" +
+                "WHERE (p_code, d_idx) IN (\n" +
+                "    SELECT p_code, MAX(d_idx)\n" +
+                "    FROM product_day\n" +
+                "    GROUP BY p_code\n" +
+                ")";
+        repo.jt.update(sql);
     }
 
     public void refreshProductItems() {

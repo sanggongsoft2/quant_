@@ -147,7 +147,8 @@ public abstract class SG_model {
                     if(value == null) {
                         ps.setNull(index, this.typeToSqlType(type));
                     } else {
-                        if(type.equals(String.class)) ps.setString(index, (String) value);
+                        ps.setObject(index, value);
+                        /*if(type.equals(String.class)) ps.setString(index, (String) value);
                         else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) value);
                         else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (Float) value);
                         else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (Double) value);
@@ -155,7 +156,7 @@ public abstract class SG_model {
                         else if(type.equals(Boolean.class) || type.equals(boolean.class)) ps.setBoolean(index, (Boolean) value);
                         else if(type.equals(Date.class)) ps.setDate(index, (Date) value);
                         else if(type.equals(Time.class)) ps.setTime(index, (Time) value);
-                        else if(type.equals(Timestamp.class)) ps.setTimestamp(index, (Timestamp) value);
+                        else if(type.equals(Timestamp.class)) ps.setTimestamp(index, (Timestamp) value);*/
                     }
                 } catch (Exception ignore) {
                 } finally {

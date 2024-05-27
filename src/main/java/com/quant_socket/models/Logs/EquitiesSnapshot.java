@@ -214,9 +214,14 @@ public class EquitiesSnapshot extends SG_model{
     private String end_keyword;
 
     @SG_column(dbField = "es_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public EquitiesSnapshot(String msg) throws NumberFormatException {
+
+        Instant now = Instant.now();
+        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
+        createdAt = Timestamp.from(koreaTime.toInstant());
+
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         board_id = msg.substring(5, 7);

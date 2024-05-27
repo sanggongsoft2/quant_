@@ -27,7 +27,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         super.channelActive(ctx);
         // 소켓 채널이 활성화될 때 포트 번호 저장
         SocketChannel socketChannel = (SocketChannel) ctx.channel();
-        InetSocketAddress inetSocketAddress = socketChannel.localAddress();
+        InetSocketAddress inetSocketAddress = socketChannel.remoteAddress();
         port = inetSocketAddress.getPort();
         remote_url = inetSocketAddress.getHostString();
     }

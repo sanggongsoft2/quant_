@@ -16,10 +16,7 @@ import javax.swing.text.DateFormatter;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,9 +76,14 @@ public class SecOrderFilled extends SG_model{
     private String end_keyword;
 
     @SG_column(dbField = "sof_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SecOrderFilled(String msg) throws NumberFormatException {
+
+        Instant now = Instant.now();
+        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
+        createdAt = Timestamp.from(koreaTime.toInstant());
+
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         if(!msg.substring(5, 13).isBlank()) message_seq_number = Integer.parseInt(msg.substring(5, 13));

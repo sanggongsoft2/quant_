@@ -16,6 +16,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -189,9 +190,14 @@ public class SeqQuote extends SG_model {
     private String end_keyword;
 
     @SG_column(dbField = "sq_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SeqQuote(String msg) throws NumberFormatException {
+
+        Instant now = Instant.now();
+        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
+        createdAt = Timestamp.from(koreaTime.toInstant());
+
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         if(!msg.substring(5, 13).isBlank()) message_seq_number = Integer.parseInt(msg.substring(5, 13));

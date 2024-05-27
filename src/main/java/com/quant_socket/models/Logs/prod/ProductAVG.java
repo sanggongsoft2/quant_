@@ -31,7 +31,7 @@ public class ProductAVG extends SG_model {
     @SG_column(dbField = "a_avg_date")
     private Date avg_date;
     @SG_column(dbField = "a_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public ProductAVG(ResultSet rs) {
         resultSetToClass(rs);

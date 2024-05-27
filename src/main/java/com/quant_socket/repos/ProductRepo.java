@@ -14,7 +14,6 @@ public class ProductRepo extends SG_repo<Product>{
         return super.jt.query(sql, (rs, rn) -> new Product(rs));
     }
 
-    @Transactional
     public boolean update(Product prod) {
         final String sql = "UPDATE product SET " +
                 "p_face_value = ?, " +
