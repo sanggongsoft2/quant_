@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 
 @Data
 @SG_table(name = "socket_log")
-@RequiredArgsConstructor
 @ToString
 public class SocketLog extends SG_model {
 
@@ -35,13 +34,13 @@ public class SocketLog extends SG_model {
     private String error;
 
     @SG_column(dbField = "SL_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
+
+    public SocketLog() {
+
+    }
 
     public SocketLog(ResultSet res) {
-
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
 
         super.resultSetToClass(res);
     }

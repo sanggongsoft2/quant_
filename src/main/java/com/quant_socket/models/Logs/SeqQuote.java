@@ -190,13 +190,11 @@ public class SeqQuote extends SG_model {
     private String end_keyword;
 
     @SG_column(dbField = "sq_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public SeqQuote(String msg) throws NumberFormatException {
 
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
+
 
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);

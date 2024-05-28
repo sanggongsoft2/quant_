@@ -241,13 +241,9 @@ public class EquitiesBatchData extends SG_model{
     @SG_column(dbField = "ebd_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "ebd_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public EquitiesBatchData(String msg) throws NumberFormatException {
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
-
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
         if(!msg.substring(5, 13).isBlank()) msg_seq_number = Integer.parseInt(msg.substring(5, 13));

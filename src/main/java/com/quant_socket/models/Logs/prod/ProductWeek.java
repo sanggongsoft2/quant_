@@ -33,7 +33,7 @@ public class ProductWeek extends SG_model {
     @SG_column(dbField = "w_date")
     private Date date;
     @SG_column(dbField = "w_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductWeek(ResultSet rs) {
         resultSetToClass(rs);

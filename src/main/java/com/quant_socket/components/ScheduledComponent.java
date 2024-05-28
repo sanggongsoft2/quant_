@@ -36,6 +36,11 @@ public class ScheduledComponent {
     private final ProductRepo productRepo;
     private final SeqQuoteRepo seqQuoteRepo;
 
+    /*@Scheduled(cron = "* * * * * *")
+    public void everySeconds() {
+        log.info("CURRENT TIMESTAMP : {}", LocalDateTime.now());
+    }*/
+
     @Scheduled(cron = "0 0/10 * * * ?")
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
@@ -49,7 +54,7 @@ public class ScheduledComponent {
     }
 
     @Scheduled(cron = "0 * 10-17 * * MON-FRI")
-    public void everyMinuteFrom10To15() {
+    public void everyMinuteFrom10To17() {
         productService.updateProductMinute();
     }
 
@@ -67,5 +72,10 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 59 11 * * FRI")
     public void everyFriday() {
         productService.updateProductWeek();
+    }
+
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void everyMonth() {
+        productService.updateProductMonth();
     }
 }

@@ -76,13 +76,11 @@ public class SecOrderFilled extends SG_model{
     private String end_keyword;
 
     @SG_column(dbField = "sof_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public SecOrderFilled(String msg) throws NumberFormatException {
 
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
+
 
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);

@@ -33,7 +33,7 @@ public class ProductMonth extends SG_model {
     @SG_column(dbField = "m_date")
     private Date date;
     @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductMonth(ResultSet rs) {
         resultSetToClass(rs);

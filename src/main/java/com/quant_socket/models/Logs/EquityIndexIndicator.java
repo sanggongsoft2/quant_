@@ -94,13 +94,11 @@ public class EquityIndexIndicator extends SG_model{
     @SG_column(dbField = "eii_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "eii_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public EquityIndexIndicator(String msg) throws NumberFormatException {
 
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
+
 
         int index = 0;
         data_category = msg.substring(index, index += 2);

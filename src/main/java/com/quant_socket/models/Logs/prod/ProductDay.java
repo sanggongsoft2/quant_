@@ -38,7 +38,7 @@ public class ProductDay extends SG_model {
     @SG_column(dbField = "d_date")
     private Date date;
     @SG_column(dbField = "d_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductDay(ResultSet rs) {
         resultSetToClass(rs);
@@ -59,10 +59,6 @@ public class ProductDay extends SG_model {
     }
 
     public ProductDay(Product prod) {
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
-
         this.isinCode = prod.getCode();
         this.close = prod.getCurrentPrice();
         this.high = prod.getHighPrice();

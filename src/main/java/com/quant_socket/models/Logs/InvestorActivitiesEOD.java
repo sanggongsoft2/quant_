@@ -50,13 +50,11 @@ public class InvestorActivitiesEOD extends SG_model {
     @SG_column(dbField = "iae_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "iae_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public InvestorActivitiesEOD(String msg) throws NumberFormatException {
 
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
+
 
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);

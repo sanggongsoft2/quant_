@@ -46,7 +46,7 @@ public class ProductMinute extends SG_model {
     @SG_column(dbField = "m_time")
     private Time time;
     @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
+    private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductMinute(ResultSet rs) {
         resultSetToClass(rs);
@@ -68,9 +68,6 @@ public class ProductMinute extends SG_model {
     }
 
     public ProductMinute(Product prod) {
-        Instant now = Instant.now();
-        ZonedDateTime koreaTime = now.atZone(ZoneId.of("Asia/Seoul"));
-        createdAt = Timestamp.from(koreaTime.toInstant());
 
         this.isinCode = prod.getCode();
         this.close = prod.getCurrentPrice();
@@ -79,7 +76,7 @@ public class ProductMinute extends SG_model {
         this.open = prod.getOpenPrice();
         this.volume = prod.getTradingVolume();
         this.pre_close = prod.getCurrentPrice();
-        this.date = Date.valueOf(createdAt.toLocalDateTime().minusMinutes(1).toLocalDate());
-        this.time = Time.valueOf(createdAt.toLocalDateTime().toLocalTime());
+        this.date = Date.valueOf(createdAt.toLocalDateTime().toLocalDate());
+        this.time = Time.valueOf(createdAt.toLocalDateTime().minusMinutes(1).toLocalTime());
     }
 }
