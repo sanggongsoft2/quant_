@@ -9,6 +9,7 @@ import com.quant_socket.models.SG_model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -23,6 +24,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @ToString
+@Slf4j
 public class ProductMinute extends SG_model {
     @SG_idx
     @SG_column(dbField = "m_idx")
@@ -68,6 +70,8 @@ public class ProductMinute extends SG_model {
     }
 
     public ProductMinute(Product prod) {
+        final ZoneId zoneId = ZoneId.of("Asia/Seoul");  // 원하는 시간대로 설정
+        final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
         this.isinCode = prod.getCode();
         this.close = prod.getCurrentPrice();
@@ -76,7 +80,8 @@ public class ProductMinute extends SG_model {
         this.open = prod.getOpenPrice();
         this.volume = prod.getTradingVolume();
         this.pre_close = prod.getCurrentPrice();
-        this.date = Date.valueOf(createdAt.toLocalDateTime().toLocalDate());
-        this.time = Time.valueOf(createdAt.toLocalDateTime().minusMinutes(1).toLocalTime());
+        this.date = Date.valueOf(zonedDateTime.toLocalDate());
+        this.time = Time.valueOf(zonedDateTime.minusMinutes(1).toLocalTime());
+        log.info("CREATED_AT : {}", createdAt);
     }
 }

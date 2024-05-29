@@ -34,4 +34,10 @@ public class SocketLogRepo extends SG_repo<SocketLog> {
             return null;
         }
     }
+
+    public void deleteLogsFrom3Days() {
+        final String sql = "DELETE FROM socket_log\n" +
+                "WHERE DATE(SL_crdt) < DATE_SUB(CURDATE(), INTERVAL 3 DAY);";
+        jt.update(sql);
+    }
 }

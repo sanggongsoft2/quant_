@@ -74,7 +74,6 @@ public class ProductService extends SocketService<Product>{
         if(result > 0) refreshProductItems();
     }
 
-    @Transactional
     public void updateProductDay() {
         final String sql = "INSERT INTO product_day (p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date)\n" +
                 "SELECT p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date FROM product_minute pm\n" +
@@ -86,7 +85,6 @@ public class ProductService extends SocketService<Product>{
         repo.jt.update(sql);
     }
 
-    @Transactional
     public void updateProductWeek() {
         final String sql = "INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)\n" +
                 "SELECT p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date FROM product_day\n" +
@@ -98,13 +96,18 @@ public class ProductService extends SocketService<Product>{
         repo.jt.update(sql);
     }
 
-    @Transactional
     public void updateProductMonth() {
         final String sql = "INSERT INTO product_month (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date)\n" +
                 "SELECT p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date FROM product_day\n" +
                 "WHERE (p_code, d_idx) IN (SELECT p_code, MAX(d_idx)\n" +
                 "                          FROM product_day\n" +
                 "                          GROUP BY p_code)";
+        repo.jt.update(sql);
+    }
+
+    public void deleteProductMinuteFrom3Month() {
+        final String sql = "DELETE FROM product_day\n" +
+                "WHERE DATE(d_crdt) < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);";
         repo.jt.update(sql);
     }
 

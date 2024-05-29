@@ -9,47 +9,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduledComponent {
-    private final EquitiesSnapshotService equitiesSnapshotService;
-    private final EquityIndexIndicatorService equityIndexIndicatorService;
     private final SocketLogService socketLogService;
-    private final SecuritiesOrderFilledService securitiesOrderFilledService;
-    private final InvestActivitiesEODService investActivitiesEODService;
-    private final EquitiesBatchDataService equitiesBatchDataService;
     private final ProductService productService;
-    private final SeqQuoteService seqQuoteService;
 
-    private final EquitiesSnapshotRepo equitiesSnapshotRepo;
-    private final EquityIndexIndicatorRepo equityIndexIndicatorRepo;
     private final SocketLogRepo socketLogRepo;
-    private final SecOrderFilledRepo secOrderFilledRepo;
-    private final InvestActivitiesEODRepo investActivitiesEODRepo;
-    private final EquitiesBatchDataRepo equitiesBatchDataRepo;
     private final ProductRepo productRepo;
-    private final SeqQuoteRepo seqQuoteRepo;
 
     /*@Scheduled(cron = "* * * * * *")
     public void everySeconds() {
-        log.info("CURRENT TIMESTAMP : {}", LocalDateTime.now());
+        log.info("CURRENT TIMESTAMP : {}", Timestamp.from(Instant.now()));
     }*/
 
     @Scheduled(cron = "0 0/10 * * * ?")
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
-        /*equitiesSnapshotService.insertLogs(EquitiesSnapshot.insertCols(), EquitiesSnapshot.class, equitiesSnapshotRepo);
-        equityIndexIndicatorService.insertLogs(EquityIndexIndicator.insertCols(), EquityIndexIndicator.class, equityIndexIndicatorRepo);
-        securitiesOrderFilledService.insertLogs(SecOrderFilled.insertCols(), SecOrderFilled.class, secOrderFilledRepo);
-        investActivitiesEODService.insertLogs(InvestorActivitiesEOD.insertCols(), InvestorActivitiesEOD.class, investActivitiesEODRepo);
-        equitiesBatchDataService.insertLogs(EquitiesBatchData.insertCols(), EquitiesBatchData.class, equitiesBatchDataRepo);
-        seqQuoteService.insertLogs(SeqQuote.insertCols(), SeqQuote.class, seqQuoteRepo);*/
         productService.insertLogs(Product.insertCols(), Product.class, productRepo);
     }
 
@@ -58,18 +39,20 @@ public class ScheduledComponent {
         productService.updateProductMinute();
     }
 
-    @Scheduled(cron = "0 0-1 18 * * MON-FRI")
+    @Scheduled(cron = "0 0 18 * * MON-FRI")
     public void at15() {
         productService.updateProductMinute();
     }
 
     @Scheduled(cron = "0 59 11 * * MON-FRI")
-    public void everyday1PM() {
+    public void everyday() {
         productService.updateProducts();
         productService.updateProductDay();
+        productService.deleteProductMinuteFrom3Month();
+        socketLogRepo.deleteLogsFrom3Days();
     }
 
-    @Scheduled(cron = "0 59 11 * * FRI")
+    @Scheduled(cron = "0 0 0 * * SAT")
     public void everyFriday() {
         productService.updateProductWeek();
     }
