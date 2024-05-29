@@ -10,7 +10,7 @@ public class EquitiesSnapshotService extends SocketService<EquitiesSnapshot>{
     @Autowired
     private ProductService productService;
     public void dataHandler(EquitiesSnapshot data) {
-        super.addLog(data);
+        /*super.addLog(data);*/
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) {

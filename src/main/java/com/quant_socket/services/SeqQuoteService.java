@@ -12,7 +12,7 @@ public class SeqQuoteService extends SocketService<SeqQuote>{
     @Autowired
     private ProductService productService;
     public void dataHandler(SeqQuote data) {
-        super.addLog(data);
+        /*super.addLog(data);*/
 
         sendMessage(data.toSocket());
         sendMessage(data.toSocket(), data.getIsin_code());

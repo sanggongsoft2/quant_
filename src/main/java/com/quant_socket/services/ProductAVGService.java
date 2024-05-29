@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ProductAVGService extends SocketService<ProductAVG> {
 
     public void dataHandler(ProductAVG data) {
-        super.addLog(data);
+        /*super.addLog(data);*/
 
         sendMessage(data);
         sendMessage(data, data.getIsinCode());

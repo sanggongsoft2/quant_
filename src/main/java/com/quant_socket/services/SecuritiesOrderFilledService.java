@@ -22,7 +22,7 @@ public class SecuritiesOrderFilledService extends SocketService<SecOrderFilled>{
     @Autowired
     private ProductService productService;
     public void dataHandler(SecOrderFilled data) {
-        super.addLog(data);
+        /*super.addLog(data);*/
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) {

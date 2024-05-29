@@ -22,7 +22,7 @@ public class EquityIndexIndicatorService extends SocketService<EquityIndexIndica
     @Autowired
     private ProductService productService;
     public void dataHandler(EquityIndexIndicator data) {
-        super.addLog(data);
+        /*super.addLog(data);*/
 
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null) productService.update(data);

@@ -44,12 +44,12 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 0/10 * * * ?")
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
-        equitiesSnapshotService.insertLogs(EquitiesSnapshot.insertCols(), EquitiesSnapshot.class, equitiesSnapshotRepo);
+        /*equitiesSnapshotService.insertLogs(EquitiesSnapshot.insertCols(), EquitiesSnapshot.class, equitiesSnapshotRepo);
         equityIndexIndicatorService.insertLogs(EquityIndexIndicator.insertCols(), EquityIndexIndicator.class, equityIndexIndicatorRepo);
         securitiesOrderFilledService.insertLogs(SecOrderFilled.insertCols(), SecOrderFilled.class, secOrderFilledRepo);
         investActivitiesEODService.insertLogs(InvestorActivitiesEOD.insertCols(), InvestorActivitiesEOD.class, investActivitiesEODRepo);
         equitiesBatchDataService.insertLogs(EquitiesBatchData.insertCols(), EquitiesBatchData.class, equitiesBatchDataRepo);
-        seqQuoteService.insertLogs(SeqQuote.insertCols(), SeqQuote.class, seqQuoteRepo);
+        seqQuoteService.insertLogs(SeqQuote.insertCols(), SeqQuote.class, seqQuoteRepo);*/
         productService.insertLogs(Product.insertCols(), Product.class, productRepo);
     }
 
