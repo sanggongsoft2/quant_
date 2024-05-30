@@ -1,12 +1,10 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.*;
-import com.quant_socket.models.Logs.prod.ProductDay;
 import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.ProductMinuteRepo;
 import com.quant_socket.repos.ProductRepo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -15,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -50,7 +46,7 @@ public class ProductService extends SocketService<Product>{
     @Transactional
     public void updateProducts() {
         for(final Product prod: products) {
-            repo.update(prod);
+            if(repo.update(prod)) prod.refreshEveryday();
         }
     }
 
@@ -112,7 +108,7 @@ public class ProductService extends SocketService<Product>{
     }
 
     public void refreshProductItems() {
-        products.forEach(Product::refresh);
+        products.forEach(Product::refreshTradingVolumeFrom1Minute);
     }
 
     public void update(EquitiesBatchData data) {

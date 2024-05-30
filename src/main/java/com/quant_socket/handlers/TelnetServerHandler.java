@@ -40,7 +40,9 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             socketLog.setLog(new String(msgByte, StandardCharsets.UTF_8));
 
             if(!socketLog.getLog().isBlank()) {
-                socketLogService.esHandler(socketLog.getLog());
+                for (String log : socketLog.getLog().split("�")) {
+                    socketLogService.esHandler(log+"�");
+                }
             }
         } catch (Exception e) {
             socketLog.setError(e.getMessage());

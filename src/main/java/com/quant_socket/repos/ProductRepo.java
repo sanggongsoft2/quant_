@@ -23,6 +23,6 @@ public class ProductRepo extends SG_repo<Product>{
                 "p_yesterday_value = ?, " +
                 "p_name_en = ?" +
                 " WHERE p_idx = ?";
-        return super.jt.update(sql, prod.getFace_value(), prod.getHaving_count(), prod.getYesterday_price(), prod.getYesterday_trading_count(), prod.getYesterday_value(), prod.getName_en(), prod.getIdx()) > 0;
+        return super.jt.update(sql, prod.getFace_value(), prod.getHaving_count(), prod.getCurrentPrice(), prod.getTodayTradingCount(), prod.getTodayTradingValue(), prod.getName_en(), prod.getIdx()) > 0;
     }
 }

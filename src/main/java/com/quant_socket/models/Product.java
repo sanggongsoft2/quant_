@@ -66,17 +66,16 @@ public class Product extends SG_model{
     private long todayBidCount = 0;
     private long todayAskCount = 0;
     private long todayTradingCount = 0;
+    private float todayTradingValue = 0;
 
     private long foreignerAskCount = 0;
     private long foreignerBidCount = 0;
     private long facilityAskCount = 0;
     private long facilityBidCount = 0;
 
-    public void updateTodayCount(String isinCode, String type, long count) {
+    private void updateTodayCount(String isinCode, String type, long count) {
         if (code.equals(isinCode)) {
             switch (type) {
-                case "0":
-                    break;
                 case "1":
                     todayAskCount += count;
                     break;
@@ -90,9 +89,11 @@ public class Product extends SG_model{
         tradingVolume = 0;
     }
 
-    public void refresh() {
+    public void refreshEveryday() {
         todayBidCount = 0;
         todayAskCount = 0;
+        todayTradingCount = 0;
+        todayTradingValue = 0;
     }
 
     public void update(EquitiesBatchData data) {
@@ -140,7 +141,9 @@ public class Product extends SG_model{
         this.highPrice = data.getTodays_high();
         this.lowPrice = data.getTodays_low();
         this.openPrice = data.getOpening_price();
-        this.tradingVolume += data.getTrading_volume();
+        this.todayTradingCount = data.getTrading_volume();
+        this.todayTradingValue = data.getAccu_trading_value();
+        updateTodayCount(data.getIsin_code(), data.getFinal_askbid_type_code(), data.getTrading_volume());
     }
 
     public Product(ResultSet rs) {
