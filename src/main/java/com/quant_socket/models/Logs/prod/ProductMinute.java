@@ -82,6 +82,5 @@ public class ProductMinute extends SG_model {
         this.pre_close = prod.getCurrentPrice();
         this.date = Date.valueOf(zonedDateTime.toLocalDate());
         this.time = Time.valueOf(zonedDateTime.minusMinutes(1).toLocalTime());
-        log.info("CREATED_AT : {}", createdAt);
     }
 }

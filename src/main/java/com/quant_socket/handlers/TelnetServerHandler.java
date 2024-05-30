@@ -17,10 +17,7 @@ import java.nio.charset.StandardCharsets;
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private final SocketLogService socketLogService;
-
-    private Integer port;
-    private String remote_url;
-    private String msg;
+    private final SocketLog socketLog = new SocketLog();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -28,42 +25,35 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         // 소켓 채널이 활성화될 때 포트 번호 저장
         SocketChannel socketChannel = (SocketChannel) ctx.channel();
         InetSocketAddress inetSocketAddress = socketChannel.remoteAddress();
-        port = inetSocketAddress.getPort();
-        remote_url = inetSocketAddress.getHostString();
+        socketLog.setPort(inetSocketAddress.getPort());
+        socketLog.setRemote_url(inetSocketAddress.getHostString());
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf in = (ByteBuf) msg;
 
-        int len = in.writerIndex();
-        byte[] msgByte = new byte[len];
-        in.readBytes(msgByte);
-        this.msg = new String(msgByte, StandardCharsets.UTF_8);
-        log.debug("received message : {}, remote_url: {}, port: {}", this.msg, this.remote_url, this.port);
+        try {
+            int len = in.writerIndex();
+            byte[] msgByte = new byte[len];
+            in.readBytes(msgByte);
+            socketLog.setLog(new String(msgByte, StandardCharsets.UTF_8));
 
-        if(!this.msg.isBlank()) {
-            final SocketLog sl = new SocketLog();
-
-            sl.setLog(this.msg);
-            sl.setPort(this.port);
-            sl.setRemote_url(remote_url);
-            socketLogService.addLog(sl);
-
-            socketLogService.esHandler(this.msg);
+            if(!socketLog.getLog().isBlank()) {
+                socketLogService.esHandler(socketLog.getLog());
+            }
+        } catch (Exception e) {
+            socketLog.setError(e.getMessage());
+            ctx.close();
+        } finally {
+            socketLogService.addLog(socketLog);
+            in.release();
         }
-
-        in.release();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        final SocketLog sl = new SocketLog();
-        sl.setLog(this.msg);
-        sl.setPort(this.port);
-        sl.setRemote_url(remote_url);
-        sl.setError(cause.toString());
-        socketLogService.addLog(sl);
+        socketLog.setError(cause.getMessage());
         ctx.close();
     }
 }
