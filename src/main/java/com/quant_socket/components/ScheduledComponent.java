@@ -40,21 +40,21 @@ public class ScheduledComponent {
         productService.updateProductMinute();
     }
 
-    @Scheduled(cron = "0 59 11 * * MON-FRI")
+    @Scheduled(cron = "0 59 23 * * MON-FRI")
     public void everyday() {
         productService.updateProducts();
-        productService.updateProductDay();
-        productService.deleteProductMinuteFrom3Month();
+        productRepo.updateProductDay();
+        productRepo.deleteProductMinuteFrom3Month();
         socketLogRepo.deleteLogsFrom3Days();
     }
 
     @Scheduled(cron = "0 0 0 * * SAT")
     public void everyFriday() {
-        productService.updateProductWeek();
+        productRepo.updateProductWeek();
     }
 
     @Scheduled(cron = "0 0 0 1 * ?")
     public void everyMonth() {
-        productService.updateProductMonth();
+        productRepo.updateProductMonth();
     }
 }

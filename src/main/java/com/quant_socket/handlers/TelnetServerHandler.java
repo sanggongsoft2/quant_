@@ -46,6 +46,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             }
         } catch (Exception e) {
             socketLog.setError(e.getMessage());
+            log.error("ERROR : {}", e.getMessage());
             ctx.close();
         } finally {
             socketLogService.addLog(socketLog);
@@ -56,6 +57,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         socketLog.setError(cause.getMessage());
+        log.error("ERROR : {}", cause.getMessage());
+        socketLogService.addLog(socketLog);
         ctx.close();
     }
 }
