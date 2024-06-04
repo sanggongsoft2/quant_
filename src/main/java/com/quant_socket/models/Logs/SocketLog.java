@@ -34,14 +34,13 @@ public class SocketLog extends SG_model {
     private String error;
 
     @SG_column(dbField = "SL_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SocketLog() {
 
     }
 
     public SocketLog(ResultSet res) {
-
         super.resultSetToClass(res);
     }
 
@@ -51,7 +50,6 @@ public class SocketLog extends SG_model {
                 "SL_remote_url",
                 "SL_port",
                 "SL_error",
-                "SL_crdt",
         };
     }
 }

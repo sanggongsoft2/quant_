@@ -13,8 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -114,5 +118,41 @@ public class ProductService extends SocketService<Product>{
                 break;
             }
         }
+    }
+
+    public List<Product> orderHigher(String type) {
+        List<Product> list = products;
+        if(type != null) list = products.stream().filter(prod->prod.getGubun().equals(type)).toList();
+        return list.stream()
+                .sorted(Comparator.comparingDouble(Product::getComparePriceRate).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    public List<Product> orderLower(String type) {
+        List<Product> list = products;
+        if(type != null) list = products.stream().filter(prod->prod.getGubun().equals(type)).toList();
+        return list.stream()
+                .sorted(Comparator.comparingDouble(Product::getComparePriceRate))
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    public List<Product> orderHavingCount(String type) {
+        List<Product> list = products;
+        if(type != null) list = products.stream().filter(prod->prod.getGubun().equals(type)).toList();
+        return list.stream()
+                .sorted(Comparator.comparingLong(Product::getHaving_count).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    public List<Product> orderTradingCount(String type) {
+        List<Product> list = products;
+        if(type != null) list = products.stream().filter(prod->prod.getGubun().equals(type)).toList();
+        return list.stream()
+                .sorted(Comparator.comparingLong(Product::getTodayTradingCount).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 }

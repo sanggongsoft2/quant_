@@ -24,7 +24,7 @@ public class ScheduledComponent {
         log.info("CURRENT TIMESTAMP : {}", Timestamp.from(Instant.now()));
     }*/
 
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
         productService.insertLogs(Product.insertCols(), Product.class, productRepo);
@@ -41,11 +41,15 @@ public class ScheduledComponent {
     }
 
     @Scheduled(cron = "0 59 23 * * MON-FRI")
-    public void everyday() {
+    public void everyWeekday() {
         productService.updateProducts();
         productRepo.updateProductDay();
-        productRepo.deleteProductMinuteFrom3Month();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void everyday() {
         socketLogRepo.deleteLogsFrom3Days();
+        productRepo.deleteProductMinuteFrom3Month();
     }
 
     @Scheduled(cron = "0 0 0 * * SAT")

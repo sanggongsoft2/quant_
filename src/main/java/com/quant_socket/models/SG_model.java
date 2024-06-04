@@ -14,7 +14,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,7 +98,6 @@ public abstract class SG_model {
         try {
             final ObjectMapper om = new ObjectMapper();
             final SG_model sm = om.readValue(json, this.getClass());
-            log.debug("SM = {}", sm.toJson());
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -106,7 +105,7 @@ public abstract class SG_model {
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 f.setAccessible(true);

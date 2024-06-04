@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -76,7 +76,7 @@ public class SecOrderFilled extends SG_model{
     private String end_keyword;
 
     @SG_column(dbField = "sof_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SecOrderFilled(String msg) throws NumberFormatException {
 
@@ -108,7 +108,7 @@ public class SecOrderFilled extends SG_model{
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 final SG_column sc = f.getAnnotation(SG_column.class);
@@ -128,7 +128,7 @@ public class SecOrderFilled extends SG_model{
     }
 
     public Map<String, Object> toSocket(Product prod) {
-        final Map<String, Object> response = new HashMap<>();
+        final Map<String, Object> response = new LinkedHashMap<>();
         //17. 체결강도
         response.put("trading_rate", getTradingRate(prod));
         //18. 체결가격
@@ -184,7 +184,6 @@ public class SecOrderFilled extends SG_model{
                 "sof_the_best_ask",
                 "sof_the_best_bid",
                 "sof_end_keyword",
-                "sof_crdt",
         };
     }
 

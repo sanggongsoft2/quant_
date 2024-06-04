@@ -17,7 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class InvestorActivitiesEOD extends SG_model {
     @SG_column(dbField = "iae_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "iae_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public InvestorActivitiesEOD(String msg) throws NumberFormatException {
 
@@ -69,7 +69,7 @@ public class InvestorActivitiesEOD extends SG_model {
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 final SG_column sc = f.getAnnotation(SG_column.class);
@@ -83,7 +83,7 @@ public class InvestorActivitiesEOD extends SG_model {
     }
 
     public Map<String, Object> toSocket(Product prod) {
-        final Map<String, Object> res = new HashMap<>();
+        final Map<String, Object> res = new LinkedHashMap<>();
         res.put("isin_code", isin_code);
         res.put("name_kr", prod.getName_kr());
         res.put("name_kr_abbr", prod.getName_kr_abbr());

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -190,7 +190,7 @@ public class SeqQuote extends SG_model {
     private String end_keyword;
 
     @SG_column(dbField = "sq_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public SeqQuote(String msg) throws NumberFormatException {
 
@@ -285,7 +285,7 @@ public class SeqQuote extends SG_model {
     }
 
     public Map<String, Object> toSocket() {
-        final Map<String, Object> response = new HashMap<>();
+        final Map<String, Object> response = new LinkedHashMap<>();
         return response;
     }
 
@@ -364,7 +364,6 @@ public class SeqQuote extends SG_model {
                 "sq_estimated_tading_price",
                 "sq_estimated_trading_volume",
                 "sq_end_keyword",
-                "sq_crdt",
         };
     }
 }

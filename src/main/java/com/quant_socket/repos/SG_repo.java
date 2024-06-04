@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,7 +27,7 @@ public abstract class SG_repo<T> {
     public JdbcTemplate jt;
 
     protected boolean insert(Class<T> clazz, DataSetter setter) {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         final String table = getTableName(clazz);
 
         setter.setData(data);
@@ -41,14 +41,13 @@ public abstract class SG_repo<T> {
                 .append(data.values().stream().map((value) -> "?").collect(Collectors.joining(",")))
                 .append(")");
 
-        log.debug("INSERT SQL = {}", sb);
 
         final int rows = this.jt.update(sb.toString(), data.values().toArray());
         return rows > 0;
     }
 
     public Long insertReturnKey(Class<T> clazz, DataSetter setter) {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         final String table = getTableName(clazz);
 
         setter.setData(data);

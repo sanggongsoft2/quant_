@@ -6,10 +6,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -17,48 +19,49 @@ import java.nio.charset.StandardCharsets;
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private final SocketLogService socketLogService;
-    private final SocketLog socketLog = new SocketLog();
+
+    private Integer port;
+    private String remote_url;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         // 소켓 채널이 활성화될 때 포트 번호 저장
-        SocketChannel socketChannel = (SocketChannel) ctx.channel();
-        InetSocketAddress inetSocketAddress = socketChannel.remoteAddress();
-        socketLog.setPort(inetSocketAddress.getPort());
-        socketLog.setRemote_url(inetSocketAddress.getHostString());
+        final SocketChannel socketChannel = (SocketChannel) ctx.channel();
+        final InetSocketAddress inetSocketAddress = socketChannel.remoteAddress();
+        port = inetSocketAddress.getPort();
+        remote_url = inetSocketAddress.getHostString();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf in = (ByteBuf) msg;
 
-        try {
-            int len = in.writerIndex();
-            byte[] msgByte = new byte[len];
-            in.readBytes(msgByte);
-            socketLog.setLog(new String(msgByte, StandardCharsets.UTF_8));
+        final String message = in.toString(CharsetUtil.UTF_8);
 
-            if(!socketLog.getLog().isBlank()) {
-                for (String log : socketLog.getLog().split("�")) {
-                    socketLogService.esHandler(log+"�");
-                }
+        try {
+            for (String logMessage : message.split("�")) {
+                final SocketLog sl = new SocketLog();
+                sl.setPort(port);
+                sl.setRemote_url(remote_url);
+                sl.setLog(logMessage);
+                socketLogService.addLog(sl);
+                socketLogService.esHandler(logMessage+"�");
             }
-        } catch (Exception e) {
-            socketLog.setError(e.getMessage());
-            log.error("ERROR : {}", e.getMessage());
-            ctx.close();
         } finally {
-            socketLogService.addLog(socketLog);
             in.release();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        socketLog.setError(cause.getMessage());
+        final SocketLog sl = new SocketLog();
+        sl.setPort(port);
+        sl.setRemote_url(remote_url);
+        sl.setLog(cause.getLocalizedMessage());
+        sl.setError(cause.getMessage());
+        socketLogService.addLog(sl);
         log.error("ERROR : {}", cause.getMessage());
-        socketLogService.addLog(socketLog);
         ctx.close();
     }
 }

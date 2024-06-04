@@ -45,45 +45,22 @@ public class SocketLogService extends SocketService<SocketLog>{
         if(msg.length() >= 5) {
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
-                case "A001S":
-                case "A002S":
-                case "A003S":
-                case "A004S":
-                case "A001Q":
-                case "A001X":
+                case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
                     equities_batch_data_handler(msg);
                     break;
-                case "C101S":
-                case "C102S":
-                case "C103S":
-                case "C104S":
-                case "C101Q":
-                case "C101X":
-                case "C101G":
+                case "C101S", "C102S", "C103S", "C104S", "C101Q", "C101X", "C101G":
                     investor_activities_per_an_issue_EOD_handler(msg);
                     break;
-                case "A301S":
-                case "A301Q":
-                case "A301X":
+                case "A301S", "A301Q", "A301X":
                     securities_order_filled_handler(msg);
                     break;
-                case "B201X":
-                case "B201Q":
-                case "B201S":
+                case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
                     equities_snapshot_handler(msg);
                     break;
-                case "B202S":
-                case "B203S":
-                case "B204S":
-                    equities_snapshot_handler2(msg);
-                    break;
-                case "CA01S":
-                case "CA01Q":
+                case "CA01S", "CA01Q":
                     equity_index_indicator_handler(msg);
                     break;
-                case "B702S":
-                case "B703S":
-                case "B704S":
+                case "B702S", "B703S", "B704S":
                     seq_quote_handler(msg);
                     break;
             }
@@ -110,11 +87,17 @@ public class SocketLogService extends SocketService<SocketLog>{
 
     //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{650})")) {
+        /*for(String chunk : msg.split("(?<=\\\\G.{650})")) {
             if(chunk.length() >= 650) {
                 final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
                 equitiesSnapshotService.dataHandler(es);
             }
+        }*/
+        try {
+            final EquitiesSnapshot es = new EquitiesSnapshot(msg);
+            equitiesSnapshotService.dataHandler(es);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
     }
     //증권 Snapshot (MM/LP호가 포함)
@@ -125,6 +108,8 @@ public class SocketLogService extends SocketService<SocketLog>{
                 equitiesSnapshotService.dataHandler(es);
             }
         }
+        /*final EquitiesSnapshot es = new EquitiesSnapshot(msg);
+        equitiesSnapshotService.dataHandler(es);*/
     }
 
     //증권 지수지표
@@ -139,7 +124,6 @@ public class SocketLogService extends SocketService<SocketLog>{
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
-        log.debug("MSG LENGTH: {}", msg.length());
         for(String chunk : msg.split("(?<=\\\\G.{620})")) {
             if(chunk.length() >= 620) {
                 final EquitiesBatchData ebd = new EquitiesBatchData(chunk);

@@ -17,7 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SG_table(name = "equities_snapshot")
@@ -30,19 +30,19 @@ public class EquitiesSnapshot extends SG_model{
     @SG_column(dbField = "es_idx")
     private Long idx;
     @SG_column(dbField = "es_data_category")
-    private final String data_category;
+    private String data_category;
     @SG_column(dbField = "es_info_category")
-    private final String info_category;
+    private String info_category;
     @SG_column(dbField = "es_board_id")
-    private final String board_id;
+    private String board_id;
     @SG_column(dbField = "es_session_id")
-    private final String session_id;
+    private String session_id;
     @SG_column(dbField = "es_isin_code")
-    private final String isin_code;
+    private String isin_code;
     @SG_column(dbField = "es_a_designated_number_for_an_issue")
     private Integer a_designated_number_for_an_issue;
     @SG_column(dbField = "es_price_change_against_previous_day")
-    private final String price_change_against_previous_day;
+    private String price_change_against_previous_day;
     @SG_column(dbField = "es_price_change_against_the_previous_day")
     private Double price_change_against_the_previous_day;
     @SG_column(dbField = "es_upper_limit_price")
@@ -62,7 +62,7 @@ public class EquitiesSnapshot extends SG_model{
     @SG_column(dbField = "es_accumulated_trading_value")
     private Float accumulated_trading_value;
     @SG_column(dbField = "es_final_ask_bid_type_code")
-    private final String final_ask_bid_type_code;
+    private String final_ask_bid_type_code;
 
     @SG_column(dbField = "es_ask_level_1_price")
     private Double ask_level_1_price;
@@ -214,11 +214,9 @@ public class EquitiesSnapshot extends SG_model{
     private String end_keyword;
 
     @SG_column(dbField = "es_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public EquitiesSnapshot(String msg) throws NumberFormatException {
-
-
 
         data_category = msg.substring(0, 2);
         info_category = msg.substring(2, 5);
@@ -370,7 +368,7 @@ public class EquitiesSnapshot extends SG_model{
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 final SG_column sc = f.getAnnotation(SG_column.class);
@@ -391,7 +389,8 @@ public class EquitiesSnapshot extends SG_model{
         if(current_price != 0 && getYesterdayPrice() != 0) value = (current_price - getYesterdayPrice()) / getYesterdayPrice() * 100;
         return value;
     }
-    private double getComparePriceRate(double price) {
+    private Double getComparePriceRate(Double price) {
+        if(price == null) return null;
         double value = 0;
         if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
         return value;
@@ -409,7 +408,7 @@ public class EquitiesSnapshot extends SG_model{
         return result;
     }
     public Map<String, Object> toSocket(Product prod) {
-        final Map<String, Object> response = new HashMap<>();
+        final Map<String, Object> response = new LinkedHashMap<>();
         response.put("name_kr", prod.getName_kr());
         response.put("name_kr_abbr", prod.getName_kr_abbr());
         response.put("name_en", prod.getName_en());
@@ -422,7 +421,7 @@ public class EquitiesSnapshot extends SG_model{
         return response;
     }
     public Map<String, Object> toDetailsSocket(Product prod) {
-        final Map<String, Object> response = new HashMap<>(toSocket(prod));
+        final Map<String, Object> response = new LinkedHashMap<>(toSocket(prod));
         //0: 초기값, 1: 상한, 2: 상승, 3: 보합, 4: 하한, 5: 하락
         response.put("compare_type", final_ask_bid_type_code);
         //9. 매도 호가 수량
@@ -510,7 +509,7 @@ public class EquitiesSnapshot extends SG_model{
         //21. 매도 잔량
         response.put("ask_total_count", total_ask_volume);
         //22. 매수 - 매도
-        response.put("bid_count", total_bid_volume - total_ask_volume);
+        response.put("bid_count", bid_count());
         //23. 매수 잔량
         response.put("bid_total_count", total_bid_volume);
 
@@ -605,7 +604,11 @@ public class EquitiesSnapshot extends SG_model{
                 "es_is_fast_close",
                 "es_fast_close_time",
                 "es_end_keyword",
-                "es_crdt",
         };
+    }
+
+    private long bid_count() {
+        if(total_bid_volume == null || total_ask_volume == null) return 0;
+        return total_bid_volume - total_ask_volume;
     }
 }

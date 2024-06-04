@@ -1,16 +1,10 @@
 package com.quant_socket.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quant_socket.annotations.SG_column;
-import com.quant_socket.annotations.SG_crdt;
-import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
-import com.quant_socket.models.Logs.SeqQuote;
 import com.quant_socket.models.SG_model;
 import com.quant_socket.repos.SG_repo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +13,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URI;
 import java.sql.PreparedStatement;
 import java.util.*;
@@ -34,7 +27,6 @@ public abstract class SocketService<T extends SG_model>{
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
     private final List<T> logs = new CopyOnWriteArrayList<>();
-
     public void addSession(WebSocketSession ws) {
         sessions.add(ws);
     }
@@ -66,7 +58,7 @@ public abstract class SocketService<T extends SG_model>{
     }
 
     public Map<String, String> extractQueryParams(String queryString) {
-        Map<String, String> queryPairs = new HashMap<>();
+        Map<String, String> queryPairs = new LinkedHashMap<>();
         String[] pairs = queryString.split("&");
 
         for (String pair : pairs) {
@@ -157,7 +149,6 @@ public abstract class SocketService<T extends SG_model>{
                 }
             });
             if(result > 0) logs.clear();
-            log.debug(getTableName(clazz).toUpperCase()+" INSERT COUNT : {}", result);
         }
     }
 

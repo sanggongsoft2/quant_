@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -241,7 +241,7 @@ public class EquitiesBatchData extends SG_model{
     @SG_column(dbField = "ebd_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "ebd_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public EquitiesBatchData(String msg) throws NumberFormatException {
         data_category = msg.substring(0, 2);
@@ -353,7 +353,7 @@ public class EquitiesBatchData extends SG_model{
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 final SG_column sc = f.getAnnotation(SG_column.class);
@@ -366,7 +366,7 @@ public class EquitiesBatchData extends SG_model{
         return data;
     }
     public Map<String, Object> toSocket(Product prod) {
-        final Map<String, Object> response = new HashMap<>();
+        final Map<String, Object> response = new LinkedHashMap<>();
         response.put("response_type", 3);
         response.put("face_value", par_value);
         //상장 주식 수
@@ -487,7 +487,6 @@ public class EquitiesBatchData extends SG_model{
                 "ebd_spac_merger",
                 "ebd_segment_type_code",
                 "ebd_end_keyword",
-                "ebd_crdt",
         };
     }
 }

@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @SG_table(name = "equity_index_indicator")
@@ -94,7 +94,7 @@ public class EquityIndexIndicator extends SG_model{
     @SG_column(dbField = "eii_end_keyword")
     private String end_keyword;
     @SG_column(dbField = "eii_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public EquityIndexIndicator(String msg) throws NumberFormatException {
 
@@ -140,7 +140,7 @@ public class EquityIndexIndicator extends SG_model{
     }
 
     public Map<String, Object> toMap() {
-        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new LinkedHashMap<>();
         for(final Field f: this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_column.class)) {
                 final SG_column sc = f.getAnnotation(SG_column.class);
@@ -191,7 +191,6 @@ public class EquityIndexIndicator extends SG_model{
                 "eii_krx_bio_knew_deal_index",
                 "eii_filler",
                 "eii_end_keyword",
-                "eii_crdt",
         };
     }
 

@@ -48,7 +48,7 @@ public class ProductMinute extends SG_model {
     @SG_column(dbField = "m_time")
     private Time time;
     @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public ProductMinute(ResultSet rs) {
         resultSetToClass(rs);

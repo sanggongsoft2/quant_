@@ -25,7 +25,6 @@ public class SeqQuoteDetailsHandler extends TextWebSocketHandler {
         if(uri != null && uri.getQuery() != null) {
             isinCode = service.getQueryValue(uri.getQuery(), "isin_code");
             if(isinCode != null) service.addSession(ws, isinCode);
-            log.debug("CONNECTED ISIN CODE : {}", isinCode);
         } else {
             ws.close();
         }
@@ -36,7 +35,6 @@ public class SeqQuoteDetailsHandler extends TextWebSocketHandler {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
             if(isinCode != null) service.removeSession(ws, isinCode);
-            log.debug("CLOSED ISIN CODE : {}", isinCode);
         } else {
             ws.close();
         }

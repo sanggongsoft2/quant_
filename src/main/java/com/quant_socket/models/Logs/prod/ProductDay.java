@@ -38,7 +38,7 @@ public class ProductDay extends SG_model {
     @SG_column(dbField = "d_date")
     private Date date;
     @SG_column(dbField = "d_crdt")
-    private Timestamp createdAt = Timestamp.from(Instant.now());
+    private Timestamp createdAt;
 
     public ProductDay(ResultSet rs) {
         resultSetToClass(rs);
@@ -54,7 +54,6 @@ public class ProductDay extends SG_model {
                 "d_volume",
                 "d_pre_close",
                 "d_date",
-                "d_crdt",
         };
     }
 
