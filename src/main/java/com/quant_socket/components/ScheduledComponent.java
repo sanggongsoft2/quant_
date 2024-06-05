@@ -26,8 +26,8 @@ public class ScheduledComponent {
 
     @Scheduled(cron = "0 * * * * ?")
     public void everyMinute() {
-        socketLogService.insertLogs(SocketLog.insertCols(), SocketLog.class, socketLogRepo);
-        productService.insertLogs(Product.insertCols(), Product.class, productRepo);
+        socketLogService.insertLogs(SocketLog.insertCols());
+        productService.insertLogs(Product.insertCols());
     }
 
     @Scheduled(cron = "0 * 10-17 * * MON-FRI")

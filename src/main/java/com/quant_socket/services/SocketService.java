@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.SG_model;
 import com.quant_socket.repos.SG_repo;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @Slf4j
-public abstract class SocketService<T extends SG_model>{
+public abstract class SocketService{
     private final ObjectMapper mapper = new ObjectMapper();
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
-    private final List<T> logs = new CopyOnWriteArrayList<>();
     public void addSession(WebSocketSession ws) {
         sessions.add(ws);
     }
@@ -115,15 +115,6 @@ public abstract class SocketService<T extends SG_model>{
             }
         }
     }
-
-    protected String insertSql(Class<? extends SG_model> clazz, String[] cols) {
-        final String tableName = getTableName(clazz);
-
-        return "INSERT INTO "+tableName+"(" +
-                String.join(",", cols) + ")" +
-                "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
-    }
-
     protected String getTableName(Class<? extends SG_model> clazz) {
         String tableName = clazz.getName();
         if(clazz.isAnnotationPresent(SG_table.class)) {
@@ -131,28 +122,5 @@ public abstract class SocketService<T extends SG_model>{
             tableName = sgTable.name();
         }
         return tableName;
-    }
-
-    @Transactional
-    public void insertLogs(String[] cols, Class<T> clazz, SG_repo<T> repo) {
-        if(!logs.isEmpty()) {
-            final int result = repo.insertMany(insertSql(clazz, cols), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) {
-                    final T data = logs.get(i);
-                    data.setPreparedStatement(ps);
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return logs.size();
-                }
-            });
-            if(result > 0) logs.clear();
-        }
-    }
-
-    protected void addLog(T log) {
-        logs.add(log);
     }
 }

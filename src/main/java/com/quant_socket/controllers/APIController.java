@@ -37,7 +37,7 @@ public class APIController {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    @PostMapping("/having-count")
+    @PostMapping("/total-price")
     private ResponseEntity<Response> getHavingCount(@RequestParam(required = false) String type) {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
@@ -52,7 +52,27 @@ public class APIController {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("거래상위 증권을 불러왔습니다.");
-        res.setData(productService.orderHavingCount(type));
+        res.setData(productService.orderTradingCount(type));
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PostMapping("/for-ask-count")
+    private ResponseEntity<Response> getForAskCount(@RequestParam(required = false) String type) {
+        final Response res = new Response();
+        res.setStatusCode(HttpStatus.OK);
+        res.setMessage("외기매수 증권을 불러왔습니다.");
+        res.setData(productService.orderAskCount(type));
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PostMapping("/for-bid-count")
+    private ResponseEntity<Response> getForBidCount(@RequestParam(required = false) String type) {
+        final Response res = new Response();
+        res.setStatusCode(HttpStatus.OK);
+        res.setMessage("외기매도 증권을 불러왔습니다.");
+        res.setData(productService.orderBidCount(type));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }

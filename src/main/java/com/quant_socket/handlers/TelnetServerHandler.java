@@ -1,18 +1,15 @@
 package com.quant_socket.handlers;
 
 import com.quant_socket.models.Logs.*;
-import com.quant_socket.services.*;
+import com.quant_socket.services.SocketLogService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,8 +42,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
                 sl.setPort(port);
                 sl.setRemote_url(remote_url);
                 sl.setLog(logMessage);
-                socketLogService.addLog(sl);
-                socketLogService.esHandler(logMessage+"�");
+                socketLogService.esHandler(sl);
             }
         } finally {
             in.release();
@@ -61,7 +57,6 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         sl.setLog(cause.getLocalizedMessage());
         sl.setError(cause.getMessage());
         socketLogService.addLog(sl);
-        log.error("ERROR : {}", cause.getMessage());
         ctx.close();
     }
 }

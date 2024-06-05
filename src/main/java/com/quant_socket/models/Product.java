@@ -119,10 +119,6 @@ public class Product extends SG_model{
         this.openPrice = data.getOpening_price();
     }
 
-    public void update(EquityIndexIndicator data) {
-
-    }
-
     public void update(InvestorActivitiesEOD data) {
         switch (data.getInvestor_code()) {
             case "9000":
@@ -242,5 +238,9 @@ public class Product extends SG_model{
                 "p_yesterday_value",
                 "p_yesterday_trading_count",
         };
+    }
+
+    public Double getTotalPrice() {
+        return currentPrice * having_count;
     }
 }

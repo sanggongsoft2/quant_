@@ -1,229 +1,109 @@
 package com.quant_socket.models.Logs;
 
-import com.quant_socket.annotations.SG_column;
-import com.quant_socket.annotations.SG_crdt;
-import com.quant_socket.annotations.SG_idx;
-import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Product;
-import com.quant_socket.models.SG_model;
 import lombok.Getter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@SG_table(name = "equities_snapshot")
 @Getter
-@Slf4j
-@ToString
-public class EquitiesSnapshot extends SG_model{
+public class EquitiesSnapshot{
 
-    @SG_idx
-    @SG_column(dbField = "es_idx")
-    private Long idx;
-    @SG_column(dbField = "es_data_category")
-    private String data_category;
-    @SG_column(dbField = "es_info_category")
-    private String info_category;
-    @SG_column(dbField = "es_board_id")
-    private String board_id;
-    @SG_column(dbField = "es_session_id")
-    private String session_id;
-    @SG_column(dbField = "es_isin_code")
     private String isin_code;
-    @SG_column(dbField = "es_a_designated_number_for_an_issue")
-    private Integer a_designated_number_for_an_issue;
-    @SG_column(dbField = "es_price_change_against_previous_day")
     private String price_change_against_previous_day;
-    @SG_column(dbField = "es_price_change_against_the_previous_day")
     private Double price_change_against_the_previous_day;
-    @SG_column(dbField = "es_upper_limit_price")
     private Double upper_limit_price;
-    @SG_column(dbField = "es_lower_limit_price")
     private Double lower_limit_price;
-    @SG_column(dbField = "es_current_price")
     private Double current_price;
-    @SG_column(dbField = "es_opening_price")
     private Double opening_price;
-    @SG_column(dbField = "es_todays_high")
     private Double todays_high;
-    @SG_column(dbField = "es_todays_low")
     private Double todays_low;
-    @SG_column(dbField = "es_accumulated_trading_volume")
     private Long accumulated_trading_volume;
-    @SG_column(dbField = "es_accumulated_trading_value")
     private Float accumulated_trading_value;
-    @SG_column(dbField = "es_final_ask_bid_type_code")
     private String final_ask_bid_type_code;
 
-    @SG_column(dbField = "es_ask_level_1_price")
     private Double ask_level_1_price;
-    @SG_column(dbField = "es_bid_level_1_price")
     private Double bid_level_1_price;
-    @SG_column(dbField = "es_ask_level_1_volume")
     private Long ask_level_1_volume;
-    @SG_column(dbField = "es_bid_level_1_volume")
     private Long bid_level_1_volume;
-    @SG_column(dbField = "es_lp_ask_level_1_volume")
     private Long es_lp_ask_level_1_volume;
-    @SG_column(dbField = "es_lp_bid_level_1_volume")
     private Long es_lp_bid_level_1_volume;
 
-    @SG_column(dbField = "es_ask_level_2_price")
     private Double ask_level_2_price;
-    @SG_column(dbField = "es_bid_level_2_price")
     private Double bid_level_2_price;
-    @SG_column(dbField = "es_ask_level_2_volume")
     private Long ask_level_2_volume;
-    @SG_column(dbField = "es_bid_level_2_volume")
     private Long bid_level_2_volume;
-    @SG_column(dbField = "es_lp_bid_level_2_volume")
     private Long es_lp_bid_level_2_volume;
-    @SG_column(dbField = "es_lp_ask_level_2_volume")
     private Long es_lp_ask_level_2_volume;
 
-    @SG_column(dbField = "es_ask_level_3_price")
     private Double ask_level_3_price;
-    @SG_column(dbField = "es_bid_level_3_price")
     private Double bid_level_3_price;
-    @SG_column(dbField = "es_ask_level_3_volume")
     private Long ask_level_3_volume;
-    @SG_column(dbField = "es_bid_level_3_volume")
     private Long bid_level_3_volume;
-    @SG_column(dbField = "es_lp_ask_level_3_volume")
     private Long es_lp_ask_level_3_volume;
-    @SG_column(dbField = "es_lp_bid_level_3_volume")
     private Long es_lp_bid_level_3_volume;
 
-    @SG_column(dbField = "es_ask_level_4_price")
     private Double ask_level_4_price;
-    @SG_column(dbField = "es_bid_level_4_price")
     private Double bid_level_4_price;
-    @SG_column(dbField = "es_ask_level_4_volume")
     private Long ask_level_4_volume;
-    @SG_column(dbField = "es_bid_level_4_volume")
     private Long bid_level_4_volume;
-    @SG_column(dbField = "es_lp_ask_level_4_volume")
     private Long es_lp_ask_level_4_volume;
-    @SG_column(dbField = "es_lp_bid_level_4_volume")
     private Long es_lp_bid_level_4_volume;
 
-    @SG_column(dbField = "es_ask_level_5_price")
     private Double ask_level_5_price;
-    @SG_column(dbField = "es_bid_level_5_price")
     private Double bid_level_5_price;
-    @SG_column(dbField = "es_ask_level_5_volume")
     private Long ask_level_5_volume;
-    @SG_column(dbField = "es_bid_level_5_volume")
     private Long bid_level_5_volume;
-    @SG_column(dbField = "es_lp_ask_level_5_volume")
     private Long es_lp_ask_level_5_volume;
-    @SG_column(dbField = "es_lp_bid_level_5_volume")
     private Long es_lp_bid_level_5_volume;
 
-    @SG_column(dbField = "es_ask_level_6_price")
     private Double ask_level_6_price;
-    @SG_column(dbField = "es_bid_level_6_price")
     private Double bid_level_6_price;
-    @SG_column(dbField = "es_ask_level_6_volume")
     private Long ask_level_6_volume;
-    @SG_column(dbField = "es_bid_level_6_volume")
     private Long bid_level_6_volume;
-    @SG_column(dbField = "es_lp_ask_level_6_volume")
     private Long es_lp_ask_level_6_volume;
-    @SG_column(dbField = "es_lp_bid_level_6_volume")
     private Long es_lp_bid_level_6_volume;
 
-    @SG_column(dbField = "es_ask_level_7_price")
     private Double ask_level_7_price;
-    @SG_column(dbField = "es_bid_level_7_price")
     private Double bid_level_7_price;
-    @SG_column(dbField = "es_ask_level_7_volume")
     private Long ask_level_7_volume;
-    @SG_column(dbField = "es_bid_level_7_volume")
     private Long bid_level_7_volume;
-    @SG_column(dbField = "es_lp_ask_level_7_volume")
     private Long es_lp_ask_level_7_volume;
-    @SG_column(dbField = "es_lp_bid_level_7_volume")
     private Long es_lp_bid_level_7_volume;
 
-    @SG_column(dbField = "es_ask_level_8_price")
     private Double ask_level_8_price;
-    @SG_column(dbField = "es_bid_level_8_price")
     private Double bid_level_8_price;
-    @SG_column(dbField = "es_ask_level_8_volume")
     private Long ask_level_8_volume;
-    @SG_column(dbField = "es_bid_level_8_volume")
     private Long bid_level_8_volume;
-    @SG_column(dbField = "es_lp_ask_level_8_volume")
     private Long es_lp_ask_level_8_volume;
-    @SG_column(dbField = "es_lp_bid_level_8_volume")
     private Long es_lp_bid_level_8_volume;
 
-    @SG_column(dbField = "es_ask_level_9_price")
     private Double ask_level_9_price ;
-    @SG_column(dbField = "es_bid_level_9_price")
     private Double bid_level_9_price ;
-    @SG_column(dbField = "es_ask_level_9_volume")
     private Long ask_level_9_volume;
-    @SG_column(dbField = "es_bid_level_9_volume")
     private Long bid_level_9_volume;
-    @SG_column(dbField = "es_lp_ask_level_9_volume")
     private Long es_lp_ask_level_9_volume;
-    @SG_column(dbField = "es_lp_bid_level_9_volume")
     private Long es_lp_bid_level_9_volume;
 
-    @SG_column(dbField = "es_ask_level_10_price")
     private Double ask_level_10_price ;
-    @SG_column(dbField = "es_bid_level_10_price")
     private Double bid_level_10_price ;
-    @SG_column(dbField = "es_ask_level_10_volume")
     private Long ask_level_10_volume;
-    @SG_column(dbField = "es_bid_level_10_volume")
     private Long bid_level_10_volume;
-    @SG_column(dbField = "es_lp_ask_level_10_volume")
     private Long es_lp_ask_level_10_volume;
-    @SG_column(dbField = "es_lp_bid_level_10_volume")
     private Long es_lp_bid_level_10_volume;
 
-    @SG_column(dbField = "es_total_ask_volume")
     private Long total_ask_volume;
-    @SG_column(dbField = "es_total_bid_volume")
     private Long total_bid_volume;
-    @SG_column(dbField = "es_estimated_trading_price")
     private Double estimated_trading_price;
-    @SG_column(dbField = "es_estimated_trading_volume")
     private Long estimated_trading_volume;
-    @SG_column(dbField = "es_closing_price_type_code")
     private String closing_price_type_code;
-    @SG_column(dbField = "es_trading_halt")
     private String trading_halt;
-    @SG_column(dbField = "es_is_fast_close")
     private boolean is_fast_close;
-    @SG_column(dbField = "es_fast_close_time")
     private String fast_close_time;
-    @SG_column(dbField = "es_end_keyword")
-    private String end_keyword;
 
-    @SG_column(dbField = "es_crdt")
-    private Timestamp createdAt;
 
-    public EquitiesSnapshot(String msg) throws NumberFormatException {
+    public EquitiesSnapshot(String msg) {
 
-        data_category = msg.substring(0, 2);
-        info_category = msg.substring(2, 5);
-        board_id = msg.substring(5, 7);
-        session_id = msg.substring(7, 9);
         isin_code = msg.substring(9, 21);
-        if(!msg.substring(21, 27).isBlank()) a_designated_number_for_an_issue = Integer.parseInt(msg.substring(21, 27));
         price_change_against_previous_day = msg.substring(27, 28);
         if(!msg.substring(28, 39).isBlank()) price_change_against_the_previous_day = Double.parseDouble(msg.substring(28, 39));
         if(!msg.substring(39, 50).isBlank()) upper_limit_price = Double.parseDouble(msg.substring(39, 50));
@@ -236,7 +116,7 @@ public class EquitiesSnapshot extends SG_model{
         if(!msg.substring(117, 139).isBlank()) accumulated_trading_value = Float.parseFloat(msg.substring(117, 139));
         final_ask_bid_type_code = msg.substring(139, 140);
 
-        if(msg.length() >= 900) {
+        if(msg.length() >= 899) {
             if(!msg.substring(140, 151).isBlank()) ask_level_1_price = Double.parseDouble(msg.substring(140, 151));
             if(!msg.substring(151, 162).isBlank()) bid_level_1_price = Double.parseDouble(msg.substring(151, 162));
             if(!msg.substring(162, 174).isBlank()) ask_level_1_volume = Long.parseLong(msg.substring(162, 174));
@@ -315,8 +195,7 @@ public class EquitiesSnapshot extends SG_model{
             if(!msg.substring(888, 889).isBlank()) trading_halt = msg.substring(888, 889);
             is_fast_close = msg.charAt(889) == 'Y';
             if(!msg.substring(890, 899).isBlank()) fast_close_time = msg.substring(890, 899);
-            end_keyword = msg.substring(899, 900);
-        } else if(msg.length() >= 650) {
+        } else if(msg.length() >= 649) {
             if(!msg.substring(140, 151).isBlank()) ask_level_1_price = Double.parseDouble(msg.substring(140, 151));
             if(!msg.substring(151, 162).isBlank()) bid_level_1_price = Double.parseDouble(msg.substring(151, 162));
             if(!msg.substring(162, 174).isBlank()) ask_level_1_volume = Long.parseLong(msg.substring(162, 174));
@@ -363,23 +242,9 @@ public class EquitiesSnapshot extends SG_model{
             if(!msg.substring(635, 647).isBlank()) estimated_trading_volume = Long.parseLong(msg.substring(635, 647));
             closing_price_type_code = msg.substring(647, 648);
             trading_halt = msg.substring(648, 649);
-            end_keyword = msg.substring(649, 650);
         }
     }
 
-    public Map<String, Object> toMap() {
-        final Map<String, Object> data = new LinkedHashMap<>();
-        for(final Field f: this.getClass().getDeclaredFields()) {
-            if(f.isAnnotationPresent(SG_column.class)) {
-                final SG_column sc = f.getAnnotation(SG_column.class);
-                try {
-                    data.put(sc.dbField(), f.get(this));
-                } catch (Exception ignore) {
-                }
-            }
-        }
-        return data;
-    }
 
     public double getYesterdayPrice() {
         return current_price + getPrice_change_against_the_previous_day();
@@ -516,96 +381,6 @@ public class EquitiesSnapshot extends SG_model{
         return response;
     }
 
-    static public String[] insertCols() {
-        return new String[] {
-                "es_data_category",
-                "es_info_category",
-                "es_board_id",
-                "es_session_id",
-                "es_isin_code",
-                "es_a_designated_number_for_an_issue",
-                "es_price_change_against_previous_day",
-                "es_price_change_against_the_previous_day",
-                "es_upper_limit_price",
-                "es_lower_limit_price",
-                "es_current_price",
-                "es_opening_price",
-                "es_todays_high",
-                "es_todays_low",
-                "es_accumulated_trading_volume",
-                "es_accumulated_trading_value",
-                "es_final_ask_bid_type_code",
-                "es_ask_level_1_price",
-                "es_bid_level_1_price",
-                "es_ask_level_1_volume",
-                "es_bid_level_1_volume",
-                "es_lp_ask_level_1_volume",
-                "es_lp_bid_level_1_volume",
-                "es_ask_level_2_price",
-                "es_bid_level_2_price",
-                "es_ask_level_2_volume",
-                "es_bid_level_2_volume",
-                "es_lp_bid_level_2_volume",
-                "es_lp_ask_level_2_volume",
-                "es_ask_level_3_price",
-                "es_bid_level_3_price",
-                "es_ask_level_3_volume",
-                "es_bid_level_3_volume",
-                "es_lp_ask_level_3_volume",
-                "es_lp_bid_level_3_volume",
-                "es_ask_level_4_price",
-                "es_bid_level_4_price",
-                "es_ask_level_4_volume",
-                "es_bid_level_4_volume",
-                "es_lp_ask_level_4_volume",
-                "es_lp_bid_level_4_volume",
-                "es_ask_level_5_price",
-                "es_bid_level_5_price",
-                "es_ask_level_5_volume",
-                "es_bid_level_5_volume",
-                "es_lp_ask_level_5_volume",
-                "es_lp_bid_level_5_volume",
-                "es_ask_level_6_price",
-                "es_bid_level_6_price",
-                "es_ask_level_6_volume",
-                "es_bid_level_6_volume",
-                "es_lp_ask_level_6_volume",
-                "es_lp_bid_level_6_volume",
-                "es_ask_level_7_price",
-                "es_bid_level_7_price",
-                "es_ask_level_7_volume",
-                "es_bid_level_7_volume",
-                "es_lp_ask_level_7_volume",
-                "es_lp_bid_level_7_volume",
-                "es_ask_level_8_price",
-                "es_bid_level_8_price",
-                "es_ask_level_8_volume",
-                "es_bid_level_8_volume",
-                "es_lp_ask_level_8_volume",
-                "es_lp_bid_level_8_volume",
-                "es_ask_level_9_price",
-                "es_bid_level_9_price",
-                "es_ask_level_9_volume",
-                "es_bid_level_9_volume",
-                "es_lp_ask_level_9_volume",
-                "es_lp_bid_level_9_volume",
-                "es_ask_level_10_price",
-                "es_bid_level_10_price",
-                "es_ask_level_10_volume",
-                "es_bid_level_10_volume",
-                "es_lp_ask_level_10_volume",
-                "es_lp_bid_level_10_volume",
-                "es_total_ask_volume",
-                "es_total_bid_volume",
-                "es_estimated_trading_price",
-                "es_estimated_trading_volume",
-                "es_closing_price_type_code",
-                "es_trading_halt",
-                "es_is_fast_close",
-                "es_fast_close_time",
-                "es_end_keyword",
-        };
-    }
 
     private long bid_count() {
         if(total_bid_volume == null || total_ask_volume == null) return 0;

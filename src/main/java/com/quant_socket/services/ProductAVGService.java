@@ -17,11 +17,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
-public class ProductAVGService extends SocketService<ProductAVG> {
+public class ProductAVGService extends SocketService {
 
     public void dataHandler(ProductAVG data) {
-        /*super.addLog(data);*/
-
         sendMessage(data);
         sendMessage(data, data.getIsinCode());
     }

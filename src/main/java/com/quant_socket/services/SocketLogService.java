@@ -1,23 +1,29 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.*;
+import com.quant_socket.models.SG_model;
+import com.quant_socket.repos.SG_repo;
 import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SocketLogService extends SocketService<SocketLog>{
+public class SocketLogService extends SocketService{
+
+    @Autowired
+    private SocketLogRepo repo;
+    private final List<SocketLog> logs = new CopyOnWriteArrayList<>();
 
     @Autowired
     private EquitiesSnapshotService equitiesSnapshotService;
@@ -31,37 +37,26 @@ public class SocketLogService extends SocketService<SocketLog>{
     @Autowired
     private InvestActivitiesEODService investActivitiesEODService;
 
-    @Autowired
-    private EquityIndexIndicatorService equityIndexIndicatorService;
-
-    @Autowired
-    private SeqQuoteService seqQuoteService;
-
-    public void addLog(SocketLog log) {
-        super.addLog(log);
-    }
-
-    public void esHandler(String msg) {
+    public void esHandler(SocketLog sl) {
+        final String msg = sl.getLog();
         if(msg.length() >= 5) {
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
                 case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
                     equities_batch_data_handler(msg);
+                    addLog(sl);
                     break;
                 case "C101S", "C102S", "C103S", "C104S", "C101Q", "C101X", "C101G":
                     investor_activities_per_an_issue_EOD_handler(msg);
+                    addLog(sl);
                     break;
                 case "A301S", "A301Q", "A301X":
                     securities_order_filled_handler(msg);
+                    addLog(sl);
                     break;
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
                     equities_snapshot_handler(msg);
-                    break;
-                case "CA01S", "CA01Q":
-                    equity_index_indicator_handler(msg);
-                    break;
-                case "B702S", "B703S", "B704S":
-                    seq_quote_handler(msg);
+                    addLog(sl);
                     break;
             }
         }
@@ -69,75 +64,54 @@ public class SocketLogService extends SocketService<SocketLog>{
 
     //종목별 투자자별 종가통계
     private void investor_activities_per_an_issue_EOD_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{96})")) {
-            if (chunk.length() >= 96) {
-                final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
-                investActivitiesEODService.dataHandler(iae);
-            }
-        }
+        final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
+        investActivitiesEODService.dataHandler(iae);
     }
 
     //증권 체결
     private void securities_order_filled_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{186})")) if(chunk.length() >= 186) {
-            final SecOrderFilled sef = new SecOrderFilled(msg);
-            securitiesOrderFilledService.dataHandler(sef);
-        }
+        final SecOrderFilled sef = new SecOrderFilled(msg);
+        securitiesOrderFilledService.dataHandler(sef);
     }
 
     //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
-        /*for(String chunk : msg.split("(?<=\\\\G.{650})")) {
-            if(chunk.length() >= 650) {
-                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
-                equitiesSnapshotService.dataHandler(es);
-            }
-        }*/
-        try {
-            final EquitiesSnapshot es = new EquitiesSnapshot(msg);
-            equitiesSnapshotService.dataHandler(es);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
-    //증권 Snapshot (MM/LP호가 포함)
-    private void equities_snapshot_handler2(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{900})")) {
-            if(chunk.length() >= 900) {
-                final EquitiesSnapshot es = new EquitiesSnapshot(chunk);
-                equitiesSnapshotService.dataHandler(es);
-            }
-        }
-        /*final EquitiesSnapshot es = new EquitiesSnapshot(msg);
-        equitiesSnapshotService.dataHandler(es);*/
-    }
-
-    //증권 지수지표
-    private void equity_index_indicator_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{185})")) {
-            if (chunk.length() >= 185) {
-                final EquityIndexIndicator eii = new EquityIndexIndicator(chunk);
-                equityIndexIndicatorService.dataHandler(eii);
-            }
-        }
+        final EquitiesSnapshot es = new EquitiesSnapshot(msg);
+        equitiesSnapshotService.dataHandler(es);
     }
 
     //증권 종목 정보
     private void equities_batch_data_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{620})")) {
-            if(chunk.length() >= 620) {
-                final EquitiesBatchData ebd = new EquitiesBatchData(chunk);
-                equitiesBatchDataService.dataHandler(ebd);
-            }
+        final EquitiesBatchData ebd = new EquitiesBatchData(msg);
+        equitiesBatchDataService.dataHandler(ebd);
+    }
+
+    private String insertSql(String[] cols) {
+        return "INSERT INTO socket_log(" +
+                String.join(",", cols) + ")" +
+                "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
+    }
+
+    @Transactional
+    public void insertLogs(String[] cols) {
+        if(!logs.isEmpty()) {
+            final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) {
+                    final SocketLog data = logs.get(i);
+                    data.setPreparedStatement(ps);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return logs.size();
+                }
+            });
+            if(result > 0) logs.clear();
         }
     }
 
-    private void seq_quote_handler(String msg) {
-        for(String chunk : msg.split("(?<=\\\\G.{795})")) {
-            if(chunk.length() >= 795) {
-                final SeqQuote data = new SeqQuote(chunk);
-                seqQuoteService.dataHandler(data);
-            }
-        }
+    public void addLog(SocketLog log) {
+        logs.add(log);
     }
 }
