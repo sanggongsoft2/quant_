@@ -4,6 +4,8 @@ import com.quant_socket.models.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
+
 @Service
 @Slf4j
 public class EquitiesSnapshotService extends SocketService{
@@ -17,6 +19,15 @@ public class EquitiesSnapshotService extends SocketService{
             productService.update(data);
             sendMessage(data.toSocket(product));
             sendMessage(data.toDetailsSocket(product), data.getIsin_code());
+        }
+    }
+
+    @Override
+    public void addSession(WebSocketSession ws, String... isinCodes) {
+        super.addSession(ws, isinCodes);
+        for(String isinCode : isinCodes) {
+            final Product prod = productService.productFromIsinCode(isinCode);
+            sendMessage(prod.getLatestSnapshot().toDetailsSocket(prod), isinCode);
         }
     }
 }

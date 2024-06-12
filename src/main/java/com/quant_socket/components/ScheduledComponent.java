@@ -43,7 +43,7 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 59 23 * * MON-FRI")
     public void everyWeekday() {
         productService.updateProducts();
-        productRepo.updateProductDay();
+        productService.updateProductDay();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -54,11 +54,11 @@ public class ScheduledComponent {
 
     @Scheduled(cron = "0 0 0 * * SAT")
     public void everyFriday() {
-        productRepo.updateProductWeek();
+        productRepo.insertProductWeek();
     }
 
     @Scheduled(cron = "0 0 0 1 * ?")
     public void everyMonth() {
-        productRepo.updateProductMonth();
+        productRepo.insertProductMonth();
     }
 }

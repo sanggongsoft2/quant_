@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,8 +40,13 @@ public class SocketLogService extends SocketService{
     @Autowired
     private InvestActivitiesEODService investActivitiesEODService;
 
+    private final LocalTime hour3half = LocalTime.of(15, 31);
+
     public void esHandler(SocketLog sl) {
         final String msg = sl.getLog();
+        final LocalTime now = LocalTime.now();
+        final boolean isBefore = now.isBefore(hour3half);
+
         if(msg.length() >= 5) {
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
@@ -51,12 +59,16 @@ public class SocketLogService extends SocketService{
                     addLog(sl);
                     break;
                 case "A301S", "A301Q", "A301X":
-                    securities_order_filled_handler(msg);
-                    addLog(sl);
+                    if(isBefore) {
+                        securities_order_filled_handler(msg);
+                        addLog(sl);
+                    }
                     break;
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
-                    equities_snapshot_handler(msg);
-                    addLog(sl);
+                    if(isBefore) {
+                        equities_snapshot_handler(msg);
+                        addLog(sl);
+                    }
                     break;
             }
         }

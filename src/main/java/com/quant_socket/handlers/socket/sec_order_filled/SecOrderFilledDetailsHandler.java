@@ -1,5 +1,6 @@
 package com.quant_socket.handlers.socket.sec_order_filled;
 
+import com.quant_socket.services.ProductService;
 import com.quant_socket.services.SecuritiesOrderFilledService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,9 @@ public class SecOrderFilledDetailsHandler extends TextWebSocketHandler {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
             isinCode = service.getQueryValue(uri.getQuery(), "isin_code");
-            if(isinCode != null) service.addSession(ws, isinCode);
+            if(isinCode != null) {
+                service.addSession(ws, isinCode);
+            }
         } else {
             ws.close();
         }

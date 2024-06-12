@@ -5,6 +5,7 @@ import com.quant_socket.models.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 
 @Service
@@ -18,6 +19,15 @@ public class SecuritiesOrderFilledService extends SocketService{
             product.update(data);
             sendMessage(data.toSocket(product));
             sendMessage(data.toSocket(product), data.getIsin_code());
+        }
+    }
+
+    @Override
+    public void addSession(WebSocketSession ws, String... isinCodes) {
+        super.addSession(ws, isinCodes);
+        for(String isinCode : isinCodes) {
+            final Product prod = productService.productFromIsinCode(isinCode);
+            sendMessage(prod.getOrders().stream().map(order -> order.toSocket(prod)).toList(), isinCode);
         }
     }
 }

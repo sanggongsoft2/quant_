@@ -2,10 +2,13 @@ package com.quant_socket.models.Logs;
 
 import com.quant_socket.models.Product;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
+@NoArgsConstructor
 public class EquitiesSnapshot{
 
     private String isin_code;
@@ -25,71 +28,71 @@ public class EquitiesSnapshot{
     private Double bid_level_1_price;
     private Long ask_level_1_volume;
     private Long bid_level_1_volume;
-    private Long es_lp_ask_level_1_volume;
-    private Long es_lp_bid_level_1_volume;
+    private Long lp_ask_level_1_volume;
+    private Long lp_bid_level_1_volume;
 
     private Double ask_level_2_price;
     private Double bid_level_2_price;
     private Long ask_level_2_volume;
     private Long bid_level_2_volume;
-    private Long es_lp_bid_level_2_volume;
-    private Long es_lp_ask_level_2_volume;
+    private Long lp_bid_level_2_volume;
+    private Long lp_ask_level_2_volume;
 
     private Double ask_level_3_price;
     private Double bid_level_3_price;
     private Long ask_level_3_volume;
     private Long bid_level_3_volume;
-    private Long es_lp_ask_level_3_volume;
-    private Long es_lp_bid_level_3_volume;
+    private Long lp_ask_level_3_volume;
+    private Long lp_bid_level_3_volume;
 
     private Double ask_level_4_price;
     private Double bid_level_4_price;
     private Long ask_level_4_volume;
     private Long bid_level_4_volume;
-    private Long es_lp_ask_level_4_volume;
-    private Long es_lp_bid_level_4_volume;
+    private Long lp_ask_level_4_volume;
+    private Long lp_bid_level_4_volume;
 
     private Double ask_level_5_price;
     private Double bid_level_5_price;
     private Long ask_level_5_volume;
     private Long bid_level_5_volume;
-    private Long es_lp_ask_level_5_volume;
-    private Long es_lp_bid_level_5_volume;
+    private Long lp_ask_level_5_volume;
+    private Long lp_bid_level_5_volume;
 
     private Double ask_level_6_price;
     private Double bid_level_6_price;
     private Long ask_level_6_volume;
     private Long bid_level_6_volume;
-    private Long es_lp_ask_level_6_volume;
-    private Long es_lp_bid_level_6_volume;
+    private Long lp_ask_level_6_volume;
+    private Long lp_bid_level_6_volume;
 
     private Double ask_level_7_price;
     private Double bid_level_7_price;
     private Long ask_level_7_volume;
     private Long bid_level_7_volume;
-    private Long es_lp_ask_level_7_volume;
-    private Long es_lp_bid_level_7_volume;
+    private Long lp_ask_level_7_volume;
+    private Long lp_bid_level_7_volume;
 
     private Double ask_level_8_price;
     private Double bid_level_8_price;
     private Long ask_level_8_volume;
     private Long bid_level_8_volume;
-    private Long es_lp_ask_level_8_volume;
-    private Long es_lp_bid_level_8_volume;
+    private Long lp_ask_level_8_volume;
+    private Long lp_bid_level_8_volume;
 
     private Double ask_level_9_price ;
     private Double bid_level_9_price ;
     private Long ask_level_9_volume;
     private Long bid_level_9_volume;
-    private Long es_lp_ask_level_9_volume;
-    private Long es_lp_bid_level_9_volume;
+    private Long lp_ask_level_9_volume;
+    private Long lp_bid_level_9_volume;
 
     private Double ask_level_10_price ;
     private Double bid_level_10_price ;
     private Long ask_level_10_volume;
     private Long bid_level_10_volume;
-    private Long es_lp_ask_level_10_volume;
-    private Long es_lp_bid_level_10_volume;
+    private Long lp_ask_level_10_volume;
+    private Long lp_bid_level_10_volume;
 
     private Long total_ask_volume;
     private Long total_bid_volume;
@@ -121,71 +124,71 @@ public class EquitiesSnapshot{
             if(!msg.substring(151, 162).isBlank()) bid_level_1_price = Double.parseDouble(msg.substring(151, 162));
             if(!msg.substring(162, 174).isBlank()) ask_level_1_volume = Long.parseLong(msg.substring(162, 174));
             if(!msg.substring(174, 186).isBlank()) bid_level_1_volume = Long.parseLong(msg.substring(174, 186));
-            if(!msg.substring(186, 198).isBlank()) es_lp_ask_level_1_volume = Long.parseLong(msg.substring(186, 198));
-            if(!msg.substring(198, 210).isBlank()) es_lp_bid_level_1_volume = Long.parseLong(msg.substring(198, 210));
+            if(!msg.substring(186, 198).isBlank()) lp_ask_level_1_volume = Long.parseLong(msg.substring(186, 198));
+            if(!msg.substring(198, 210).isBlank()) lp_bid_level_1_volume = Long.parseLong(msg.substring(198, 210));
 
             if(!msg.substring(210, 221).isBlank()) ask_level_2_price = Double.parseDouble(msg.substring(210, 221));
             if(!msg.substring(221, 232).isBlank()) bid_level_2_price = Double.parseDouble(msg.substring(221, 232));
             if(!msg.substring(232, 244).isBlank()) ask_level_2_volume = Long.parseLong(msg.substring(232, 244));
             if(!msg.substring(244, 256).isBlank()) bid_level_2_volume = Long.parseLong(msg.substring(244, 256));
-            if(!msg.substring(256, 268).isBlank()) es_lp_ask_level_2_volume = Long.parseLong(msg.substring(256, 268));
-            if(!msg.substring(268, 280).isBlank()) es_lp_bid_level_2_volume = Long.parseLong(msg.substring(268, 280));
+            if(!msg.substring(256, 268).isBlank()) lp_ask_level_2_volume = Long.parseLong(msg.substring(256, 268));
+            if(!msg.substring(268, 280).isBlank()) lp_bid_level_2_volume = Long.parseLong(msg.substring(268, 280));
 
             if(!msg.substring(280, 291).isBlank()) ask_level_3_price = Double.parseDouble(msg.substring(280, 291));
             if(!msg.substring(291, 302).isBlank()) bid_level_3_price = Double.parseDouble(msg.substring(291, 302));
             if(!msg.substring(302, 314).isBlank()) ask_level_3_volume = Long.parseLong(msg.substring(302, 314));
             if(!msg.substring(314, 326).isBlank()) bid_level_3_volume = Long.parseLong(msg.substring(314, 326));
-            if(!msg.substring(326, 338).isBlank()) es_lp_ask_level_3_volume = Long.parseLong(msg.substring(326, 338));
-            if(!msg.substring(338, 350).isBlank()) es_lp_bid_level_3_volume = Long.parseLong(msg.substring(338, 350));
+            if(!msg.substring(326, 338).isBlank()) lp_ask_level_3_volume = Long.parseLong(msg.substring(326, 338));
+            if(!msg.substring(338, 350).isBlank()) lp_bid_level_3_volume = Long.parseLong(msg.substring(338, 350));
 
             if(!msg.substring(350, 361).isBlank()) ask_level_4_price = Double.parseDouble(msg.substring(350, 361));
             if(!msg.substring(361, 372).isBlank()) bid_level_4_price = Double.parseDouble(msg.substring(361, 372));
             if(!msg.substring(372, 384).isBlank()) ask_level_4_volume = Long.parseLong(msg.substring(372, 384));
             if(!msg.substring(384, 396).isBlank()) bid_level_4_volume = Long.parseLong(msg.substring(384, 396));
-            if(!msg.substring(396, 408).isBlank()) es_lp_ask_level_4_volume = Long.parseLong(msg.substring(396, 408));
-            if(!msg.substring(408, 420).isBlank()) es_lp_bid_level_4_volume = Long.parseLong(msg.substring(408, 420));
+            if(!msg.substring(396, 408).isBlank()) lp_ask_level_4_volume = Long.parseLong(msg.substring(396, 408));
+            if(!msg.substring(408, 420).isBlank()) lp_bid_level_4_volume = Long.parseLong(msg.substring(408, 420));
 
             if(!msg.substring(420, 431).isBlank()) ask_level_5_price = Double.parseDouble(msg.substring(420, 431));
             if(!msg.substring(431, 442).isBlank()) bid_level_5_price = Double.parseDouble(msg.substring(431, 442));
             if(!msg.substring(442, 454).isBlank()) ask_level_5_volume = Long.parseLong(msg.substring(442, 454));
             if(!msg.substring(454, 466).isBlank()) bid_level_5_volume = Long.parseLong(msg.substring(454, 466));
-            if(!msg.substring(466, 478).isBlank()) es_lp_ask_level_5_volume = Long.parseLong(msg.substring(466, 478));
-            if(!msg.substring(478, 490).isBlank()) es_lp_bid_level_5_volume = Long.parseLong(msg.substring(478, 490));
+            if(!msg.substring(466, 478).isBlank()) lp_ask_level_5_volume = Long.parseLong(msg.substring(466, 478));
+            if(!msg.substring(478, 490).isBlank()) lp_bid_level_5_volume = Long.parseLong(msg.substring(478, 490));
 
             if(!msg.substring(490, 501).isBlank()) ask_level_6_price = Double.parseDouble(msg.substring(490, 501));
             if(!msg.substring(501, 512).isBlank()) bid_level_6_price = Double.parseDouble(msg.substring(501, 512));
             if(!msg.substring(512, 524).isBlank()) ask_level_6_volume = Long.parseLong(msg.substring(512, 524));
             if(!msg.substring(524, 536).isBlank()) bid_level_6_volume = Long.parseLong(msg.substring(524, 536));
-            if(!msg.substring(536, 548).isBlank()) es_lp_ask_level_6_volume = Long.parseLong(msg.substring(536, 548));
-            if(!msg.substring(548, 560).isBlank()) es_lp_bid_level_6_volume = Long.parseLong(msg.substring(548, 560));
+            if(!msg.substring(536, 548).isBlank()) lp_ask_level_6_volume = Long.parseLong(msg.substring(536, 548));
+            if(!msg.substring(548, 560).isBlank()) lp_bid_level_6_volume = Long.parseLong(msg.substring(548, 560));
 
             if(!msg.substring(560, 571).isBlank()) ask_level_7_price = Double.parseDouble(msg.substring(560, 571));
             if(!msg.substring(571, 582).isBlank()) bid_level_7_price = Double.parseDouble(msg.substring(571, 582));
             if(!msg.substring(582, 594).isBlank()) ask_level_7_volume = Long.parseLong(msg.substring(582, 594));
             if(!msg.substring(594, 606).isBlank()) bid_level_7_volume = Long.parseLong(msg.substring(594, 606));
-            if(!msg.substring(606, 618).isBlank()) es_lp_ask_level_7_volume = Long.parseLong(msg.substring(606, 618));
-            if(!msg.substring(618, 630).isBlank()) es_lp_bid_level_7_volume = Long.parseLong(msg.substring(618, 630));
+            if(!msg.substring(606, 618).isBlank()) lp_ask_level_7_volume = Long.parseLong(msg.substring(606, 618));
+            if(!msg.substring(618, 630).isBlank()) lp_bid_level_7_volume = Long.parseLong(msg.substring(618, 630));
 
             if(!msg.substring(630, 641).isBlank()) ask_level_8_price = Double.parseDouble(msg.substring(630, 641));
             if(!msg.substring(641, 652).isBlank()) bid_level_8_price = Double.parseDouble(msg.substring(641, 652));
             if(!msg.substring(652, 664).isBlank()) ask_level_8_volume = Long.parseLong(msg.substring(652, 664));
             if(!msg.substring(664, 676).isBlank()) bid_level_8_volume = Long.parseLong(msg.substring(664, 676));
-            if(!msg.substring(676, 688).isBlank()) es_lp_ask_level_8_volume = Long.parseLong(msg.substring(676, 688));
-            if(!msg.substring(688, 700).isBlank()) es_lp_bid_level_8_volume = Long.parseLong(msg.substring(688, 700));
+            if(!msg.substring(676, 688).isBlank()) lp_ask_level_8_volume = Long.parseLong(msg.substring(676, 688));
+            if(!msg.substring(688, 700).isBlank()) lp_bid_level_8_volume = Long.parseLong(msg.substring(688, 700));
 
             if(!msg.substring(700, 711).isBlank()) ask_level_9_price = Double.parseDouble(msg.substring(700, 711));
             if(!msg.substring(711, 722).isBlank()) bid_level_9_price = Double.parseDouble(msg.substring(711, 722));
             if(!msg.substring(722, 734).isBlank()) ask_level_9_volume = Long.parseLong(msg.substring(722, 734));
             if(!msg.substring(734, 746).isBlank()) bid_level_9_volume = Long.parseLong(msg.substring(734, 746));
-            if(!msg.substring(746, 758).isBlank()) es_lp_ask_level_9_volume = Long.parseLong(msg.substring(746, 758));
-            if(!msg.substring(758, 770).isBlank()) es_lp_bid_level_9_volume = Long.parseLong(msg.substring(758, 770));
+            if(!msg.substring(746, 758).isBlank()) lp_ask_level_9_volume = Long.parseLong(msg.substring(746, 758));
+            if(!msg.substring(758, 770).isBlank()) lp_bid_level_9_volume = Long.parseLong(msg.substring(758, 770));
 
             if(!msg.substring(770, 781).isBlank()) ask_level_10_price = Double.parseDouble(msg.substring(770, 781));
             if(!msg.substring(781, 792).isBlank()) bid_level_10_price = Double.parseDouble(msg.substring(781, 792));
             if(!msg.substring(792, 804).isBlank()) ask_level_10_volume = Long.parseLong(msg.substring(792, 804));
             if(!msg.substring(804, 816).isBlank()) bid_level_10_volume = Long.parseLong(msg.substring(804, 816));
-            if(!msg.substring(816, 828).isBlank()) es_lp_ask_level_10_volume = Long.parseLong(msg.substring(816, 828));
-            if(!msg.substring(828, 840).isBlank()) es_lp_bid_level_10_volume = Long.parseLong(msg.substring(828, 840));
+            if(!msg.substring(816, 828).isBlank()) lp_ask_level_10_volume = Long.parseLong(msg.substring(816, 828));
+            if(!msg.substring(828, 840).isBlank()) lp_bid_level_10_volume = Long.parseLong(msg.substring(828, 840));
 
             if(!msg.substring(828, 840).isBlank()) total_ask_volume = Long.parseLong(msg.substring(840, 852));
             if(!msg.substring(840, 852).isBlank()) total_bid_volume = Long.parseLong(msg.substring(852, 864));
@@ -247,31 +250,47 @@ public class EquitiesSnapshot{
 
 
     public double getYesterdayPrice() {
-        return current_price + getPrice_change_against_the_previous_day();
+        try {
+            return current_price + getPrice_change_against_the_previous_day();
+        } catch (Exception e) {
+            return 0;
+        }
     }
     public double getComparePriceRate() {
-        double value = 0;
-        if(current_price != 0 && getYesterdayPrice() != 0) value = (current_price - getYesterdayPrice()) / getYesterdayPrice() * 100;
-        return value;
-    }
-    private Double getComparePriceRate(Double price) {
-        if(price == null) return null;
-        double value = 0;
-        if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
-        return value;
-    }
-    public double getCompareYesterdayPrice() {
-        double result;
-        switch (price_change_against_previous_day) {
-            case "4":
-            case "5":
-                result = -price_change_against_the_previous_day;
-                break;
-            default:
-                result = price_change_against_the_previous_day;
+        try {
+            double value = 0;
+            if(current_price != 0 && getYesterdayPrice() != 0) value = (current_price - getYesterdayPrice()) / getYesterdayPrice() * 100;
+            return value;
+        } catch (Exception e) {
+            return 0;
         }
-        return result;
     }
+    private double getComparePriceRate(Double price) {
+        try {
+            if(price == null) return 0;
+            double value = 0;
+            if(opening_price != 0 && price != 0) value = (current_price - price) / price * 100;
+            return value;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+    public Double getCompareYesterdayPrice() {
+        try {
+            return switch (price_change_against_previous_day) {
+                case "4", "5" -> -price_change_against_the_previous_day;
+                default -> price_change_against_the_previous_day;
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private double marketTotalPrice(Long havingCount) {
+        if(current_price != null) return havingCount * current_price;
+        else return 0;
+    }
+
     public Map<String, Object> toSocket(Product prod) {
         final Map<String, Object> response = new LinkedHashMap<>();
         response.put("name_kr", prod.getName_kr());
@@ -282,7 +301,7 @@ public class EquitiesSnapshot{
         response.put("today_trading_count", accumulated_trading_volume);
         response.put("compare_yesterday_price", getCompareYesterdayPrice());
         response.put("compare_yesterday_rate", getComparePriceRate());
-        response.put("market_total_price", prod.getHaving_count() * current_price);
+        response.put("market_total_price", marketTotalPrice(prod.getHaving_count()));
         return response;
     }
     public Map<String, Object> toDetailsSocket(Product prod) {

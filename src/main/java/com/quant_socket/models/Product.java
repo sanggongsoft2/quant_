@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 @SG_table(name = "product")
 @Getter
@@ -73,6 +75,9 @@ public class Product extends SG_model{
     private long facilityAskCount = 0;
     private long facilityBidCount = 0;
 
+    private EquitiesSnapshot latestSnapshot = new EquitiesSnapshot();
+    private List<SecOrderFilled> orders = new ArrayList<>();
+
     private void updateTodayCount(String isinCode, String type, long count) {
         if (code.equals(isinCode)) {
             switch (type) {
@@ -103,20 +108,21 @@ public class Product extends SG_model{
             this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
             this.team = sectionTypeCodeToTeam(data.getSection_type_code());
             this.type = stockTypeToType(data.getOther_stock_type_code());
-            this.face_value = data.getPar_value();
-            this.having_count = data.getNumber_of_listed_shares();
-            this.yesterday_price = data.getYes_closing_price();
-            this.yesterday_value = data.getYes_accu_trading_value();
+            if(data.getPar_value() != 0) this.face_value = data.getPar_value();
+            if(data.getNumber_of_listed_shares() != 0) this.having_count = data.getNumber_of_listed_shares();
+            if(data.getYes_closing_price() != 0) this.yesterday_price = data.getYes_closing_price();
+            if(data.getYes_accu_trading_value() != 0) this.yesterday_value = data.getYes_accu_trading_value();
         }
     }
 
     public void update(EquitiesSnapshot data) {
-        this.currentPrice = data.getCurrent_price();
-        this.comparePriceRate = data.getComparePriceRate();
-        this.yesterday_price = data.getYesterdayPrice();
-        this.highPrice = data.getTodays_high();
-        this.lowPrice = data.getTodays_low();
-        this.openPrice = data.getOpening_price();
+        if(data.getCurrent_price() != 0) this.currentPrice = data.getCurrent_price();
+        if(data.getComparePriceRate() != 0) this.comparePriceRate = data.getComparePriceRate();
+        if(data.getYesterdayPrice() != 0)  this.yesterday_price = data.getYesterdayPrice();
+        if(data.getTodays_high() != 0) this.highPrice = data.getTodays_high();
+        if(data.getTodays_low() != 0) this.lowPrice = data.getTodays_low();
+        if(data.getOpening_price() != 0) this.openPrice = data.getOpening_price();
+        this.latestSnapshot = data;
     }
 
     public void update(InvestorActivitiesEOD data) {
@@ -141,6 +147,12 @@ public class Product extends SG_model{
         this.todayTradingValue = data.getAccu_trading_value();
         this.tradingVolume += data.getTrading_volume();
         updateTodayCount(data.getIsin_code(), data.getFinal_askbid_type_code(), data.getTrading_volume());
+        if(orders.size() == 20) {
+            this.orders.remove(19);
+            this.orders.add(data);
+        } else {
+            this.orders.add(data);
+        }
     }
 
     public Product(ResultSet rs) {

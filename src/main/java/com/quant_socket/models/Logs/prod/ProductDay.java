@@ -37,24 +37,19 @@ public class ProductDay extends SG_model {
     private Double pre_close;
     @SG_column(dbField = "d_date")
     private Date date;
+    @SG_column(dbField = "d_for_ask_count")
+    private long for_ask_count;
+    @SG_column(dbField = "d_for_bid_count")
+    private long for_bid_count;
+    @SG_column(dbField = "d_fac_ask_count")
+    private long fac_ask_count;
+    @SG_column(dbField = "d_fac_bid_count")
+    private long fac_bid_count;
     @SG_column(dbField = "d_crdt")
     private Timestamp createdAt;
 
     public ProductDay(ResultSet rs) {
         resultSetToClass(rs);
-    }
-
-    static public String[] insertCols() {
-        return new String[] {
-                "p_code",
-                "d_close",
-                "d_high",
-                "d_low",
-                "d_open",
-                "d_volume",
-                "d_pre_close",
-                "d_date",
-        };
     }
 
     public ProductDay(Product prod) {
@@ -66,5 +61,9 @@ public class ProductDay extends SG_model {
         this.volume = prod.getTradingVolume();
         this.pre_close = prod.getCurrentPrice();
         this.date = Date.valueOf(createdAt.toLocalDateTime().toLocalDate());
+        this.for_ask_count = prod.getForeignerAskCount();
+        this.for_bid_count = prod.getForeignerBidCount();
+        this.fac_ask_count = prod.getFacilityAskCount();
+        this.fac_bid_count = prod.getFacilityBidCount();
     }
 }

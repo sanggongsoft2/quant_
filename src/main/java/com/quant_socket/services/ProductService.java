@@ -3,10 +3,8 @@ package com.quant_socket.services;
 import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
-import com.quant_socket.models.SG_model;
 import com.quant_socket.repos.ProductMinuteRepo;
 import com.quant_socket.repos.ProductRepo;
-import com.quant_socket.repos.SG_repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -72,6 +70,14 @@ public class ProductService extends SocketService{
             }
         });
         if(result > 0) refreshProductItems();
+    }
+
+    public void updateProductDay() {
+        if(repo.insertProductDay() > 0) {
+            for(Product product : products){
+                repo.updateProductDay(product);
+            }
+        }
     }
 
     public void refreshProductItems() {
