@@ -3,7 +3,6 @@ package com.quant_socket.services;
 import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
-import com.quant_socket.repos.ProductMinuteRepo;
 import com.quant_socket.repos.ProductRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -21,8 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductService extends SocketService{
 
-    @Autowired
-    private ProductMinuteRepo productMinuteRepo;
     @Autowired
     private ProductRepo repo;
 
@@ -52,16 +48,13 @@ public class ProductService extends SocketService{
         }
     }
 
-    @Transactional
     public void updateProductMinute() {
-        final List<ProductMinute> minutes = logs.stream().map(ProductMinute::new).toList();
-        final String sql = insertSql(ProductMinute.insertCols());
-        final int result = productMinuteRepo.insertMany(sql, new BatchPreparedStatementSetter() {
+        final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
+        repo.insertProductMinute(new BatchPreparedStatementSetter() {
             @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
+            public void setValues(PreparedStatement ps, int i) {
                 final ProductMinute pm = minutes.get(i);
-                pm.setPreparedStatement(ps);
-                logs.get(i).refreshTradingVolumeFrom1Minute();
+                if(pm.setPreparedStatement(ps)) products.get(i).refreshTradingVolumeFrom1Minute();
             }
 
             @Override
@@ -69,19 +62,15 @@ public class ProductService extends SocketService{
                 return minutes.size();
             }
         });
-        if(result > 0) refreshProductItems();
     }
 
+    @Transactional
     public void updateProductDay() {
         if(repo.insertProductDay() > 0) {
             for(Product product : products){
                 repo.updateProductDay(product);
             }
         }
-    }
-
-    public void refreshProductItems() {
-        products.forEach(Product::refreshTradingVolumeFrom1Minute);
     }
 
     public void update(EquitiesBatchData data) {

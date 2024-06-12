@@ -52,28 +52,20 @@ public class SocketLogService extends SocketService{
             switch (prodCode) {
                 case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
                     equities_batch_data_handler(msg);
-                    addLog(sl);
                     break;
                 case "C101S", "C102S", "C103S", "C104S", "C101Q", "C101X", "C101G":
                     investor_activities_per_an_issue_EOD_handler(msg);
-                    addLog(sl);
                     break;
                 case "A301S", "A301Q", "A301X":
-                    if(isBefore) {
-                        securities_order_filled_handler(msg);
-                        addLog(sl);
-                    }
+                    if(isBefore) securities_order_filled_handler(msg);
                     break;
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
-                    if(isBefore) {
-                        equities_snapshot_handler(msg);
-                        addLog(sl);
-                    }
+                    /*equities_snapshot_handler(msg);*/
+                    if(isBefore) equities_snapshot_handler(msg);
                     break;
             }
         }
     }
-
     //종목별 투자자별 종가통계
     private void investor_activities_per_an_issue_EOD_handler(String msg) {
         final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);

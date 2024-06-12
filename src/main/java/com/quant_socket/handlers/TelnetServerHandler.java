@@ -40,10 +40,15 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         try {
             for (String logMessage : message.split("�")) {
                 final SocketLog sl = new SocketLog();
-                sl.setPort(port);
-                sl.setRemote_url(remote_url);
-                sl.setLog(logMessage);
-                socketLogService.esHandler(sl);
+                try {
+                    sl.setPort(port);
+                    sl.setRemote_url(remote_url);
+                    sl.setLog(logMessage);
+                    socketLogService.esHandler(sl);
+                } catch (Exception e) {
+                    sl.setError(e.getMessage());
+                }
+                socketLogService.addLog(sl);
             }
         } finally {
             in.release();

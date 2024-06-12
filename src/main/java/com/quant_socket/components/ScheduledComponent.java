@@ -9,12 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduledComponent {
     private final SocketLogService socketLogService;
     private final ProductService productService;
+    private final EquitiesSnapshotService equitiesSnapshotService;
 
     private final SocketLogRepo socketLogRepo;
     private final ProductRepo productRepo;
@@ -30,14 +34,11 @@ public class ScheduledComponent {
         productService.insertLogs(Product.insertCols());
     }
 
-    @Scheduled(cron = "0 * 10-17 * * MON-FRI")
-    public void everyMinuteFrom10To17() {
+    @Scheduled(cron = "0 * 10-14 * * MON-FRI")
+    @Scheduled(cron = "0 0-30 15 * * MON-FRI")
+    public void everyMinuteFrom10To15() {
         productService.updateProductMinute();
-    }
-
-    @Scheduled(cron = "0 0 18 * * MON-FRI")
-    public void at15() {
-        productService.updateProductMinute();
+        equitiesSnapshotService.insertLogs();
     }
 
     @Scheduled(cron = "0 59 23 * * MON-FRI")

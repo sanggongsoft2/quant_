@@ -10,8 +10,4 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class SeqQuoteService extends SocketService{
-    public void dataHandler(SeqQuote data) {
-        sendMessage(data.toSocket());
-        sendMessage(data.toSocket(), data.getIsin_code());
-    }
 }

@@ -19,16 +19,14 @@ public class EquitiesSnapshotDetailsHandler extends TextWebSocketHandler {
 
     private final EquitiesSnapshotService service;
 
-    private String isinCode;
+    private String[] isinCode = new String[]{};
 
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
-            isinCode = service.getQueryValue(uri.getQuery(), "isin_code");
-            if(isinCode != null) {
-                service.addSession(ws, isinCode);
-            }
+            isinCode = service.getQueryValue(uri.getQuery(), "isin_code").split(",");
+            if(isinCode.length > 0) service.addSession(ws, isinCode);
         } else {
             ws.close();
         }
@@ -38,7 +36,7 @@ public class EquitiesSnapshotDetailsHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
-            if(isinCode != null) service.removeSession(ws, isinCode);
+            service.removeSession(ws, isinCode);
         } else {
             ws.close();
         }

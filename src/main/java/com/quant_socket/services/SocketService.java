@@ -27,9 +27,6 @@ public abstract class SocketService{
     private final ObjectMapper mapper = new ObjectMapper();
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
-    public void addSession(WebSocketSession ws) {
-        sessions.add(ws);
-    }
     public void addSession(WebSocketSession ws, String... isinCodes) {
         for(String isinCode : isinCodes) {
             isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
@@ -37,18 +34,11 @@ public abstract class SocketService{
         }
     }
 
-    public void removeSession(WebSocketSession ws) {
-        sessions.remove(ws);
-    }
     public void removeSession(WebSocketSession ws, String... isinCodes) {
         for(String isinCode : isinCodes) {
             if(isinSessions.get(isinCode) != null) isinSessions.get(isinCode).remove(ws);
             if(isinSessions.get(isinCode).isEmpty()) isinSessions.remove(isinCode);
         }
-    }
-
-    public <T> void sendMessage(T message){
-        sendMessage(message, this.sessions);
     }
     public <T> void sendMessage(T message, String... isinCodes){
         for(String isinCode : isinCodes) {

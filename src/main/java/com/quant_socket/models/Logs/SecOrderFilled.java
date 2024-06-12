@@ -73,8 +73,8 @@ public class SecOrderFilled{
     private String tradingTimeToString() {
         final long milliseconds = Long.parseLong(processing_time_of_trading_system);
         final Instant instant = Instant.ofEpochMilli(milliseconds);
-        final LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Seoul"));
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return dateTime.format(formatter);
+        final ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Seoul"));
+        final LocalDate date = zonedDateTime.toLocalDate();
+        return date.toString();
     }
 }

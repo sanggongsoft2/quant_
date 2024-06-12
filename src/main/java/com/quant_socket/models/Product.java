@@ -1,14 +1,13 @@
 package com.quant_socket.models;
 
-import com.quant_socket.annotations.SG_column;
-import com.quant_socket.annotations.SG_crdt;
-import com.quant_socket.annotations.SG_idx;
-import com.quant_socket.annotations.SG_table;
+import com.quant_socket.annotations.*;
 import com.quant_socket.models.Logs.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class Product extends SG_model{
 
     @SG_idx
     @SG_column(dbField = "p_idx")
-    private Long idx;
+    private Integer idx;
     @SG_column(dbField = "p_code")
     private String code;
     @SG_column(dbField = "p_short_code")
@@ -45,7 +44,7 @@ public class Product extends SG_model{
     @SG_column(dbField = "p_having_count")
     private Long having_count;
     @SG_column(dbField = "p_yesterday_price")
-    private Double yesterday_price;
+    private BigDecimal yesterday_price;
     @SG_column(dbField = "p_yesterday_value")
     private Float yesterday_value;
     @SG_column(dbField = "p_yesterday_trading_count")
@@ -56,7 +55,13 @@ public class Product extends SG_model{
 
     @SG_crdt
     @SG_column(dbField = "p_crdt")
-    private String crdt;
+    private Date createdAt;
+
+    @SG_column(dbField = "max_52_price")
+    private BigDecimal max_52_price;
+
+    @SG_column(dbField = "min_52_price")
+    private BigDecimal min_52_price;
 
     private double currentPrice = 0;
     private double comparePriceRate = 0;
@@ -75,6 +80,7 @@ public class Product extends SG_model{
     private long facilityAskCount = 0;
     private long facilityBidCount = 0;
 
+    @SG_join(clazz = EquitiesSnapshot.class)
     private EquitiesSnapshot latestSnapshot = new EquitiesSnapshot();
     private List<SecOrderFilled> orders = new ArrayList<>();
 
@@ -110,19 +116,21 @@ public class Product extends SG_model{
             this.type = stockTypeToType(data.getOther_stock_type_code());
             if(data.getPar_value() != 0) this.face_value = data.getPar_value();
             if(data.getNumber_of_listed_shares() != 0) this.having_count = data.getNumber_of_listed_shares();
-            if(data.getYes_closing_price() != 0) this.yesterday_price = data.getYes_closing_price();
+            if(data.getYes_closing_price() != null) this.yesterday_price = data.getYes_closing_price();
             if(data.getYes_accu_trading_value() != 0) this.yesterday_value = data.getYes_accu_trading_value();
         }
     }
 
     public void update(EquitiesSnapshot data) {
-        if(data.getCurrent_price() != 0) this.currentPrice = data.getCurrent_price();
-        if(data.getComparePriceRate() != 0) this.comparePriceRate = data.getComparePriceRate();
-        if(data.getYesterdayPrice() != 0)  this.yesterday_price = data.getYesterdayPrice();
-        if(data.getTodays_high() != 0) this.highPrice = data.getTodays_high();
-        if(data.getTodays_low() != 0) this.lowPrice = data.getTodays_low();
-        if(data.getOpening_price() != 0) this.openPrice = data.getOpening_price();
-        this.latestSnapshot = data;
+        if(data.isRealBoard()) {
+            this.currentPrice = data.getCurrent_price().doubleValue();
+            this.comparePriceRate = data.getComparePriceRate();
+            this.yesterday_price = data.getYesterdayPrice();
+            this.highPrice = data.getTodays_high().doubleValue();
+            this.lowPrice = data.getTodays_low().doubleValue();
+            this.openPrice = data.getOpening_price().doubleValue();
+            this.latestSnapshot = data;
+        }
     }
 
     public void update(InvestorActivitiesEOD data) {
@@ -157,6 +165,7 @@ public class Product extends SG_model{
 
     public Product(ResultSet rs) {
         super.resultSetToClass(rs);
+        update(new EquitiesSnapshot(rs));
     }
 
     public Product(EquitiesBatchData data) {
