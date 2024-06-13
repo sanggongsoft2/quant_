@@ -25,12 +25,11 @@ public class TelnetServer implements CommandLineRunner {
 
     private final SocketLogService socketLogService;
     private final ProductService productService;
-    private final ProductRepo productRepo;
     /*private final int[] ports = new int[]{22902, 22903, 22904, 22905, 23902, 23903, 23904, 24103, 24102, 24104, 24902, 24904, 24903};*/
     private final int[] ports = new int[]{22103, 22102, 22104, 22105, 23103, 23102, 23104, 24103, 24102, 24104};
     @Override
     public void run(String... args) throws Exception {
-        if(productService.refreshProducts(productRepo)) setPorts();
+        if(productService.refreshProducts()) setPorts();
     }
 
     private void setPorts() throws InterruptedException {

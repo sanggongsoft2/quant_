@@ -1,7 +1,7 @@
 package com.quant_socket.config;
 
-import com.quant_socket.handlers.socket.equities_snapshot.EquitiesSnapshotDetailsHandler;
-import com.quant_socket.handlers.socket.sec_order_filled.SecOrderFilledDetailsHandler;
+import com.quant_socket.handlers.socket.equities_snapshot.EquitiesSnapshotHandler;
+import com.quant_socket.handlers.socket.sec_order_filled.SecOrderFilledHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +15,9 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Slf4j
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final EquitiesSnapshotDetailsHandler equitiesSnapshotDetailsHandler;
+    private final EquitiesSnapshotHandler equitiesSnapshotDetailsHandler;
 
-    private final SecOrderFilledDetailsHandler secOrderFilledDetailsHandler;
+    private final SecOrderFilledHandler secOrderFilledDetailsHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

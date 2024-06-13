@@ -20,14 +20,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class EquitiesSnapshotService extends SocketService{
 
     private final List<EquitiesSnapshot> logs = new CopyOnWriteArrayList<>();
-
     @Autowired
     private EquitiesSnapshotRepo repo;
     @Autowired
     private ProductService productService;
     public void dataHandler(EquitiesSnapshot data) {
        logs.add(data);
-
         final Product product = productService.productFromIsinCode(data.getIsin_code());
         if(product != null && data.isRealBoard()) {
             productService.update(data);
@@ -40,7 +38,8 @@ public class EquitiesSnapshotService extends SocketService{
         super.addSession(ws, isinCodes);
         for(String isinCode : isinCodes) {
             final Product prod = productService.productFromIsinCode(isinCode);
-            sendMessage(prod.getLatestSnapshot().toSocket(prod), isinCode);
+            final EquitiesSnapshot initData = prod.getLatestSnapshot();
+            if(initData != null) sendMessage(initData.toSocket(prod), isinCode);
         }
     }
 
@@ -50,7 +49,7 @@ public class EquitiesSnapshotService extends SocketService{
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 final EquitiesSnapshot eq = logs.get(i);
-                if(eq.setPreparedStatement(ps)) logs.remove(i);
+                eq.setPreparedStatement(ps);
             }
 
             @Override
@@ -58,6 +57,7 @@ public class EquitiesSnapshotService extends SocketService{
                 return logs.size();
             }
         });
+        if(result > 0) logs.clear();
     }
 
     private String insertSql() {

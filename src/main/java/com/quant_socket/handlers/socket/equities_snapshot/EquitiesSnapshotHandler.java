@@ -1,7 +1,6 @@
-package com.quant_socket.handlers.socket.sec_order_filled;
+package com.quant_socket.handlers.socket.equities_snapshot;
 
-import com.quant_socket.services.ProductService;
-import com.quant_socket.services.SecuritiesOrderFilledService;
+import com.quant_socket.services.EquitiesSnapshotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,32 +13,26 @@ import java.net.URI;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SecOrderFilledDetailsHandler extends TextWebSocketHandler {
+public class EquitiesSnapshotHandler extends TextWebSocketHandler {
 
-    private final SecuritiesOrderFilledService service;
+    private final EquitiesSnapshotService service;
 
-    private String isinCode;
+    private String[] isinCode = new String[]{};
 
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
-            isinCode = service.getQueryValue(uri.getQuery(), "isin_code");
-            if(isinCode != null) {
-                service.addSession(ws, isinCode);
-            }
+            isinCode = service.getQueryValue(uri.getQuery(), "isin_code").split(",");
+            if(isinCode.length > 0) service.addSession(ws, isinCode);
         } else {
             ws.close();
         }
     }
 
-    @Override
+    /*@Override
     public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
         final URI uri = ws.getUri();
-        if(uri != null && uri.getQuery() != null) {
-            if(isinCode != null) service.removeSession(ws, isinCode);
-        } else {
-            ws.close();
-        }
-    }
+        if(uri != null && uri.getQuery() != null) service.removeSession(ws, isinCode);
+    }*/
 }

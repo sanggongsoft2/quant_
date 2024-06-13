@@ -18,7 +18,6 @@ public class SecuritiesOrderFilledService extends SocketService{
         if(product != null) {
             product.update(data);
             sendMessage(data.toSocket(product), data.getIsin_code());
-            sendMessage(data.toSocket(product), data.getIsin_code());
         }
     }
 

@@ -25,7 +25,7 @@ public class ProductService extends SocketService{
     private final List<Product> logs = new CopyOnWriteArrayList<>();
     private final List<Product> products = new CopyOnWriteArrayList<>();
 
-    public boolean refreshProducts(ProductRepo repo) {
+    public boolean refreshProducts() {
         products.clear();
         return products.addAll(repo.findAll());
     }

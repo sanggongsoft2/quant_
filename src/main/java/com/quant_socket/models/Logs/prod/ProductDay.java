@@ -58,7 +58,7 @@ public class ProductDay extends SG_model {
         this.high = prod.getHighPrice();
         this.low = prod.getLowPrice();
         this.open = prod.getOpenPrice();
-        this.volume = prod.getTradingVolume();
+        this.volume = prod.getTodayTradingCount();
         this.pre_close = prod.getCurrentPrice();
         this.date = Date.valueOf(createdAt.toLocalDateTime().toLocalDate());
         this.for_ask_count = prod.getForeignerAskCount();

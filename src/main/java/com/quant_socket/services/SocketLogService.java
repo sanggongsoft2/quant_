@@ -60,7 +60,6 @@ public class SocketLogService extends SocketService{
                     if(isBefore) securities_order_filled_handler(msg);
                     break;
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
-                    /*equities_snapshot_handler(msg);*/
                     if(isBefore) equities_snapshot_handler(msg);
                     break;
             }
@@ -81,7 +80,7 @@ public class SocketLogService extends SocketService{
     //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
         final EquitiesSnapshot es = new EquitiesSnapshot(msg);
-        equitiesSnapshotService.dataHandler(es);
+        if(es.isRealBoard()) equitiesSnapshotService.dataHandler(es);
     }
 
     //증권 종목 정보

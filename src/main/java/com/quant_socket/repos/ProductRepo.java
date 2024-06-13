@@ -77,6 +77,7 @@ public class ProductRepo extends SG_repo<Product>{
                 "         WHERE (eq_isin_code, eq_idx) IN (\n" +
                 "             SELECT eq_isin_code, MAX(eq_idx) AS max_eq_idx\n" +
                 "             FROM equities_snapshot\n" +
+                "             WHERE eq_board_id = 'G1'\n" +
                 "             GROUP BY eq_isin_code\n" +
                 "         )\n" +
                 "     )\n" +

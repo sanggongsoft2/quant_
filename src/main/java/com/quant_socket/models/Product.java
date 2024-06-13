@@ -114,10 +114,10 @@ public class Product extends SG_model{
             this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
             this.team = sectionTypeCodeToTeam(data.getSection_type_code());
             this.type = stockTypeToType(data.getOther_stock_type_code());
-            if(data.getPar_value() != 0) this.face_value = data.getPar_value();
-            if(data.getNumber_of_listed_shares() != 0) this.having_count = data.getNumber_of_listed_shares();
-            if(data.getYes_closing_price() != null) this.yesterday_price = data.getYes_closing_price();
-            if(data.getYes_accu_trading_value() != 0) this.yesterday_value = data.getYes_accu_trading_value();
+            this.face_value = data.getPar_value();
+            this.having_count = data.getNumber_of_listed_shares();
+            this.yesterday_price = data.getYes_closing_price();
+            this.yesterday_value = data.getYes_accu_trading_value();
         }
     }
 
@@ -125,7 +125,6 @@ public class Product extends SG_model{
         if(data.isRealBoard()) {
             this.currentPrice = data.getCurrent_price().doubleValue();
             this.comparePriceRate = data.getComparePriceRate();
-            this.yesterday_price = data.getYesterdayPrice();
             this.highPrice = data.getTodays_high().doubleValue();
             this.lowPrice = data.getTodays_low().doubleValue();
             this.openPrice = data.getOpening_price().doubleValue();
@@ -154,6 +153,7 @@ public class Product extends SG_model{
         this.todayTradingCount = data.getTrading_volume();
         this.todayTradingValue = data.getAccu_trading_value();
         this.tradingVolume += data.getTrading_volume();
+        this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
         updateTodayCount(data.getIsin_code(), data.getFinal_askbid_type_code(), data.getTrading_volume());
         if(orders.size() == 20) {
             this.orders.remove(19);
