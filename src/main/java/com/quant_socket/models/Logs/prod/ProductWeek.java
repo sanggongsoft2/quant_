@@ -38,6 +38,6 @@ public class ProductWeek extends SG_model {
     private Timestamp createdAt;
 
     public ProductWeek(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 }

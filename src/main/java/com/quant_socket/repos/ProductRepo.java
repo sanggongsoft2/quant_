@@ -13,14 +13,14 @@ import java.util.List;
 @Repository
 public class ProductRepo extends SG_repo<Product>{
 
-    private final String productUpdateSql = "UPDATE product SET \" +\n" +
-            "                \"p_face_value = ?, \" +\n" +
-            "                \"p_having_count = ?, \" +\n" +
-            "                \"p_yesterday_price = ?, \" +\n" +
-            "                \"p_yesterday_trading_count = ?, \" +\n" +
-            "                \"p_yesterday_value = ?, \" +\n" +
-            "                \"p_name_en = ?\" +\n" +
-            "                \" WHERE p_idx = ?";
+    private final String productUpdateSql = "UPDATE product SET\n" +
+            "                p_face_value = ?,\n" +
+            "                p_having_count = ?,\n" +
+            "                p_yesterday_price = ?,\n" +
+            "                p_yesterday_trading_count = ?,\n" +
+            "                p_yesterday_value = ?,\n" +
+            "                p_name_en = ?\n" +
+            "                WHERE p_idx = ?";
 
     private final String productMinuteSql = "INSERT INTO product_minute (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close)\n" +
             "VALUES(?, ?, ?, ?, ?, ?, ?)";
@@ -33,15 +33,26 @@ public class ProductRepo extends SG_repo<Product>{
             "    GROUP BY p_code\n" +
             ")";
 
-    private final String productDayUpdateSql = "UPDATE product_day SET d_for_ask_count = ?, d_for_bid_count = ?, d_fac_ask_count = ?, d_fac_bid_count = ? WHERE p_code = ?";
+    private final String productDayUpdateSql = """
+UPDATE product_day SET d_for_ask_count = ?, d_for_bid_count = ?, d_fac_ask_count = ?, d_fac_bid_count = ? 
+WHERE p_code = ?
+""";
 
-    private final String productWeekSql = "INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)\n" +
-            "SELECT p_code, d_close, d_high, d_low, d_open, (SELECT SUM(pd.d_volume) FROM product_day pd WHERE pd.p_code = product_day.p_code AND d_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 WEEK) AND CURDATE()), d_pre_close, d_date FROM product_day\n" +
-            "WHERE (p_code, d_idx) IN (\n" +
-            "    SELECT p_code, MAX(d_idx)\n" +
-            "    FROM product_day\n" +
-            "    GROUP BY p_code\n" +
-            ")";
+    private final String productWeekSql = """
+INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)
+SELECT p_code, d_close, d_high, d_low, d_open,
+       (SELECT SUM(pd.d_volume)
+        FROM product_day pd
+        WHERE pd.p_code = product_day.p_code
+          AND d_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 WEEK) AND CURDATE()),
+       d_pre_close, d_date
+FROM product_day
+WHERE (p_code, d_idx) IN (
+    SELECT p_code, MAX(d_idx)
+    FROM product_day
+    GROUP BY p_code
+);
+""";
 
     private final String productMonthSql = "INSERT INTO product_month (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date)\n" +
             "SELECT p_code, d_close, d_high, d_low, d_open,\n" +
@@ -58,56 +69,48 @@ public class ProductRepo extends SG_repo<Product>{
             "WHERE d_crdt < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);";
 
     public List<Product> findAll() {
-        final String sql = "WITH RecentData AS (\n" +
-                "    SELECT p_code, w_high, w_low,\n" +
-                "           ROW_NUMBER() OVER (PARTITION BY p_code ORDER BY w_idx DESC) AS rn\n" +
-                "    FROM product_week\n" +
-                "),\n" +
-                "     MaxMinWClose AS (\n" +
-                "         SELECT p_code,\n" +
-                "                MAX(w_high) AS Max_w_high,\n" +
-                "                MIN(w_low) AS Min_w_low\n" +
-                "         FROM RecentData\n" +
-                "         WHERE rn <= 52\n" +
-                "         GROUP BY p_code\n" +
-                "     ),\n" +
-                "     LatestEquitiesSnapshot AS (\n" +
-                "         SELECT *\n" +
-                "         FROM equities_snapshot\n" +
-                "         WHERE (eq_isin_code, eq_idx) IN (\n" +
-                "             SELECT eq_isin_code, MAX(eq_idx) AS max_eq_idx\n" +
-                "             FROM equities_snapshot\n" +
-                "             WHERE eq_board_id = 'G1'\n" +
-                "             GROUP BY eq_isin_code\n" +
-                "         )\n" +
-                "     )\n" +
-                "SELECT p.*,\n" +
-                "       mmw.Max_w_high max_52_price,\n" +
-                "       mmw.Min_w_low min_52_price,\n" +
-                "       es.*\n" +
-                "FROM product p\n" +
-                "         LEFT JOIN MaxMinWClose mmw ON p.p_code = mmw.p_code\n" +
-                "         LEFT JOIN LatestEquitiesSnapshot es ON es.eq_isin_code = p.p_code;\n";
-        /*final String sql = "SELECT\n" +
-                "    *\n" +
-                "FROM\n" +
-                "    product p\n" +
-                "        LEFT JOIN (\n" +
-                "        SELECT\n" +
-                "            *\n" +
-                "        FROM\n" +
-                "            equities_snapshot\n" +
-                "        WHERE\n" +
-                "            (eq_isin_code, eq_idx) IN (\n" +
-                "                SELECT\n" +
-                "                    eq_isin_code,\n" +
-                "                    MAX(eq_idx) AS max_eq_idx\n" +
-                "                FROM\n" +
-                "                    equities_snapshot\n" +
-                "                GROUP BY\n" +
-                "                    eq_isin_code\n" +
-                "            )\n" +
-                "    ) es ON es.eq_isin_code = p.p_code;\n";*/
+        final String sql = """
+WITH RecentData AS (
+        SELECT p_code, w_high, w_low,
+               ROW_NUMBER() OVER (PARTITION BY p_code ORDER BY w_idx DESC) AS rn
+        FROM product_week
+    ),
+     MaxMinWClose AS (
+         SELECT p_code,
+                MAX(w_high) AS Max_w_high,
+                MIN(w_low) AS Min_w_low
+         FROM RecentData
+         WHERE rn <= 52
+         GROUP BY p_code
+     ),
+     LatestEquitiesSnapshot AS (
+         SELECT *
+         FROM equities_snapshot
+         WHERE (eq_isin_code, eq_idx) IN (
+             SELECT eq_isin_code, MAX(eq_idx) AS max_eq_idx
+             FROM equities_snapshot
+             GROUP BY eq_isin_code
+         )
+     ),
+     LatestSecuritiesQuote AS (
+         SELECT *
+         FROM securities_quote
+         WHERE (sq_isin_code, sq_idx) IN (
+             SELECT sq_isin_code, MAX(sq_idx) AS max_sq_idx
+             FROM securities_quote
+             GROUP BY sq_isin_code
+         )
+     )
+SELECT p.*,
+       mmw.Max_w_high AS max_52_price,
+       mmw.Min_w_low AS min_52_price,
+       es.*,
+       sq.*
+FROM product p
+         LEFT JOIN MaxMinWClose mmw ON p.p_code = mmw.p_code
+         LEFT JOIN LatestEquitiesSnapshot es ON es.eq_isin_code = p.p_code
+         LEFT JOIN LatestSecuritiesQuote sq ON sq.sq_isin_code = p.p_code;
+""";
         return super.jt.query(sql, (rs, rn) -> new Product(rs));
     }
 

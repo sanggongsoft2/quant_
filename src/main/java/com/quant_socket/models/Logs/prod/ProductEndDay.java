@@ -28,6 +28,6 @@ public class ProductEndDay extends SG_model {
     private Timestamp createdAt = Timestamp.from(Instant.now());
 
     public ProductEndDay(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 }

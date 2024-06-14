@@ -41,7 +41,7 @@ public class SocketLog extends SG_model {
     }
 
     public SocketLog(ResultSet res) {
-        super.resultSetToClass(res);
+        super(res);
     }
 
     static public String[] insertCols() {

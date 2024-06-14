@@ -19,6 +19,7 @@ public class ScheduledComponent {
     private final SocketLogService socketLogService;
     private final ProductService productService;
     private final EquitiesSnapshotService equitiesSnapshotService;
+    private final SecuritiesQuoteService securitiesQuoteService;
 
     private final SocketLogRepo socketLogRepo;
     private final ProductRepo productRepo;
@@ -39,6 +40,7 @@ public class ScheduledComponent {
     public void everyMinuteFrom10To15() {
         productService.updateProductMinute();
         equitiesSnapshotService.insertLogs();
+        securitiesQuoteService.insertLogs();
     }
 
     @Scheduled(cron = "0 59 23 * * MON-FRI")

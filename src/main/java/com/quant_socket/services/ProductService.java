@@ -66,11 +66,7 @@ public class ProductService extends SocketService{
 
     @Transactional
     public void updateProductDay() {
-        if(repo.insertProductDay() > 0) {
-            for(Product product : products){
-                repo.updateProductDay(product);
-            }
-        }
+        repo.insertProductDay();
     }
 
     public void update(EquitiesBatchData data) {
@@ -81,6 +77,16 @@ public class ProductService extends SocketService{
             }
         }
     }
+
+    public void update(SecuritiesQuote data) {
+        for(Product prod : products) {
+            if(prod.getCode().equals(data.getIsin_code())) {
+                prod.update(data);
+                break;
+            }
+        }
+    }
+
     public void update(EquitiesSnapshot data) {
         for(Product prod : products) {
             if(prod.getCode().equals(data.getIsin_code())) {

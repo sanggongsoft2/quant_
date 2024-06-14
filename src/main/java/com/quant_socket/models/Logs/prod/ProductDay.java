@@ -49,7 +49,7 @@ public class ProductDay extends SG_model {
     private Timestamp createdAt;
 
     public ProductDay(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 
     public ProductDay(Product prod) {

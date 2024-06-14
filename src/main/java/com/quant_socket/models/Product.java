@@ -81,18 +81,20 @@ public class Product extends SG_model{
     private long facilityBidCount = 0;
 
     @SG_join(clazz = EquitiesSnapshot.class)
-    private EquitiesSnapshot latestSnapshot = new EquitiesSnapshot();
+    private EquitiesSnapshot latestSnapshot;
+
+    @SG_join(clazz = SecuritiesQuote.class)
+    private SecuritiesQuote latestSecuritiesQuote;
+
     private List<SecOrderFilled> orders = new ArrayList<>();
 
-    private void updateTodayCount(String isinCode, String type, long count) {
-        if (code.equals(isinCode)) {
-            switch (type) {
-                case "1":
-                    todayAskCount += count;
-                    break;
-                case "2":
-                    todayBidCount += count;
-            }
+    private void updateTodayCount(String type, long count) {
+        switch (type) {
+            case "1":
+                todayAskCount += count;
+                break;
+            case "2":
+                todayBidCount += count;
         }
     }
 
@@ -121,6 +123,10 @@ public class Product extends SG_model{
         }
     }
 
+    public void update(SecuritiesQuote data) {
+        this.latestSecuritiesQuote = data;
+    }
+
     public void update(EquitiesSnapshot data) {
         if(data.isRealBoard()) {
             this.currentPrice = data.getCurrent_price().doubleValue();
@@ -128,6 +134,7 @@ public class Product extends SG_model{
             this.highPrice = data.getTodays_high().doubleValue();
             this.lowPrice = data.getTodays_low().doubleValue();
             this.openPrice = data.getOpening_price().doubleValue();
+            this.yesterday_price = data.getYesterdayPrice();
             this.latestSnapshot = data;
         }
     }
@@ -154,18 +161,21 @@ public class Product extends SG_model{
         this.todayTradingValue = data.getAccu_trading_value();
         this.tradingVolume += data.getTrading_volume();
         this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
-        updateTodayCount(data.getIsin_code(), data.getFinal_askbid_type_code(), data.getTrading_volume());
+        updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
         if(orders.size() == 20) {
             this.orders.remove(19);
             this.orders.add(data);
         } else {
             this.orders.add(data);
         }
+        if(highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
+        if(lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
     }
 
     public Product(ResultSet rs) {
-        super.resultSetToClass(rs);
+        super(rs);
         update(new EquitiesSnapshot(rs));
+        update(new SecuritiesQuote(rs));
     }
 
     public Product(EquitiesBatchData data) {

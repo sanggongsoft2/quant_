@@ -1,8 +1,6 @@
 package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.*;
-import com.quant_socket.models.SG_model;
-import com.quant_socket.repos.SG_repo;
 import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
-import java.sql.Time;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +26,9 @@ public class SocketLogService extends SocketService{
 
     @Autowired
     private EquitiesSnapshotService equitiesSnapshotService;
+
+    @Autowired
+    private SecuritiesQuoteService securitiesQuoteService;
 
     @Autowired
     private SecuritiesOrderFilledService securitiesOrderFilledService;
@@ -62,6 +61,9 @@ public class SocketLogService extends SocketService{
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
                     if(isBefore) equities_snapshot_handler(msg);
                     break;
+                case "B601S", "B601Q", "B601X", "B702S", "B703S", "B704S":
+                    if(isBefore) securities_quote_handler(msg);
+                    break;
             }
         }
     }
@@ -81,6 +83,11 @@ public class SocketLogService extends SocketService{
     private void equities_snapshot_handler(String msg) {
         final EquitiesSnapshot es = new EquitiesSnapshot(msg);
         if(es.isRealBoard()) equitiesSnapshotService.dataHandler(es);
+    }
+
+    private void securities_quote_handler(String msg) {
+        final SecuritiesQuote sq = new SecuritiesQuote(msg);
+        securitiesQuoteService.dataHandler(sq);
     }
 
     //증권 종목 정보

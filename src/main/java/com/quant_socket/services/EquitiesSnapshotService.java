@@ -38,8 +38,10 @@ public class EquitiesSnapshotService extends SocketService{
         super.addSession(ws, isinCodes);
         for(String isinCode : isinCodes) {
             final Product prod = productService.productFromIsinCode(isinCode);
-            final EquitiesSnapshot initData = prod.getLatestSnapshot();
-            if(initData != null) sendMessage(initData.toSocket(prod), isinCode);
+            if(prod != null) {
+                final EquitiesSnapshot initData = prod.getLatestSnapshot();
+                if(initData != null) sendMessage(initData.toSocket(prod), isinCode);
+            }
         }
     }
 
@@ -76,66 +78,6 @@ public class EquitiesSnapshotService extends SocketService{
                 "eq_accumulated_trading_volume," +
                 "eq_accumulated_trading_value," +
                 "eq_final_ask_bid_type_code," +
-                "eq_ask_level_1_price," +
-                "eq_ask_level_2_price," +
-                "eq_ask_level_3_price," +
-                "eq_ask_level_4_price," +
-                "eq_ask_level_5_price," +
-                "eq_ask_level_6_price," +
-                "eq_ask_level_7_price," +
-                "eq_ask_level_8_price," +
-                "eq_ask_level_9_price," +
-                "eq_ask_level_10_price," +
-                "eq_bid_level_1_price," +
-                "eq_bid_level_2_price," +
-                "eq_bid_level_3_price," +
-                "eq_bid_level_4_price," +
-                "eq_bid_level_5_price," +
-                "eq_bid_level_6_price," +
-                "eq_bid_level_7_price," +
-                "eq_bid_level_8_price," +
-                "eq_bid_level_9_price," +
-                "eq_bid_level_10_price," +
-                "eq_ask_level_1_volume," +
-                "eq_ask_level_2_volume," +
-                "eq_ask_level_3_volume," +
-                "eq_ask_level_4_volume," +
-                "eq_ask_level_5_volume," +
-                "eq_ask_level_6_volume," +
-                "eq_ask_level_7_volume," +
-                "eq_ask_level_8_volume," +
-                "eq_ask_level_9_volume," +
-                "eq_ask_level_10_volume," +
-                "eq_bid_level_1_volume," +
-                "eq_bid_level_2_volume," +
-                "eq_bid_level_3_volume," +
-                "eq_bid_level_4_volume," +
-                "eq_bid_level_5_volume," +
-                "eq_bid_level_6_volume," +
-                "eq_bid_level_7_volume," +
-                "eq_bid_level_8_volume," +
-                "eq_bid_level_9_volume," +
-                "eq_bid_level_10_volume," +
-                "eq_lp_ask_level_1_volume," +
-                "eq_lp_ask_level_2_volume," +
-                "eq_lp_ask_level_3_volume," +
-                "eq_lp_ask_level_4_volume," +
-                "eq_lp_ask_level_5_volume," +
-                "eq_lp_ask_level_6_volume," +
-                "eq_lp_ask_level_7_volume," +
-                "eq_lp_ask_level_8_volume," +
-                "eq_lp_ask_level_9_volume," +
-                "eq_lp_ask_level_10_volume," +
-                "eq_lp_bid_level_1_volume," +
-                "eq_lp_bid_level_2_volume," +
-                "eq_lp_bid_level_3_volume," +
-                "eq_lp_bid_level_4_volume," +
-                "eq_lp_bid_level_5_volume," +
-                "eq_lp_bid_level_6_volume," +
-                "eq_lp_bid_level_7_volume," +
-                "eq_lp_bid_level_8_volume," +
-                "eq_lp_bid_level_9_volume," +
-                "eq_lp_bid_level_10_volume," +
                 "eq_total_ask_volume," +
                 "eq_total_bid_volume," +
                 "eq_estimated_trading_price," +

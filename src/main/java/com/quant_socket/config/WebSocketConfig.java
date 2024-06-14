@@ -1,7 +1,8 @@
 package com.quant_socket.config;
 
-import com.quant_socket.handlers.socket.equities_snapshot.EquitiesSnapshotHandler;
-import com.quant_socket.handlers.socket.sec_order_filled.SecOrderFilledHandler;
+import com.quant_socket.handlers.socket.EquitiesSnapshotHandler;
+import com.quant_socket.handlers.socket.SecOrderFilledHandler;
+import com.quant_socket.handlers.socket.SecuritiesQuoteHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +19,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final EquitiesSnapshotHandler equitiesSnapshotDetailsHandler;
 
     private final SecOrderFilledHandler secOrderFilledDetailsHandler;
+    private final SecuritiesQuoteHandler securitiesQuoteHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(equitiesSnapshotDetailsHandler, "/ws/equities_snapshot").setAllowedOrigins("*");
-
         registry.addHandler(secOrderFilledDetailsHandler, "/ws/sec_order_filled").setAllowedOrigins("*");
+        registry.addHandler(securitiesQuoteHandler, "/ws/securities_quote").setAllowedOrigins("*");
     }
 }

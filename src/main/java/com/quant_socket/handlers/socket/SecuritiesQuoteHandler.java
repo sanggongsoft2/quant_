@@ -1,10 +1,9 @@
-package com.quant_socket.handlers.socket.sec_order_filled;
+package com.quant_socket.handlers.socket;
 
-import com.quant_socket.services.SecuritiesOrderFilledService;
+import com.quant_socket.services.SecuritiesQuoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -13,9 +12,9 @@ import java.net.URI;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class SecOrderFilledHandler extends TextWebSocketHandler {
+public class SecuritiesQuoteHandler extends TextWebSocketHandler {
 
-    private final SecuritiesOrderFilledService service;
+    private final SecuritiesQuoteService service;
 
     private String[] isinCode = new String[]{};
 
@@ -29,14 +28,4 @@ public class SecOrderFilledHandler extends TextWebSocketHandler {
             ws.close();
         }
     }
-
-    /*@Override
-    public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        final URI uri = ws.getUri();
-        if(uri != null && uri.getQuery() != null) {
-            if(isinCode != null) service.removeSession(ws, isinCode);
-        } else {
-            ws.close();
-        }
-    }*/
 }

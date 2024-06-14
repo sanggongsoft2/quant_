@@ -38,6 +38,6 @@ public class ProductMonth extends SG_model {
     private Timestamp createdAt;
 
     public ProductMonth(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 }

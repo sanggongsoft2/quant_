@@ -1,10 +1,9 @@
-package com.quant_socket.handlers.socket.equities_snapshot;
+package com.quant_socket.handlers.socket;
 
 import com.quant_socket.services.EquitiesSnapshotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 

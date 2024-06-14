@@ -1,8 +1,11 @@
 package com.quant_socket.models.Logs;
 
+import com.quant_socket.annotations.SG_substring;
 import com.quant_socket.models.Product;
+import com.quant_socket.models.SG_substring_model;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.*;
 import java.util.LinkedHashMap;
@@ -10,22 +13,38 @@ import java.util.Map;
 
 @Getter
 @ToString
-public class SecOrderFilled{
+@Slf4j
+public class SecOrderFilled extends SG_substring_model {
+    @SG_substring(start = 17, end = 29)
     private String isin_code;
+    @SG_substring(start = 35, end = 47)
     private String processing_time_of_trading_system;
+    @SG_substring(start = 47, end = 48)
     private String price_change_against_previous_day ;
-    private double a_price_change_against_the_pre_day = 0;
-    private double trading_price = 0;
-    private long trading_volume = 0;
-    private double opening_price = 0;
-    private double todays_high = 0;
-    private double todays_low = 0;
-    private double accu_trading_volume = 0;
-    private float accu_trading_value = 0;
+    @SG_substring(start = 48, end = 59)
+    private double a_price_change_against_the_pre_day;
+    @SG_substring(start = 59, end = 70)
+    private double trading_price;
+    @SG_substring(start = 70, end = 80)
+    private long trading_volume;
+    @SG_substring(start = 80, end = 91)
+    private double opening_price;
+    @SG_substring(start = 91, end = 102)
+    private double todays_high;
+    @SG_substring(start = 102, end = 113)
+    private double todays_low;
+    @SG_substring(start = 113, end = 125)
+    private double accu_trading_volume;
+    @SG_substring(start = 125, end = 147)
+    private float accu_trading_value;
+    @SG_substring(start = 147, end = 148)
     private String final_askbid_type_code;
-    private long lp_holding_quantity = 0;
-    private double the_best_ask = 0;
-    private double the_best_bid = 0;
+    @SG_substring(start = 148, end = 163)
+    private long lp_holding_quantity;
+    @SG_substring(start = 163, end = 174)
+    private double the_best_ask;
+    @SG_substring(start = 174, end = 185)
+    private double the_best_bid;
 
     public double getYesterdayPrice() {
         return switch (price_change_against_previous_day) {
@@ -34,22 +53,8 @@ public class SecOrderFilled{
         };
     }
 
-    public SecOrderFilled(String msg) throws NumberFormatException {
-        isin_code = msg.substring(17, 29);
-        processing_time_of_trading_system = msg.substring(35, 47);
-        price_change_against_previous_day = msg.substring(47, 48);
-        if(!msg.substring(48, 59).isBlank()) a_price_change_against_the_pre_day = Double.parseDouble(msg.substring(48, 59));
-        if(!msg.substring(59, 70).isBlank()) trading_price = Double.parseDouble(msg.substring(59, 70));
-        if(!msg.substring(70, 80).isBlank()) trading_volume = Long.parseLong(msg.substring(70, 80));
-        if(!msg.substring(80, 91).isBlank()) opening_price = Double.parseDouble(msg.substring(80, 91));
-        if(!msg.substring(91, 102).isBlank()) todays_high = Double.parseDouble(msg.substring(91, 102));
-        if(!msg.substring(102, 113).isBlank()) todays_low = Double.parseDouble(msg.substring(102, 113));
-        if(!msg.substring(113, 125).isBlank()) accu_trading_volume = Double.parseDouble(msg.substring(113, 125));
-        if(!msg.substring(125, 147).isBlank()) accu_trading_value = Float.parseFloat(msg.substring(125, 147));
-        final_askbid_type_code = msg.substring(147, 148);
-        if(!msg.substring(148, 163).isBlank()) lp_holding_quantity = Long.parseLong(msg.substring(148, 163));
-        if(!msg.substring(163, 174).isBlank()) the_best_ask = Double.parseDouble(msg.substring(163, 174));
-        if(!msg.substring(174, 185).isBlank()) the_best_bid = Double.parseDouble(msg.substring(174, 185));
+    public SecOrderFilled(String msg) {
+        super(msg);
     }
     private double getTradingRate(Product prod) {
         double value = 0;

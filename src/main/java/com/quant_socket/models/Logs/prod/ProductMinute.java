@@ -51,7 +51,7 @@ public class ProductMinute extends SG_model {
     private Timestamp createdAt;
 
     public ProductMinute(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 
     static public String[] insertCols() {

@@ -26,7 +26,7 @@ public class SecuritiesOrderFilledService extends SocketService{
         super.addSession(ws, isinCodes);
         for(String isinCode : isinCodes) {
             final Product prod = productService.productFromIsinCode(isinCode);
-            sendMessage(prod.getOrders().stream().map(order -> order.toSocket(prod)).toList(), isinCode);
+            if(prod != null) sendMessage(prod.getOrders().stream().map(order -> order.toSocket(prod)).toList(), isinCode);
         }
     }
 }

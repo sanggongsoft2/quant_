@@ -36,6 +36,6 @@ public class ProductAVG extends SG_model {
     private Timestamp createdAt;
 
     public ProductAVG(ResultSet rs) {
-        resultSetToClass(rs);
+        super(rs);
     }
 }
