@@ -141,24 +141,6 @@ public class ProductService extends SocketService{
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> orderAskCount(String type) {
-        final List<Product> list = factoryProducts(type);
-        return list.stream()
-                .sorted(Comparator.comparingLong(Product::getForeignerAskCount).reversed())
-                .limit(10)
-                .map(this::getProduct2)
-                .collect(Collectors.toList());
-    }
-
-    public List<Map<String, Object>> orderBidCount(String type) {
-        final List<Product> list = factoryProducts(type);
-        return list.stream()
-                .sorted(Comparator.comparingLong(Product::getForeignerBidCount).reversed())
-                .limit(10)
-                .map(this::getProduct2)
-                .collect(Collectors.toList());
-    }
-
     private Map<String, Object> getProduct1(Product prod) {
         final Map<String, Object> data = new LinkedHashMap<>();
         data.put("name", prod.getName_kr_abbr());
@@ -167,17 +149,7 @@ public class ProductService extends SocketService{
         data.put("current_price", prod.getCurrentPrice());
         data.put("open_price", prod.getOpenPrice());
         data.put("compare_price_rate", prod.getComparePriceRate());
-        return data;
-    }
-
-    private Map<String, Object> getProduct2(Product prod) {
-        final Map<String, Object> data = new LinkedHashMap<>();
-        data.put("name", prod.getName_kr_abbr());
-        data.put("isin_code", prod.getCode());
-        data.put("total_price", prod.getTotalPrice());
-        data.put("compare_price_rate", prod.getComparePriceRate());
-        data.put("foreign_count", prod.getForeignerBidCount());
-        data.put("facility_count", prod.getFacilityBidCount());
+        data.put("yesterday_price", prod.getYesterday_price());
         return data;
     }
 

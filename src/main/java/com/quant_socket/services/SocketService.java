@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 public abstract class SocketService{
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
     public void addSession(WebSocketSession ws, String... isinCodes) {
         for(String isinCode : isinCodes) {
@@ -33,20 +32,12 @@ public abstract class SocketService{
             isinSessions.get(isinCode).add(ws);
         }
     }
-
-    public void removeSession(WebSocketSession ws, String... isinCodes) {
-        for(String isinCode : isinCodes) {
-            if(isinSessions.get(isinCode) != null) isinSessions.get(isinCode).remove(ws);
-            if(isinSessions.get(isinCode).isEmpty()) isinSessions.remove(isinCode);
-        }
-    }
     public <T> void sendMessage(T message, String... isinCodes){
         for(String isinCode : isinCodes) {
-            Set<WebSocketSession> sessions = isinSessions.get(isinCode);
+            final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
             if(sessions != null) sendMessage(message, sessions);
         }
     }
-
     public Map<String, String> extractQueryParams(String queryString) {
         Map<String, String> queryPairs = new LinkedHashMap<>();
         String[] pairs = queryString.split("&");
@@ -60,7 +51,6 @@ public abstract class SocketService{
         }
         return queryPairs;
     }
-
     public String getQueryValue(String queryString, String key) {
         final Map<String, String> data = extractQueryParams(queryString);
         return data.get(key);
@@ -79,38 +69,5 @@ public abstract class SocketService{
                 return true;
             }
         });
-    }
-
-    public void afterConnectionEstablished(WebSocketSession ws) throws IOException {
-        final URI uri = ws.getUri();
-        if(uri != null && uri.getQuery() != null) {
-            final String isinCodeString = getQueryValue(uri.getQuery(), "isin_code");
-            if(isinCodeString != null) {
-                final String[] isinCodes = isinCodeString.split(",");
-                addSession(ws, isinCodes);
-            }
-        } else {
-            ws.close();
-        }
-    }
-
-    public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        final URI uri = ws.getUri();
-        if(uri != null && uri.getQuery() != null) {
-            final String isinCodeString = getQueryValue(uri.getQuery(), "isin_code");
-            if(isinCodeString != null) {
-                final String[] isinCodes = isinCodeString.split(",");
-                if (isinCodes.length > 0) removeSession(ws, isinCodes);
-
-            }
-        }
-    }
-    protected String getTableName(Class<? extends SG_model> clazz) {
-        String tableName = clazz.getName();
-        if(clazz.isAnnotationPresent(SG_table.class)) {
-            final SG_table sgTable = clazz.getAnnotation(SG_table.class);
-            tableName = sgTable.name();
-        }
-        return tableName;
     }
 }

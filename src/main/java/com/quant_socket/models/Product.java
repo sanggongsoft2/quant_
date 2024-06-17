@@ -11,6 +11,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @SG_table(name = "product")
 @Getter
@@ -86,7 +87,7 @@ public class Product extends SG_model{
     @SG_join(clazz = SecuritiesQuote.class)
     private SecuritiesQuote latestSecuritiesQuote;
 
-    private List<SecOrderFilled> orders = new ArrayList<>();
+    private List<SecOrderFilled> orders = new CopyOnWriteArrayList<>();
 
     private void updateTodayCount(String type, long count) {
         switch (type) {

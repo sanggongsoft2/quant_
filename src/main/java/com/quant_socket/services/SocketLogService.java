@@ -40,6 +40,7 @@ public class SocketLogService extends SocketService{
     private InvestActivitiesEODService investActivitiesEODService;
 
     private final LocalTime hour3half = LocalTime.of(15, 31);
+    /*private final LocalTime hour3half = LocalTime.of(23, 31);*/
 
     public void esHandler(SocketLog sl) {
         final String msg = sl.getLog();
@@ -50,50 +51,28 @@ public class SocketLogService extends SocketService{
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
                 case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
-                    equities_batch_data_handler(msg);
+                    equitiesBatchDataService.dataHandler(new EquitiesBatchData(msg));
                     break;
                 case "C101S", "C102S", "C103S", "C104S", "C101Q", "C101X", "C101G":
-                    investor_activities_per_an_issue_EOD_handler(msg);
+                    investActivitiesEODService.dataHandler(new InvestorActivitiesEOD(msg));
                     break;
                 case "A301S", "A301Q", "A301X":
-                    if(isBefore) securities_order_filled_handler(msg);
+                    if(isBefore) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
                     break;
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
                     if(isBefore) equities_snapshot_handler(msg);
                     break;
                 case "B601S", "B601Q", "B601X", "B702S", "B703S", "B704S":
-                    if(isBefore) securities_quote_handler(msg);
+                    if(isBefore) securitiesQuoteService.dataHandler(new SecuritiesQuote(msg));
                     break;
             }
         }
-    }
-    //종목별 투자자별 종가통계
-    private void investor_activities_per_an_issue_EOD_handler(String msg) {
-        final InvestorActivitiesEOD iae = new InvestorActivitiesEOD(msg);
-        investActivitiesEODService.dataHandler(iae);
-    }
-
-    //증권 체결
-    private void securities_order_filled_handler(String msg) {
-        final SecOrderFilled sef = new SecOrderFilled(msg);
-        securitiesOrderFilledService.dataHandler(sef);
     }
 
     //증권 Snapshot (MM/LP호가 제외)
     private void equities_snapshot_handler(String msg) {
         final EquitiesSnapshot es = new EquitiesSnapshot(msg);
-        if(es.isRealBoard()) equitiesSnapshotService.dataHandler(es);
-    }
-
-    private void securities_quote_handler(String msg) {
-        final SecuritiesQuote sq = new SecuritiesQuote(msg);
-        securitiesQuoteService.dataHandler(sq);
-    }
-
-    //증권 종목 정보
-    private void equities_batch_data_handler(String msg) {
-        final EquitiesBatchData ebd = new EquitiesBatchData(msg);
-        equitiesBatchDataService.dataHandler(ebd);
+        if(es.isRealBoard()) equitiesSnapshotService.dataHandler(new EquitiesSnapshot(msg));
     }
 
     private String insertSql(String[] cols) {

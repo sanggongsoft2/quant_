@@ -5,11 +5,9 @@ import com.quant_socket.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/issue")
 @RestController
 public class APIController {
@@ -53,26 +51,6 @@ public class APIController {
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("거래상위 증권을 불러왔습니다.");
         res.setData(productService.orderTradingCount(type));
-
-        return ResponseEntity.status(HttpStatus.OK).body(res);
-    }
-
-    @PostMapping("/for-ask-count")
-    private ResponseEntity<Response> getForAskCount(@RequestParam(required = false) String type) {
-        final Response res = new Response();
-        res.setStatusCode(HttpStatus.OK);
-        res.setMessage("외기매수 증권을 불러왔습니다.");
-        res.setData(productService.orderAskCount(type));
-
-        return ResponseEntity.status(HttpStatus.OK).body(res);
-    }
-
-    @PostMapping("/for-bid-count")
-    private ResponseEntity<Response> getForBidCount(@RequestParam(required = false) String type) {
-        final Response res = new Response();
-        res.setStatusCode(HttpStatus.OK);
-        res.setMessage("외기매도 증권을 불러왔습니다.");
-        res.setData(productService.orderBidCount(type));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }

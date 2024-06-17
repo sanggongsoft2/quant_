@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -67,6 +69,7 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("market_total_price", prod.getHaving_count() * trading_price);
         response.put("trading_rate", getTradingRate(prod));
         response.put("trading_price", trading_price);
+        response.put("compare_type", price_change_against_previous_day);
         response.put("isin_code", isin_code);
         response.put("compare_price", a_price_change_against_the_pre_day);
         response.put("compare_rate", getCompareRate());
@@ -89,7 +92,8 @@ public class SecOrderFilled extends SG_substring_model {
     }
 
     private double getYesterdayCompareRate(double price) {
-        return a_price_change_against_the_pre_day /price*100;
+        if(price == 0 || a_price_change_against_the_pre_day == 0) return 0;
+        return a_price_change_against_the_pre_day/price*100;
     }
 
     private String bidTypeToString() {

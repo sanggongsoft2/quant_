@@ -10,6 +10,7 @@ import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf in = (ByteBuf) msg;
 
-        final String message = in.toString(CharsetUtil.UTF_8);
+        final String message = in.toString(Charset.forName("EUC-KR"));
 
         try {
             for (String logMessage : message.split("�")) {
