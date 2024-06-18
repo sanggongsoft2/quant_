@@ -36,6 +36,9 @@ public class SocketLogService extends SocketService{
     @Autowired
     private EquitiesBatchDataService equitiesBatchDataService;
 
+    @Autowired
+    private IssueClosingService issueClosingService;
+
     private final LocalTime hour3half = LocalTime.of(15, 31);
     /*private final LocalTime hour3half = LocalTime.of(23, 31);*/
 
@@ -59,6 +62,10 @@ public class SocketLogService extends SocketService{
                     break;
                 case "B601S", "B601Q", "B601X", "B702S", "B703S", "B704S":
                     if(isBefore) securitiesQuoteService.dataHandler(new SecuritiesQuote(msg));
+                    break;
+                case "A601S", "A602S", "A603S", "A604S", "A601Q", "A601X":
+                    final IssueClosing ic = new IssueClosing(msg);
+                    if(ic.getClosing_type() != null && ic.getClosing_type().equals("1") && ic.getBoard_id().equals("G1")) issueClosingService.dataHandler(ic);
                     break;
             }
         }
