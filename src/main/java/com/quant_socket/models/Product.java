@@ -5,11 +5,12 @@ import com.quant_socket.models.Logs.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,6 +18,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Slf4j
+@ToString
 public class Product extends SG_model{
 
     @SG_idx
@@ -76,11 +79,6 @@ public class Product extends SG_model{
     private long todayTradingCount = 0;
     private float todayTradingValue = 0;
 
-    private long foreignerAskCount = 0;
-    private long foreignerBidCount = 0;
-    private long facilityAskCount = 0;
-    private long facilityBidCount = 0;
-
     @SG_join(clazz = EquitiesSnapshot.class)
     private EquitiesSnapshot latestSnapshot;
 
@@ -111,17 +109,20 @@ public class Product extends SG_model{
     }
 
     public void update(EquitiesBatchData data) {
-        if(data.getBase_price_change().equals("Y")) {
-            this.name_en = data.getAbbr_issue_name();
-            this.gubun = infoCategoryToClass(data.getInfo_category());
-            this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
-            this.team = sectionTypeCodeToTeam(data.getSection_type_code());
-            this.type = stockTypeToType(data.getOther_stock_type_code());
-            this.face_value = data.getPar_value();
-            this.having_count = data.getNumber_of_listed_shares();
-            this.yesterday_price = data.getYes_closing_price();
-            this.yesterday_value = data.getYes_accu_trading_value();
-        }
+        this.code = data.getIsin_code();
+        this.short_code = data.getShort_code();
+        this.name_kr = data.getAbbr_issue_name_kr();
+        this.name_kr_abbr = data.getAbbr_issue_name_kr();
+        this.name_en = data.getAbbr_issue_name_en();
+        this.gubun = infoCategoryToClass(data.getInfo_category());
+        this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
+        this.team = sectionTypeCodeToTeam(data.getSection_type_code());
+        this.type = stockTypeToType(data.getOther_stock_type_code());
+        this.face_value = data.getPar_value();
+        this.having_count = data.getNumber_of_listed_shares();
+        this.yesterday_price = data.getYesterday_closing_price();
+        this.yesterday_trading_count = data.getYesterday_trading_volume();
+        this.yesterday_value = data.getYesterday_trading_value();
     }
 
     public void update(SecuritiesQuote data) {
@@ -137,19 +138,6 @@ public class Product extends SG_model{
             this.openPrice = data.getOpening_price().doubleValue();
             this.yesterday_price = data.getYesterdayPrice();
             this.latestSnapshot = data;
-        }
-    }
-
-    public void update(InvestorActivitiesEOD data) {
-        switch (data.getInvestor_code()) {
-            case "9000":
-            case "9001":
-                foreignerBidCount = data.getAccu_bid_trading_volume();
-                foreignerAskCount = data.getAccu_ask_trading_volume();
-                break;
-            default:
-                facilityBidCount = data.getAccu_bid_trading_volume();
-                facilityAskCount = data.getAccu_ask_trading_volume();
         }
     }
 
@@ -180,18 +168,23 @@ public class Product extends SG_model{
     }
 
     public Product(EquitiesBatchData data) {
-        this.code = data.getIsin_code();
-        this.name_kr = data.getAbbr_issue_name();
-        this.name_kr_abbr = data.getAbbr_issue_name();
-        this.name_en = data.getAbbr_issue_name();
-        this.gubun = infoCategoryToClass(data.getInfo_category());
-        this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
-        this.team = sectionTypeCodeToTeam(data.getSection_type_code());
-        this.type = stockTypeToType(data.getOther_stock_type_code());
-        this.face_value = data.getPar_value();
-        this.having_count = data.getNumber_of_listed_shares();
-        this.yesterday_price = data.getYes_closing_price();
-        this.yesterday_value = data.getYes_accu_trading_value();
+        try {
+            this.code = data.getIsin_code();
+            this.short_code = data.getShort_code();
+            this.name_kr = data.getAbbr_issue_name_kr();
+            this.name_kr_abbr = data.getAbbr_issue_name_kr();
+            this.name_en = data.getAbbr_issue_name_en();
+            this.gubun = infoCategoryToClass(data.getInfo_category());
+            this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
+            this.team = sectionTypeCodeToTeam(data.getSection_type_code());
+            this.type = stockTypeToType(data.getOther_stock_type_code());
+            this.face_value = data.getPar_value();
+            this.having_count = data.getNumber_of_listed_shares();
+            this.yesterday_price = data.getYesterday_closing_price();
+            this.yesterday_trading_count = data.getYesterday_trading_volume();
+            this.yesterday_value = data.getYesterday_trading_value();
+        } catch (Exception ignore) {
+        }
     }
 
     private String infoCategoryToClass(String value) {
@@ -199,12 +192,13 @@ public class Product extends SG_model{
             case "01S" -> "KOSPI";
             case "01X" -> "KONEX";
             case "01Q" -> "KOSDAQ";
-            case "A002S","A003S","A004S" -> "ETF";
+            case "03S" -> "ETF";
             default -> null;
         };
     }
 
     private String groupIdToSeqClass(String value) {
+        if(value == null) return null;
         return switch (value) {
             case "MF" -> "투자회사";
             case "RT" -> "부동산투자회사";
@@ -214,11 +208,16 @@ public class Product extends SG_model{
             case "ST" -> "주권";
             case "FS" -> "외국주권";
             case "DR" -> "주식예탁증권";
-            default -> null;
+            case "EF" -> "ETF";
+            case "ET" -> "ETN";
+            case "FE" -> "외국ETF";
+            case "EN" -> "ETN";
+            default -> value;
         };
     }
 
     private String sectionTypeCodeToTeam(String value) {
+        if(value == null) return "기타(소속부없음)";
         return switch (value) {
             case "1" -> "우량기업부";
             case "2" -> "벤처기업부";
@@ -238,12 +237,12 @@ public class Product extends SG_model{
             case "W" -> "크라우드펀딩기업부";
             case "X" -> "일반기업부";
             case "Y" -> "스타트업기업부";
-            case "Z" -> "기타(소속부없음)";
-            default -> null;
+            default -> "기타(소속부없음)";
         };
     }
 
     private String stockTypeToType(String value) {
+        if(value == null) return null;
         return switch (value) {
             case "0" -> "보통주";
             case "1" -> "구형우선주";

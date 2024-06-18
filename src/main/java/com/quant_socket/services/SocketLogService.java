@@ -36,9 +36,6 @@ public class SocketLogService extends SocketService{
     @Autowired
     private EquitiesBatchDataService equitiesBatchDataService;
 
-    @Autowired
-    private InvestActivitiesEODService investActivitiesEODService;
-
     private final LocalTime hour3half = LocalTime.of(15, 31);
     /*private final LocalTime hour3half = LocalTime.of(23, 31);*/
 
@@ -51,10 +48,8 @@ public class SocketLogService extends SocketService{
             final String prodCode = msg.substring(0, 5);
             switch (prodCode) {
                 case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
-                    equitiesBatchDataService.dataHandler(new EquitiesBatchData(msg));
-                    break;
-                case "C101S", "C102S", "C103S", "C104S", "C101Q", "C101X", "C101G":
-                    investActivitiesEODService.dataHandler(new InvestorActivitiesEOD(msg));
+                    final EquitiesBatchData data = new EquitiesBatchData(msg);
+                    equitiesBatchDataService.dataHandler(data);
                     break;
                 case "A301S", "A301Q", "A301X":
                     if(isBefore) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));

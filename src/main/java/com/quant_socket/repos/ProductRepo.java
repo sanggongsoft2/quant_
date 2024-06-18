@@ -19,6 +19,8 @@ public class ProductRepo extends SG_repo<Product>{
             "                p_yesterday_price = ?,\n" +
             "                p_yesterday_trading_count = ?,\n" +
             "                p_yesterday_value = ?,\n" +
+            "                p_name_kr = ?,\n" +
+            "                p_name_kr_abbr = ?,\n" +
             "                p_name_en = ?\n" +
             "                WHERE p_idx = ?";
 
@@ -32,11 +34,6 @@ public class ProductRepo extends SG_repo<Product>{
             "    FROM product_minute pm2\n" +
             "    GROUP BY p_code\n" +
             ")";
-
-    private final String productDayUpdateSql = """
-UPDATE product_day SET d_for_ask_count = ?, d_for_bid_count = ?, d_fac_ask_count = ?, d_fac_bid_count = ? 
-WHERE p_code = ?
-""";
 
     private final String productWeekSql = """
 INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)
@@ -115,7 +112,7 @@ FROM product p
     }
 
     public boolean update(Product prod) {
-        return super.jt.update(productUpdateSql, prod.getFace_value(), prod.getHaving_count(), prod.getCurrentPrice(), prod.getTodayTradingCount(), prod.getTodayTradingValue(), prod.getName_en(), prod.getIdx()) > 0;
+        return super.jt.update(productUpdateSql, prod.getFace_value(), prod.getHaving_count(), prod.getCurrentPrice(), prod.getTodayTradingCount(), prod.getTodayTradingValue(), prod.getName_kr(), prod.getName_kr_abbr(), prod.getName_en(), prod.getIdx()) > 0;
     }
 
     @Transactional
@@ -125,10 +122,6 @@ FROM product p
 
     public int insertProductDay() {
         return jt.update(productDaySql);
-    }
-
-    public void updateProductDay(Product prod) {
-        jt.update(productDayUpdateSql, prod.getForeignerAskCount(), prod.getForeignerBidCount(), prod.getFacilityAskCount(), prod.getFacilityBidCount(), prod.getCode());
     }
 
     public void insertProductWeek() {

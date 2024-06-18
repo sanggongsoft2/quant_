@@ -95,15 +95,6 @@ public class ProductService extends SocketService{
             }
         }
     }
-    public void update(InvestorActivitiesEOD data) {
-
-        for(Product prod : products) {
-            if(prod.getCode().equals(data.getIsin_code())) {
-                prod.update(data);
-                break;
-            }
-        }
-    }
 
     public List<Map<String, Object>> orderHigher(String type) {
         final List<Product> list = factoryProducts(type);
