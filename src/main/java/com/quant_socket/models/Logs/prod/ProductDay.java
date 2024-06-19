@@ -45,7 +45,7 @@ public class ProductDay extends SG_model {
     private long fac_ask_count;
     @SG_column(dbField = "d_fac_bid_count")
     private long fac_bid_count;
-    @SG_column(dbField = "d_crdt")
+    @SG_column(dbField = "d_crdt", useInsert = false)
     private Timestamp createdAt;
 
     public ProductDay(ResultSet rs) {

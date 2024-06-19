@@ -33,7 +33,7 @@ public class SocketLog extends SG_model {
     @SG_column(dbField = "SL_error")
     private String error;
 
-    @SG_column(dbField = "SL_crdt")
+    @SG_column(dbField = "SL_crdt", useInsert = false)
     private Timestamp createdAt;
 
     public SocketLog() {

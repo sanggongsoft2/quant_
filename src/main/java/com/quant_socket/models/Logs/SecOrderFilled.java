@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.text.DateFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
@@ -49,6 +50,7 @@ public class SecOrderFilled extends SG_substring_model {
     private double the_best_bid;
 
     public double getYesterdayPrice() {
+        if(price_change_against_previous_day == null) return 0;
         return switch (price_change_against_previous_day) {
             case "4", "5" -> trading_price + a_price_change_against_the_pre_day;
             default -> trading_price - a_price_change_against_the_pre_day;
@@ -87,7 +89,7 @@ public class SecOrderFilled extends SG_substring_model {
         return response;
     }
 
-    private double getCompareRate() {
+    public double getCompareRate() {
         return a_price_change_against_the_pre_day / trading_price*100;
     }
 
@@ -97,19 +99,28 @@ public class SecOrderFilled extends SG_substring_model {
     }
 
     private String bidTypeToString() {
-        return switch (final_askbid_type_code) {
-            case " " -> "단일가";
-            case "1" -> "매도";
-            case "2" -> "매수";
-            default -> null;
-        };
+        if(final_askbid_type_code != null) {
+            return switch (final_askbid_type_code) {
+                case " " -> "단일가";
+                case "1" -> "매도";
+                case "2" -> "매수";
+                default -> null;
+            };
+        } else {
+            return null;
+        }
     }
 
     private String tradingTimeToString() {
-        final long microseconds = Long.parseLong(processing_time_of_trading_system);
-        final Instant instant = Instant.ofEpochMilli(microseconds / 1000);
-        final ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Seoul"));
-        final LocalDate date = zonedDateTime.toLocalDate();
-        return date.toString();
+        if(processing_time_of_trading_system != null) {
+            final long microseconds = Long.parseLong(processing_time_of_trading_system);
+            final Instant instant = Instant.ofEpochMilli(microseconds / 1000);
+            final ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Seoul"));
+            final LocalDate date = zonedDateTime.toLocalDate();
+            return date.toString();
+        } else {
+            return LocalDate.now().toString();
+        }
     }
+
 }

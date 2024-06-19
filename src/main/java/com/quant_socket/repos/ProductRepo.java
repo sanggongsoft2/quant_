@@ -86,6 +86,7 @@ WITH RecentData AS (
          WHERE (eq_isin_code, eq_idx) IN (
              SELECT eq_isin_code, MAX(eq_idx) AS max_eq_idx
              FROM equities_snapshot
+             WHERE eq_board_id = 'G1'
              GROUP BY eq_isin_code
          )
      ),

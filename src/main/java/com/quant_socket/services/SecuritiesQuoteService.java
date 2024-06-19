@@ -24,11 +24,13 @@ public class SecuritiesQuoteService extends SocketService{
     @Autowired
     private ProductService productService;
     public void dataHandler(SecuritiesQuote data) {
-       logs.add(data);
-        final Product product = productService.productFromIsinCode(data.getIsin_code());
-        if(product != null) {
-            productService.update(data);
-            sendMessage(data.toSocket(product), data.getIsin_code());
+        if(data.getIsin_code() != null) {
+            logs.add(data);
+            final Product product = productService.productFromIsinCode(data.getIsin_code());
+            if(product != null) {
+                productService.update(data);
+                sendMessage(data.toSocket(product), data.getIsin_code());
+            }
         }
     }
 
@@ -106,26 +108,6 @@ public class SecuritiesQuoteService extends SocketService{
                 "sq_bid_level_8_volume," +
                 "sq_bid_level_9_volume," +
                 "sq_bid_level_10_volume," +
-                "sq_lp_ask_level_1_volume," +
-                "sq_lp_ask_level_2_volume," +
-                "sq_lp_ask_level_3_volume," +
-                "sq_lp_ask_level_4_volume," +
-                "sq_lp_ask_level_5_volume," +
-                "sq_lp_ask_level_6_volume," +
-                "sq_lp_ask_level_7_volume," +
-                "sq_lp_ask_level_8_volume," +
-                "sq_lp_ask_level_9_volume," +
-                "sq_lp_ask_level_10_volume," +
-                "sq_lp_bid_level_1_volume," +
-                "sq_lp_bid_level_2_volume," +
-                "sq_lp_bid_level_3_volume," +
-                "sq_lp_bid_level_4_volume," +
-                "sq_lp_bid_level_5_volume," +
-                "sq_lp_bid_level_6_volume," +
-                "sq_lp_bid_level_7_volume," +
-                "sq_lp_bid_level_8_volume," +
-                "sq_lp_bid_level_9_volume," +
-                "sq_lp_bid_level_10_volume," +
                 "sq_total_ask_volume," +
                 "sq_total_bid_volume," +
                 "sq_estimated_trading_price," +

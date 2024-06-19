@@ -37,17 +37,21 @@ public abstract class SG_model {
     }
 
     protected int typeToSqlType(Class<?> type) {
-        if(type.equals(String.class)) {
-            return Types.VARCHAR;
-        } else if(type.equals(Integer.class) || type.equals(int.class)) {
-            return Types.INTEGER;
-        } else if(type.equals(Long.class) || type.equals(long.class)) {
-            return Types.BIGINT;
-        } else if(type.equals(Double.class) || type.equals(double.class)) {
-            return Types.DECIMAL;
-        } else if(type.equals(Float.class) || type.equals(float.class)) {
-            return Types.FLOAT;
-        } else {
+        try {
+            if(type.equals(String.class)) {
+                return Types.VARCHAR;
+            } else if(type.equals(Integer.class) || type.equals(int.class)) {
+                return Types.INTEGER;
+            } else if(type.equals(Long.class) || type.equals(long.class)) {
+                return Types.BIGINT;
+            } else if(type.equals(Double.class) || type.equals(double.class)) {
+                return Types.DECIMAL;
+            } else if(type.equals(Float.class) || type.equals(float.class)) {
+                return Types.FLOAT;
+            } else {
+                return Types.NULL;
+            }
+        } catch (Exception e) {
             return Types.NULL;
         }
     }
@@ -58,25 +62,20 @@ public abstract class SG_model {
             final Class<?> type = field.getType();
             field.setAccessible(true);
             if(field.isAnnotationPresent(SG_column.class) && !field.isAnnotationPresent(SG_idx.class) && !field.isAnnotationPresent(SG_crdt.class)) {
-                try {
-                    final Object value = field.get(this);
-                    if(value == null) {
-                        ps.setNull(index, this.typeToSqlType(type));
-                    } else {
-                        ps.setObject(index, value);
-                        /*if(type.equals(String.class)) ps.setString(index, (String) value);
-                        else if(type.equals(Integer.class) || type.equals(int.class)) ps.setInt(index, (Integer) value);
-                        else if(type.equals(Float.class) || type.equals(float.class)) ps.setFloat(index, (Float) value);
-                        else if(type.equals(Double.class) || type.equals(double.class)) ps.setDouble(index, (Double) value);
-                        else if(type.equals(Long.class) || type.equals(long.class)) ps.setLong(index, (Long) value);
-                        else if(type.equals(Boolean.class) || type.equals(boolean.class)) ps.setBoolean(index, (Boolean) value);
-                        else if(type.equals(Date.class)) ps.setDate(index, (Date) value);
-                        else if(type.equals(Time.class)) ps.setTime(index, (Time) value);
-                        else if(type.equals(Timestamp.class)) ps.setTimestamp(index, (Timestamp) value);*/
+                final SG_column sgc = field.getAnnotation(SG_column.class);
+                if(sgc.useInsert()) {
+                    try {
+                        final Object value = field.get(this);
+                        if(value == null) {
+                            ps.setNull(index, this.typeToSqlType(type));
+                        } else {
+                            ps.setObject(index, value);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        index++;
                     }
-                } catch (Exception ignore) {
-                } finally {
-                    index++;
                 }
             }
         }

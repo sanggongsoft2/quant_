@@ -65,7 +65,7 @@ public class SocketLogService extends SocketService{
                     break;
                 case "A601S", "A602S", "A603S", "A604S", "A601Q", "A601X":
                     final IssueClosing ic = new IssueClosing(msg);
-                    if(ic.getClosing_type() != null && ic.getClosing_type().equals("1") && ic.getBoard_id().equals("G1")) issueClosingService.dataHandler(ic);
+                    if(ic.getClosing_type() != null && ic.getBoard_id() != null && ic.getClosing_type().equals("1") && ic.getBoard_id().equals("G1")) issueClosingService.dataHandler(ic);
                     break;
             }
         }

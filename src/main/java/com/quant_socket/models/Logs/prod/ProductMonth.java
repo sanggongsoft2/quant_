@@ -34,8 +34,6 @@ public class ProductMonth extends SG_model {
     private Integer pre_close;
     @SG_column(dbField = "m_date")
     private Date date;
-    @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
 
     public ProductMonth(ResultSet rs) {
         super(rs);

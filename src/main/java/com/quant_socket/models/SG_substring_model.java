@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 @Slf4j
@@ -32,8 +31,10 @@ abstract public class SG_substring_model {
                         else if(type.equals(Double.class) || type.equals(double.class)) f.set(this, Double.parseDouble(value));
                         else f.set(this, value);
                     }
-                } catch (Exception e) {
+                } catch (ArrayIndexOutOfBoundsException ignored) {
 
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

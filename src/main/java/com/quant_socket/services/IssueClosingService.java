@@ -22,7 +22,7 @@ public class IssueClosingService extends SocketService{
     @Autowired
     private EquitiesSnapshotRepo repo;
     public void dataHandler(IssueClosing data) {
-       logs.add(data);
+        if(data.getIsin_code() != null) logs.add(data);
     }
 
     @Transactional
@@ -45,7 +45,18 @@ public class IssueClosingService extends SocketService{
     private String insertSql() {
         final StringBuilder sb = new StringBuilder();
 
-        String insertCols = "";
+        String insertCols = """
+                ic_board_id,
+                ic_isin_code,
+                ic_closing_price,
+                ic_closing_type,
+                ic_upper_limit_price_out,
+                ic_lower_limit_price_out,
+                ic_closing_price_avg,
+                ic_base_price,
+                ic_upper_limit_price,
+                ic_lower_limit_price
+                """;
 
         final List<String> columns = List.of(insertCols.split(","));
 

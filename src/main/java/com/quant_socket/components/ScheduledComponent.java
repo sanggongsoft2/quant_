@@ -20,6 +20,7 @@ public class ScheduledComponent {
     private final ProductService productService;
     private final EquitiesSnapshotService equitiesSnapshotService;
     private final SecuritiesQuoteService securitiesQuoteService;
+    private final IssueClosingService issueClosingService;
 
     private final SocketLogRepo socketLogRepo;
     private final ProductRepo productRepo;
@@ -33,9 +34,10 @@ public class ScheduledComponent {
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols());
         productService.insertLogs(Product.insertCols());
+        issueClosingService.insertLogs();
     }
 
-    @Scheduled(cron = "0 * 10-14 * * MON-FRI")
+    @Scheduled(cron = "0 * 9-14 * * MON-FRI")
     @Scheduled(cron = "0 0-30 15 * * MON-FRI")
     public void everyMinuteFrom10To15() {
         productService.updateProductMinute();

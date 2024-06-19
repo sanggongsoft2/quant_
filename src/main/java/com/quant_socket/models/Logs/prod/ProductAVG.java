@@ -32,8 +32,6 @@ public class ProductAVG extends SG_model {
     private Integer price20;
     @SG_column(dbField = "a_avg_date")
     private Date avg_date;
-    @SG_column(dbField = "a_crdt")
-    private Timestamp createdAt;
 
     public ProductAVG(ResultSet rs) {
         super(rs);

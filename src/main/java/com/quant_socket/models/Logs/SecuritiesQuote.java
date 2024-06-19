@@ -250,7 +250,7 @@ public class SecuritiesQuote extends SG_model {
     }
     public double getComparePriceRate(BigDecimal yesterday_price, BigDecimal price) {
 
-        if(price == null) return 0;
+        if(price == null ||  yesterday_price == null) return 0;
         if (yesterday_price.compareTo(BigDecimal.ZERO) == 0) return 0;
         // (B - A) / A * 100
         BigDecimal increase = price.subtract(yesterday_price); // B - A

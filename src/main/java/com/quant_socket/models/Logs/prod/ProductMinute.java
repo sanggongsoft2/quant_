@@ -43,12 +43,6 @@ public class ProductMinute extends SG_model {
     private Long volume;
     @SG_column(dbField = "m_pre_close")
     private Double pre_close;
-    @SG_column(dbField = "m_date")
-    private Date date;
-    @SG_column(dbField = "m_time")
-    private Time time;
-    @SG_column(dbField = "m_crdt")
-    private Timestamp createdAt;
 
     public ProductMinute(ResultSet rs) {
         super(rs);
@@ -80,7 +74,5 @@ public class ProductMinute extends SG_model {
         this.open = prod.getOpenPrice();
         this.volume = prod.getTradingVolume();
         this.pre_close = prod.getCurrentPrice();
-        this.date = Date.valueOf(zonedDateTime.toLocalDate());
-        this.time = Time.valueOf(zonedDateTime.minusMinutes(1).toLocalTime());
     }
 }

@@ -25,11 +25,13 @@ public class EquitiesSnapshotService extends SocketService{
     @Autowired
     private ProductService productService;
     public void dataHandler(EquitiesSnapshot data) {
-       logs.add(data);
-        final Product product = productService.productFromIsinCode(data.getIsin_code());
-        if(product != null && data.isRealBoard()) {
-            productService.update(data);
-            sendMessage(data.toSocket(product), data.getIsin_code());
+        if(data.getIsin_code() != null) {
+            logs.add(data);
+            final Product product = productService.productFromIsinCode(data.getIsin_code());
+            if(product != null && data.isRealBoard()) {
+                productService.update(data);
+                sendMessage(data.toSocket(product), data.getIsin_code());
+            }
         }
     }
 
@@ -65,27 +67,27 @@ public class EquitiesSnapshotService extends SocketService{
     private String insertSql() {
         final StringBuilder sb = new StringBuilder();
 
-        String insertCols = "eq_board_id," +
-                "eq_isin_code," +
-                "eq_price_change_against_previous_day," +
-                "eq_price_change_against_the_previous_day," +
-                "eq_upper_limit_price," +
-                "eq_lower_limit_price," +
-                "eq_current_price," +
-                "eq_opening_price," +
-                "eq_todays_high," +
-                "eq_todays_low," +
-                "eq_accumulated_trading_volume," +
-                "eq_accumulated_trading_value," +
-                "eq_final_ask_bid_type_code," +
-                "eq_total_ask_volume," +
-                "eq_total_bid_volume," +
-                "eq_estimated_trading_price," +
-                "eq_estimated_trading_volume," +
-                "eq_closing_price_type_code," +
-                "eq_trading_halt," +
-                "eq_is_fast_close," +
-                "eq_fast_close_time";
+        String insertCols = """
+                eq_board_id,
+                eq_isin_code,
+                eq_price_change_against_previous_day,
+                eq_price_change_against_the_previous_day,
+                eq_upper_limit_price,
+                eq_lower_limit_price,
+                eq_current_price,
+                eq_opening_price,
+                eq_todays_high,
+                eq_todays_low,
+                eq_accumulated_trading_volume,
+                eq_accumulated_trading_value,
+                eq_final_ask_bid_type_code,
+                eq_total_ask_volume,
+                eq_total_bid_volume,
+                eq_estimated_trading_price,
+                eq_estimated_trading_volume,
+                eq_closing_price_type_code,
+                eq_trading_halt
+                """;
 
         final List<String> columns = List.of(insertCols.split(","));
 

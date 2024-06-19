@@ -8,6 +8,7 @@ import com.quant_socket.models.SG_model;
 import com.quant_socket.models.SG_substring_model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
+@ToString
 public class EquitiesSnapshot extends SG_model {
 
     @SG_substring(start = 5, end = 7)
@@ -121,18 +123,19 @@ public class EquitiesSnapshot extends SG_model {
 
 
     public BigDecimal getYesterdayPrice() {
+        if(current_price == null) return null;
         return switch (price_change_against_previous_day) {
             case "4", "5" -> current_price.add(price_change_against_the_previous_day);
             default -> current_price.subtract(price_change_against_the_previous_day);
         };
     }
-    public double getComparePriceRate() {
+    public Double getComparePriceRate() {
         try {
-            double value = 0;
-            if(getYesterdayPrice().doubleValue() != 0 && getYesterdayPrice() != null) value = (current_price.doubleValue() - getYesterdayPrice().doubleValue()) / getYesterdayPrice().doubleValue() * 100;
-            return value;
+            final Double result = (current_price.doubleValue() - getYesterdayPrice().doubleValue()) / getYesterdayPrice().doubleValue() * 100;
+            if(result.isNaN()) return null;
+            else return result;
         } catch (Exception e) {
-            return 0;
+            return null;
         }
     }
     public Double getCompareYesterdayPrice() {
