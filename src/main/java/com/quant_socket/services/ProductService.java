@@ -26,8 +26,10 @@ public class ProductService extends SocketService{
     private final List<Product> products = new CopyOnWriteArrayList<>();
 
     public boolean refreshProducts() {
-        products.clear();
-        return products.addAll(repo.findAll());
+        synchronized (products) {
+            products.clear();
+            return products.addAll(repo.findAll());
+        }
     }
 
     public Product productFromIsinCode(String isinCode) {
@@ -42,26 +44,30 @@ public class ProductService extends SocketService{
     }
 
     @Transactional
-    public void updateProducts() {
-        for(final Product prod: products) {
-            if(repo.update(prod)) prod.refreshEveryday();
+    public synchronized void updateProducts() {
+        synchronized (products) {
+            for(final Product prod: products) {
+                if(repo.update(prod)) prod.refreshEveryday();
+            }
         }
     }
 
-    public void updateProductMinute() {
-        final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
-        repo.insertProductMinute(new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) {
-                final ProductMinute pm = minutes.get(i);
-                if(pm.setPreparedStatement(ps)) products.get(i).refreshTradingVolumeFrom1Minute();
-            }
+    public synchronized void updateProductMinute() {
+        synchronized (products) {
+            final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
+            repo.insertProductMinute(new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) {
+                    final ProductMinute pm = minutes.get(i);
+                    if(pm.setPreparedStatement(ps)) products.get(i).refreshTradingVolumeFrom1Minute();
+                }
 
-            @Override
-            public int getBatchSize() {
-                return minutes.size();
-            }
-        });
+                @Override
+                public int getBatchSize() {
+                    return minutes.size();
+                }
+            });
+        }
     }
 
     @Transactional
@@ -70,6 +76,17 @@ public class ProductService extends SocketService{
     }
 
     public void update(EquitiesBatchData data) {
+        synchronized (products) {
+            for(Product prod : products) {
+                if(prod.getCode().equals(data.getIsin_code())) {
+                    prod.update(data);
+                    break;
+                }
+            }
+        }
+    }
+
+    public synchronized void update(SecuritiesQuote data) {
         for(Product prod : products) {
             if(prod.getCode().equals(data.getIsin_code())) {
                 prod.update(data);
@@ -78,16 +95,7 @@ public class ProductService extends SocketService{
         }
     }
 
-    public void update(SecuritiesQuote data) {
-        for(Product prod : products) {
-            if(prod.getCode().equals(data.getIsin_code())) {
-                prod.update(data);
-                break;
-            }
-        }
-    }
-
-    public void update(EquitiesSnapshot data) {
+    public synchronized void update(EquitiesSnapshot data) {
         for(Product prod : products) {
             if(prod.getCode().equals(data.getIsin_code())) {
                 prod.update(data);
@@ -158,24 +166,28 @@ public class ProductService extends SocketService{
 
     @Transactional
     public <T> void insertLogs(String[] cols) {
-        if(!logs.isEmpty()) {
-            final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) {
-                    final Product data = logs.get(i);
-                    data.setPreparedStatement(ps);
-                }
+        synchronized (logs) {
+            if(!logs.isEmpty()) {
+                final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) {
+                        final Product data = logs.get(i);
+                        data.setPreparedStatement(ps);
+                    }
 
-                @Override
-                public int getBatchSize() {
-                    return logs.size();
-                }
-            });
-            if(result > 0) logs.clear();
+                    @Override
+                    public int getBatchSize() {
+                        return logs.size();
+                    }
+                });
+                if(result > 0) logs.clear();
+            }
         }
     }
 
     public void addLog(Product log) {
-        logs.add(log);
+        synchronized (logs) {
+            logs.add(log);
+        }
     }
 }

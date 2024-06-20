@@ -87,7 +87,7 @@ public class Product extends SG_model{
 
     private List<SecOrderFilled> orders = new CopyOnWriteArrayList<>();
 
-    private void updateTodayCount(String type, long count) {
+    private synchronized void updateTodayCount(String type, long count) {
         if(type != null) switch (type) {
             case "1":
                 todayAskCount += count;
@@ -97,18 +97,18 @@ public class Product extends SG_model{
         }
     }
 
-    public void refreshTradingVolumeFrom1Minute() {
+    public synchronized void refreshTradingVolumeFrom1Minute() {
         tradingVolume = 0;
     }
 
-    public void refreshEveryday() {
+    public synchronized void refreshEveryday() {
         todayBidCount = 0;
         todayAskCount = 0;
         todayTradingCount = 0;
         todayTradingValue = 0;
     }
 
-    public void update(EquitiesBatchData data) {
+    public synchronized void update(EquitiesBatchData data) {
         if(data.getIsin_code() != null) this.code = data.getIsin_code();
         if(data.getShort_code() != null) this.short_code = data.getShort_code();
         if(data.getAbbr_issue_name_kr() != null) this.name_kr = data.getAbbr_issue_name_kr();
@@ -125,11 +125,11 @@ public class Product extends SG_model{
         if(data.getYesterday_trading_value() != null) this.yesterday_value = data.getYesterday_trading_value();
     }
 
-    public void update(SecuritiesQuote data) {
+    public synchronized void update(SecuritiesQuote data) {
         if(data != null) this.latestSecuritiesQuote = data;
     }
 
-    public void update(EquitiesSnapshot data) {
+    public synchronized void update(EquitiesSnapshot data) {
         if(data != null && data.isRealBoard()) {
             if(data.getCurrent_price() != null) this.currentPrice = data.getCurrent_price().doubleValue();
             if(data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
@@ -141,7 +141,7 @@ public class Product extends SG_model{
         }
     }
 
-    public void update(SecOrderFilled data) {
+    public synchronized void update(SecOrderFilled data) {
         this.currentPrice = data.getTrading_price();
         this.highPrice = data.getTodays_high();
         this.lowPrice = data.getTodays_low();
@@ -151,7 +151,7 @@ public class Product extends SG_model{
         this.tradingVolume += data.getTrading_volume();
         this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
         updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
-        comparePriceRate = data.getCompareRate();
+        if(data.getCompareRate() != null) comparePriceRate = data.getCompareRate();
         if(orders.size() == 20) {
             this.orders.remove(19);
             this.orders.add(data);

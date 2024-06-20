@@ -24,6 +24,7 @@ public class ScheduledComponent {
 
     private final SocketLogRepo socketLogRepo;
     private final ProductRepo productRepo;
+    private final EquitiesSnapshotRepo equitiesSnapshotRepo;
 
     /*@Scheduled(cron = "* * * * * *")
     public void everySeconds() {
@@ -31,39 +32,40 @@ public class ScheduledComponent {
     }*/
 
     @Scheduled(cron = "0 * * * * ?")
-    public void everyMinute() {
+    public synchronized void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols());
         productService.insertLogs(Product.insertCols());
         issueClosingService.insertLogs();
     }
 
-    @Scheduled(cron = "0 * 9-14 * * MON-FRI")
+    /*@Scheduled(cron = "0 * 9-14 * * MON-FRI")
     @Scheduled(cron = "0 0-30 15 * * MON-FRI")
-    public void everyMinuteFrom10To15() {
+    public void everyMinuteFrom9To15() {
         productService.updateProductMinute();
         equitiesSnapshotService.insertLogs();
         securitiesQuoteService.insertLogs();
-    }
+    }*/
 
     @Scheduled(cron = "0 59 23 * * MON-FRI")
-    public void everyWeekday() {
+    public synchronized void everyWeekday() {
         productService.updateProducts();
-        productService.updateProductDay();
+        /*productService.updateProductDay();*/
+        equitiesSnapshotRepo.deleteLogsFrom3Days();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void everyday() {
+    public synchronized void everyday() {
         socketLogRepo.deleteLogsFrom3Days();
         productRepo.deleteProductMinuteFrom3Month();
     }
 
     @Scheduled(cron = "0 0 0 * * SAT")
-    public void everyFriday() {
+    public synchronized void everyFriday() {
         productRepo.insertProductWeek();
     }
 
     @Scheduled(cron = "0 0 0 1 * ?")
-    public void everyMonth() {
+    public synchronized void everyMonth() {
         productRepo.insertProductMonth();
     }
 }

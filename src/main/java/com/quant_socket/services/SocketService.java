@@ -58,15 +58,17 @@ public abstract class SocketService{
 
     private <T> void sendMessage(T message, Set<WebSocketSession> sessions){
         sessions.removeIf(ws -> {
-            if(ws.isOpen()) {
-                try {
-                    ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            synchronized (ws) {
+                if(ws.isOpen()) {
+                    try {
+                        ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return false;
+                } else {
+                    return true;
                 }
-                return false;
-            } else {
-                return true;
             }
         });
     }

@@ -10,4 +10,10 @@ import java.util.List;
 
 @Repository
 public class EquitiesSnapshotRepo extends SG_repo<EquitiesSnapshot>{
+
+    public void deleteLogsFrom3Days() {
+        final String sql = "DELETE FROM equities_snapshot\n" +
+                "WHERE eq_crdt < DATE_SUB(NOW(), INTERVAL 3 DAY);";
+        jt.update(sql);
+    }
 }

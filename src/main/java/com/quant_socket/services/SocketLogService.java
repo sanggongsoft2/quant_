@@ -85,24 +85,28 @@ public class SocketLogService extends SocketService{
 
     @Transactional
     public void insertLogs(String[] cols) {
-        if(!logs.isEmpty()) {
-            final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) {
-                    final SocketLog data = logs.get(i);
-                    data.setPreparedStatement(ps);
-                }
+        synchronized (logs) {
+            if(!logs.isEmpty()) {
+                final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) {
+                        final SocketLog data = logs.get(i);
+                        data.setPreparedStatement(ps);
+                    }
 
-                @Override
-                public int getBatchSize() {
-                    return logs.size();
-                }
-            });
-            if(result > 0) logs.clear();
+                    @Override
+                    public int getBatchSize() {
+                        return logs.size();
+                    }
+                });
+                if(result > 0) logs.clear();
+            }
         }
     }
 
     public void addLog(SocketLog log) {
-        logs.add(log);
+        synchronized (logs) {
+            logs.add(log);
+        }
     }
 }

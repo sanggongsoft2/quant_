@@ -22,24 +22,30 @@ public class IssueClosingService extends SocketService{
     @Autowired
     private EquitiesSnapshotRepo repo;
     public void dataHandler(IssueClosing data) {
-        if(data.getIsin_code() != null) logs.add(data);
+        if(data.getIsin_code() != null) {
+            synchronized (logs) {
+                logs.add(data);
+            }
+        }
     }
 
     @Transactional
     public void insertLogs() {
-        final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                final IssueClosing ic = logs.get(i);
-                ic.setPreparedStatement(ps);
-            }
+        synchronized (logs) {
+            final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    final IssueClosing ic = logs.get(i);
+                    ic.setPreparedStatement(ps);
+                }
 
-            @Override
-            public int getBatchSize() {
-                return logs.size();
-            }
-        });
-        if(result > 0) logs.clear();
+                @Override
+                public int getBatchSize() {
+                    return logs.size();
+                }
+            });
+            if(result > 0) logs.clear();
+        }
     }
 
     private String insertSql() {

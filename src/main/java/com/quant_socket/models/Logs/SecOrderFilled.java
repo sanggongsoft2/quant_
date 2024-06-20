@@ -89,8 +89,10 @@ public class SecOrderFilled extends SG_substring_model {
         return response;
     }
 
-    public double getCompareRate() {
-        return a_price_change_against_the_pre_day / trading_price*100;
+    public Double getCompareRate() {
+        final Double result = a_price_change_against_the_pre_day / trading_price*100;
+        if(result.isNaN()) return null;
+        return result;
     }
 
     private double getYesterdayCompareRate(double price) {

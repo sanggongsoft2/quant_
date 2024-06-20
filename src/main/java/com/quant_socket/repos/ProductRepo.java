@@ -117,7 +117,7 @@ FROM product p
     }
 
     @Transactional
-    public void insertProductMinute(BatchPreparedStatementSetter setter) {
+    public synchronized void insertProductMinute(BatchPreparedStatementSetter setter) {
         jt.batchUpdate(productMinuteSql, setter);
     }
 
@@ -125,15 +125,15 @@ FROM product p
         return jt.update(productDaySql);
     }
 
-    public void insertProductWeek() {
+    public synchronized void insertProductWeek() {
         jt.update(productWeekSql);
     }
 
-    public void insertProductMonth() {
+    public synchronized void insertProductMonth() {
         jt.update(productMonthSql);
     }
 
-    public void deleteProductMinuteFrom3Month() {
+    public synchronized void deleteProductMinuteFrom3Month() {
         jt.update(deleteProductDaySql);
     }
 }
