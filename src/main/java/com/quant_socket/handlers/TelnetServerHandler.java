@@ -17,7 +17,6 @@ import java.nio.charset.Charset;
 @RequiredArgsConstructor
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final boolean saveLog;
     private final SocketLogService socketLogService;
 
     @Override
