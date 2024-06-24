@@ -3,6 +3,7 @@ package com.quant_socket.models.Logs;
 import com.quant_socket.annotations.SG_column;
 import com.quant_socket.annotations.SG_substring;
 import com.quant_socket.annotations.SG_table;
+import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
 import lombok.ToString;
@@ -78,8 +79,22 @@ public class IssueClosing extends SG_model {
     @SG_substring(start = 100, end = 111)
     private BigDecimal lower_limit_price;
 
+    @SG_column(dbField = "ic_yesterday_price")
+    private BigDecimal yesterday_price;
+
+    @SG_column(dbField = "ic_trading_volume")
+    private Long trading_volume;
+
+    @SG_column(dbField = "ic_trading_value")
+    private Float trading_value;
 
     public IssueClosing(String msg) {
         super(msg);
+    }
+
+    public void setFromProduct(Product prod) {
+        this.yesterday_price = prod.getYesterday_price();
+        this.trading_volume = prod.getTradingVolume();
+        this.trading_value = prod.getYesterday_value();
     }
 }

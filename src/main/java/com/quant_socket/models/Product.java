@@ -87,7 +87,7 @@ public class Product extends SG_model{
 
     private List<SecOrderFilled> orders = new CopyOnWriteArrayList<>();
 
-    private synchronized void updateTodayCount(String type, long count) {
+    private void updateTodayCount(String type, long count) {
         if(type != null) switch (type) {
             case "1":
                 todayAskCount += count;
@@ -97,69 +97,77 @@ public class Product extends SG_model{
         }
     }
 
-    public synchronized void refreshTradingVolumeFrom1Minute() {
+    public void refreshTradingVolumeFrom1Minute() {
         tradingVolume = 0;
     }
 
-    public synchronized void refreshEveryday() {
+    public void refreshEveryday() {
         todayBidCount = 0;
         todayAskCount = 0;
         todayTradingCount = 0;
         todayTradingValue = 0;
     }
 
-    public synchronized void update(EquitiesBatchData data) {
-        if(data.getIsin_code() != null) this.code = data.getIsin_code();
-        if(data.getShort_code() != null) this.short_code = data.getShort_code();
-        if(data.getAbbr_issue_name_kr() != null) this.name_kr = data.getAbbr_issue_name_kr();
-        if(data.getAbbr_issue_name_kr() != null) this.name_kr_abbr = data.getAbbr_issue_name_kr();
-        if(data.getAbbr_issue_name_en() != null) this.name_en = data.getAbbr_issue_name_en();
-        if(data.getInfo_category() != null) this.gubun = infoCategoryToClass(data.getInfo_category());
-        if(data.getSec_group_id() != null) this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
-        if(data.getSection_type_code() != null) this.team = sectionTypeCodeToTeam(data.getSection_type_code());
-        if(data.getOther_stock_type_code() != null) this.type = stockTypeToType(data.getOther_stock_type_code());
-        if(data.getPar_value() != null) this.face_value = data.getPar_value();
-        if(data.getNumber_of_listed_shares() != null) this.having_count = data.getNumber_of_listed_shares();
-        if(data.getYesterday_closing_price() != null) this.yesterday_price = data.getYesterday_closing_price();
-        if(data.getYesterday_trading_volume() != null) this.yesterday_trading_count = data.getYesterday_trading_volume();
-        if(data.getYesterday_trading_value() != null) this.yesterday_value = data.getYesterday_trading_value();
-    }
-
-    public synchronized void update(SecuritiesQuote data) {
-        if(data != null) this.latestSecuritiesQuote = data;
-    }
-
-    public synchronized void update(EquitiesSnapshot data) {
-        if(data != null && data.isRealBoard()) {
-            if(data.getCurrent_price() != null) this.currentPrice = data.getCurrent_price().doubleValue();
-            if(data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
-            if(data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
-            if(data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
-            if(data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
-            if(data.getYesterdayPrice() != null) this.yesterday_price = data.getYesterdayPrice();
-            this.latestSnapshot = data;
+    public void update(EquitiesBatchData data) {
+        synchronized (this) {
+            if(data.getIsin_code() != null) this.code = data.getIsin_code();
+            if(data.getShort_code() != null) this.short_code = data.getShort_code();
+            if(data.getAbbr_issue_name_kr() != null) this.name_kr = data.getAbbr_issue_name_kr();
+            if(data.getAbbr_issue_name_kr() != null) this.name_kr_abbr = data.getAbbr_issue_name_kr();
+            if(data.getAbbr_issue_name_en() != null) this.name_en = data.getAbbr_issue_name_en();
+            if(data.getInfo_category() != null) this.gubun = infoCategoryToClass(data.getInfo_category());
+            if(data.getSec_group_id() != null) this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
+            if(data.getSection_type_code() != null) this.team = sectionTypeCodeToTeam(data.getSection_type_code());
+            if(data.getOther_stock_type_code() != null) this.type = stockTypeToType(data.getOther_stock_type_code());
+            if(data.getPar_value() != null) this.face_value = data.getPar_value();
+            if(data.getNumber_of_listed_shares() != null) this.having_count = data.getNumber_of_listed_shares();
+            if(data.getYesterday_closing_price() != null) this.yesterday_price = data.getYesterday_closing_price();
+            if(data.getYesterday_trading_volume() != null) this.yesterday_trading_count = data.getYesterday_trading_volume();
+            if(data.getYesterday_trading_value() != null) this.yesterday_value = data.getYesterday_trading_value();
         }
     }
 
-    public synchronized void update(SecOrderFilled data) {
-        this.currentPrice = data.getTrading_price();
-        this.highPrice = data.getTodays_high();
-        this.lowPrice = data.getTodays_low();
-        this.openPrice = data.getOpening_price();
-        this.todayTradingCount = data.getTrading_volume();
-        this.todayTradingValue = data.getAccu_trading_value();
-        this.tradingVolume += data.getTrading_volume();
-        this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
-        updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
-        if(data.getCompareRate() != null) comparePriceRate = data.getCompareRate();
-        if(orders.size() == 20) {
-            this.orders.remove(19);
-            this.orders.add(data);
-        } else {
-            this.orders.add(data);
+    public void update(SecuritiesQuote data) {
+        synchronized (this) {
+            if(data != null) this.latestSecuritiesQuote = data;
         }
-        if(highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
-        if(lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
+    }
+
+    public void update(EquitiesSnapshot data) {
+        synchronized (this) {
+            if(data != null && data.isRealBoard()) {
+                if(data.getCurrent_price() != null) this.currentPrice = data.getCurrent_price().doubleValue();
+                if(data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
+                if(data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
+                if(data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
+                if(data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
+                if(data.getYesterdayPrice() != null) this.yesterday_price = data.getYesterdayPrice();
+                this.latestSnapshot = data;
+            }
+        }
+    }
+
+    public void update(SecOrderFilled data) {
+        synchronized (this) {
+            this.currentPrice = data.getTrading_price();
+            this.highPrice = data.getTodays_high();
+            this.lowPrice = data.getTodays_low();
+            this.openPrice = data.getOpening_price();
+            this.todayTradingCount = data.getTrading_volume();
+            this.todayTradingValue = data.getAccu_trading_value();
+            this.tradingVolume += data.getTrading_volume();
+            this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
+            updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
+            if(data.getCompareRate() != null) comparePriceRate = data.getCompareRate();
+            if(orders.size() == 20) {
+                this.orders.remove(19);
+                this.orders.add(data);
+            } else {
+                this.orders.add(data);
+            }
+            if(highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
+            if(lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
+        }
     }
 
     public Product(ResultSet rs) {

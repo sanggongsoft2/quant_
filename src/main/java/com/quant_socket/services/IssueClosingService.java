@@ -19,11 +19,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class IssueClosingService extends SocketService{
 
     private final List<IssueClosing> logs = new CopyOnWriteArrayList<>();
+
     @Autowired
     private EquitiesSnapshotRepo repo;
+
+    @Autowired
+    private ProductService productService;
+
     public void dataHandler(IssueClosing data) {
-        if(data.getIsin_code() != null) {
-            synchronized (logs) {
+        synchronized (logs) {
+            if(data.getIsin_code() != null) {
+                final Product prod = productService.productFromIsinCode(data.getIsin_code());
+                if(prod != null) data.setFromProduct(prod);
                 logs.add(data);
             }
         }
@@ -61,7 +68,10 @@ public class IssueClosingService extends SocketService{
                 ic_closing_price_avg,
                 ic_base_price,
                 ic_upper_limit_price,
-                ic_lower_limit_price
+                ic_lower_limit_price,
+                ic_yesterday_price,
+                ic_trading_volume,
+                ic_trading_value
                 """;
 
         final List<String> columns = List.of(insertCols.split(","));

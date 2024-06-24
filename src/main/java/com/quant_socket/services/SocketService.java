@@ -27,17 +27,22 @@ public abstract class SocketService{
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
     public void addSession(WebSocketSession ws, String... isinCodes) {
-        for(String isinCode : isinCodes) {
-            isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
-            isinSessions.get(isinCode).add(ws);
+        synchronized (isinSessions) {
+            for(String isinCode : isinCodes) {
+                isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
+                isinSessions.get(isinCode).add(ws);
+            }
         }
     }
     public <T> void sendMessage(T message, String... isinCodes){
-        for(String isinCode : isinCodes) {
-            final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
-            if(sessions != null) sendMessage(message, sessions);
+        synchronized (isinSessions) {
+            for(String isinCode : isinCodes) {
+                final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
+                if(sessions != null) sendMessage(message, sessions);
+            }
         }
     }
+
     public Map<String, String> extractQueryParams(String queryString) {
         Map<String, String> queryPairs = new LinkedHashMap<>();
         String[] pairs = queryString.split("&");
@@ -58,18 +63,24 @@ public abstract class SocketService{
 
     private <T> void sendMessage(T message, Set<WebSocketSession> sessions){
         sessions.removeIf(ws -> {
-            synchronized (ws) {
-                if(ws.isOpen()) {
-                    try {
-                        ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return false;
-                } else {
-                    return true;
+            if(ws.isOpen()) {
+                try {
+                    ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+                return false;
+            } else {
+                return true;
             }
         });
+    }
+
+    public <T> void sendMessage(T message, WebSocketSession session){
+        try {
+            if(session.isOpen()) session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

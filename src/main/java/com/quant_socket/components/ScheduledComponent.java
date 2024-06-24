@@ -6,6 +6,7 @@ import com.quant_socket.repos.*;
 import com.quant_socket.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,13 +17,17 @@ import java.time.Instant;
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduledComponent {
+
+    @Value("${save.log}")
+    private boolean saveLog;
+
     private final SocketLogService socketLogService;
     private final ProductService productService;
     private final EquitiesSnapshotService equitiesSnapshotService;
     private final SecuritiesQuoteService securitiesQuoteService;
     private final IssueClosingService issueClosingService;
 
-    private final SocketLogRepo socketLogRepo;
+    private final SecuritiesQuoteRepo securitiesQuoteRepo;
     private final ProductRepo productRepo;
     private final EquitiesSnapshotRepo equitiesSnapshotRepo;
 
@@ -32,40 +37,40 @@ public class ScheduledComponent {
     }*/
 
     @Scheduled(cron = "0 * * * * ?")
-    public synchronized void everyMinute() {
-        socketLogService.insertLogs(SocketLog.insertCols());
+    public void everyMinute() {
+        if(saveLog) socketLogService.insertLogs(SocketLog.insertCols());
         productService.insertLogs(Product.insertCols());
         issueClosingService.insertLogs();
     }
 
-    /*@Scheduled(cron = "0 * 9-14 * * MON-FRI")
+    @Scheduled(cron = "0 * 9-14 * * MON-FRI")
     @Scheduled(cron = "0 0-30 15 * * MON-FRI")
     public void everyMinuteFrom9To15() {
         productService.updateProductMinute();
         equitiesSnapshotService.insertLogs();
         securitiesQuoteService.insertLogs();
-    }*/
+    }
 
-    @Scheduled(cron = "0 59 23 * * MON-FRI")
-    public synchronized void everyWeekday() {
+    @Scheduled(cron = "0 0 0 * * MON-FRI")
+    public void everyWeekday() {
         productService.updateProducts();
-        /*productService.updateProductDay();*/
         equitiesSnapshotRepo.deleteLogsFrom3Days();
+        securitiesQuoteRepo.deleteBefore1Day();
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    public synchronized void everyday() {
-        socketLogRepo.deleteLogsFrom3Days();
+    public void everyday() {
+//        socketLogRepo.deleteLogsFrom3Days();
         productRepo.deleteProductMinuteFrom3Month();
     }
 
     @Scheduled(cron = "0 0 0 * * SAT")
-    public synchronized void everyFriday() {
+    public void everyFriday() {
         productRepo.insertProductWeek();
     }
 
     @Scheduled(cron = "0 0 0 1 * ?")
-    public synchronized void everyMonth() {
+    public void everyMonth() {
         productRepo.insertProductMonth();
     }
 }

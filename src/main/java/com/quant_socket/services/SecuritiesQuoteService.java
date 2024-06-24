@@ -41,7 +41,7 @@ public class SecuritiesQuoteService extends SocketService{
             final Product prod = productService.productFromIsinCode(isinCode);
             if(prod != null) {
                 final SecuritiesQuote initData = prod.getLatestSecuritiesQuote();
-                if(initData != null) sendMessage(initData.toSocket(prod), isinCode);
+                if(initData != null) sendMessage(initData.toSocket(prod), ws);
             }
         }
     }

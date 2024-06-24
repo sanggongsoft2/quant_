@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -83,12 +84,18 @@ public abstract class SG_model {
     }
 
     protected SG_model(String msg) {
+        final Charset eucKrCharset = Charset.forName("EUC-KR");
+        byte[] byteArray = msg.getBytes(eucKrCharset);
         for(Field f : this.getClass().getDeclaredFields()) {
             if(f.isAnnotationPresent(SG_substring.class)) {
                 final SG_substring sgs = f.getAnnotation(SG_substring.class);
                 final Class<?> type = f.getType();
                 try {
-                    final String value = msg.substring(sgs.start(), sgs.end()).trim();
+//                    final byte[] subArray = Arrays.copyOfRange(byteArray, sgs.start(), sgs.end());
+                    final int length = sgs.end()-sgs.start();
+                    final byte[] subArray = new byte[sgs.end()-sgs.start()];
+                    System.arraycopy(byteArray, sgs.start(), subArray, 0, length);
+                    final String value = new String(subArray, eucKrCharset).trim();
                     if(!value.isBlank()) {
                         f.setAccessible(true);
                         if(type.equals(int.class) || type.equals(Integer.class)) f.set(this, Integer.parseInt(value));
@@ -99,7 +106,9 @@ public abstract class SG_model {
                         else if(type.equals(Double.class) || type.equals(double.class)) f.set(this, Double.parseDouble(value));
                         else f.set(this, value);
                     }
-                } catch (Exception ignore) {
+                } catch (Exception e) {
+                    log.error("LOG : {}", msg);
+                    log.error("ERROR : {}", e);
                 }
             }
         }
@@ -114,7 +123,8 @@ public abstract class SG_model {
                         f.setAccessible(true);
                         f.set(this, res.getObject(sc.dbField()));
                     }
-                } catch (SQLException | IllegalAccessException ignore) {
+                } catch (SQLException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }

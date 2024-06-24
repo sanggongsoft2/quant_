@@ -4,6 +4,7 @@ import com.quant_socket.models.Logs.*;
 import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
 import com.quant_socket.repos.ProductRepo;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -23,6 +24,7 @@ public class ProductService extends SocketService{
     private ProductRepo repo;
 
     private final List<Product> logs = new CopyOnWriteArrayList<>();
+    @Getter
     private final List<Product> products = new CopyOnWriteArrayList<>();
 
     public boolean refreshProducts() {
@@ -44,7 +46,7 @@ public class ProductService extends SocketService{
     }
 
     @Transactional
-    public synchronized void updateProducts() {
+    public void updateProducts() {
         synchronized (products) {
             for(final Product prod: products) {
                 if(repo.update(prod)) prod.refreshEveryday();
@@ -52,7 +54,7 @@ public class ProductService extends SocketService{
         }
     }
 
-    public synchronized void updateProductMinute() {
+    public void updateProductMinute() {
         synchronized (products) {
             final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
             repo.insertProductMinute(new BatchPreparedStatementSetter() {
@@ -86,20 +88,24 @@ public class ProductService extends SocketService{
         }
     }
 
-    public synchronized void update(SecuritiesQuote data) {
-        for(Product prod : products) {
-            if(prod.getCode().equals(data.getIsin_code())) {
-                prod.update(data);
-                break;
+    public void update(SecuritiesQuote data) {
+        synchronized (products) {
+            for(Product prod : products) {
+                if(prod.getCode().equals(data.getIsin_code())) {
+                    prod.update(data);
+                    break;
+                }
             }
         }
     }
 
-    public synchronized void update(EquitiesSnapshot data) {
-        for(Product prod : products) {
-            if(prod.getCode().equals(data.getIsin_code())) {
-                prod.update(data);
-                break;
+    public void update(EquitiesSnapshot data) {
+        synchronized(products) {
+            for(Product prod : products) {
+                if(prod.getCode().equals(data.getIsin_code())) {
+                    prod.update(data);
+                    break;
+                }
             }
         }
     }

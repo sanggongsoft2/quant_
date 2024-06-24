@@ -42,7 +42,7 @@ public class EquitiesSnapshotService extends SocketService{
             final Product prod = productService.productFromIsinCode(isinCode);
             if(prod != null) {
                 final EquitiesSnapshot initData = prod.getLatestSnapshot();
-                if(initData != null) sendMessage(initData.toSocket(prod), isinCode);
+                if(initData != null) sendMessage(initData.toSocket(prod), ws);
             }
         }
     }

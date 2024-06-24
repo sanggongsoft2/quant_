@@ -5,6 +5,7 @@ import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,11 +40,13 @@ public class SocketLogService extends SocketService{
     @Autowired
     private IssueClosingService issueClosingService;
 
+    @Value("${save.log}")
+    private boolean saveLog;
+
     private final LocalTime hour3half = LocalTime.of(15, 31);
     /*private final LocalTime hour3half = LocalTime.of(23, 31);*/
 
-    public void esHandler(SocketLog sl) {
-        final String msg = sl.getLog();
+    public void esHandler(String msg) {
         final LocalTime now = LocalTime.now();
         final boolean isBefore = now.isBefore(hour3half);
 
@@ -60,12 +63,14 @@ public class SocketLogService extends SocketService{
                 case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
                     if(isBefore) equities_snapshot_handler(msg);
                     break;
-                case "B601S", "B601Q", "B601X", "B702S", "B703S", "B704S":
+                case "B601S", "B601Q", "B601X":
                     if(isBefore) securitiesQuoteService.dataHandler(new SecuritiesQuote(msg));
                     break;
+                case "B702S", "B703S", "B704S":
+
+                    break;
                 case "A601S", "A602S", "A603S", "A604S", "A601Q", "A601X":
-                    final IssueClosing ic = new IssueClosing(msg);
-                    if(ic.getClosing_type() != null && ic.getBoard_id() != null && ic.getClosing_type().equals("1") && ic.getBoard_id().equals("G1")) issueClosingService.dataHandler(ic);
+                    issueClosingService.dataHandler(new IssueClosing(msg));
                     break;
             }
         }
@@ -85,28 +90,24 @@ public class SocketLogService extends SocketService{
 
     @Transactional
     public void insertLogs(String[] cols) {
-        synchronized (logs) {
-            if(!logs.isEmpty()) {
-                final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) {
-                        final SocketLog data = logs.get(i);
-                        data.setPreparedStatement(ps);
-                    }
+        if (!logs.isEmpty() && saveLog) {
+            final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) {
+                    final SocketLog data = logs.get(i);
+                    data.setPreparedStatement(ps);
+                }
 
-                    @Override
-                    public int getBatchSize() {
-                        return logs.size();
-                    }
-                });
-                if(result > 0) logs.clear();
-            }
+                @Override
+                public int getBatchSize() {
+                    return logs.size();
+                }
+            });
+            if (result > 0) logs.clear();
         }
     }
 
     public void addLog(SocketLog log) {
-        synchronized (logs) {
-            logs.add(log);
-        }
+        if(saveLog) logs.add(log);
     }
 }
