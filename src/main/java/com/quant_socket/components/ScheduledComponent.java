@@ -62,6 +62,7 @@ public class ScheduledComponent {
     public void everyday() {
 //        socketLogRepo.deleteLogsFrom3Days();
         productRepo.deleteProductMinuteFrom3Month();
+        productService.refreshProducts();
     }
 
     @Scheduled(cron = "0 0 0 * * SAT")

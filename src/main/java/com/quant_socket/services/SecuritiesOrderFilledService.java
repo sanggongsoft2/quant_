@@ -29,9 +29,7 @@ public class SecuritiesOrderFilledService extends SocketService{
         for(String isinCode : isinCodes) {
             final Product prod = productService.productFromIsinCode(isinCode);
             if(prod != null) {
-                for(SecOrderFilled sof : prod.getOrders()) {
-                    sendMessage(sof.toSocket(prod), ws);
-                }
+                for(SecOrderFilled sof : prod.getOrders()) sendMessage(sof.toSocket(prod), ws);
             }
         }
     }

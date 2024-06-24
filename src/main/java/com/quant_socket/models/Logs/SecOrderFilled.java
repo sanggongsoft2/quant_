@@ -86,13 +86,18 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("trading_time", tradingTimeToString());
         response.put("accu_trading_volume", accu_trading_volume);
         response.put("accu_trading_value", accu_trading_value);
+        response.put("avg_5_day", prod.getAvg_5_day());
+        response.put("avg_20_day", prod.getAvg_20_day());
         return response;
     }
 
     public Double getCompareRate() {
-        final Double result = a_price_change_against_the_pre_day / trading_price*100;
-        if(result.isNaN()) return null;
-        return result;
+        final double result = a_price_change_against_the_pre_day / trading_price*100;
+        if(Double.isNaN(result)) return null;
+        return switch (price_change_against_previous_day) {
+            case "4", "5" -> -result;
+            default -> result;
+        };
     }
 
     private double getYesterdayCompareRate(double price) {

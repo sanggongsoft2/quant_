@@ -67,47 +67,19 @@ WHERE (p_code, d_idx) IN (
 
     public List<Product> findAll() {
         final String sql = """
-WITH RecentData AS (
-        SELECT p_code, w_high, w_low,
-               ROW_NUMBER() OVER (PARTITION BY p_code ORDER BY w_idx DESC) AS rn
-        FROM product_week
-    ),
-     MaxMinWClose AS (
-         SELECT p_code,
-                MAX(w_high) AS Max_w_high,
-                MIN(w_low) AS Min_w_low
-         FROM RecentData
-         WHERE rn <= 52
-         GROUP BY p_code
-     ),
-     LatestEquitiesSnapshot AS (
-         SELECT *
-         FROM equities_snapshot
-         WHERE (eq_isin_code, eq_idx) IN (
-             SELECT eq_isin_code, MAX(eq_idx) AS max_eq_idx
-             FROM equities_snapshot
-             WHERE eq_board_id = 'G1'
-             GROUP BY eq_isin_code
-         )
-     ),
-     LatestSecuritiesQuote AS (
-         SELECT *
-         FROM securities_quote
-         WHERE (sq_isin_code, sq_idx) IN (
-             SELECT sq_isin_code, MAX(sq_idx) AS max_sq_idx
-             FROM securities_quote
-             GROUP BY sq_isin_code
-         )
-     )
 SELECT p.*,
-       mmw.Max_w_high AS max_52_price,
-       mmw.Min_w_low AS min_52_price,
+       c52w.max_52_price,
+       c52w.min_52_price,
+       a5d.closing_price avg_5_day,
+       a20d.closing_price avg_20_day,
        es.*,
        sq.*
 FROM product p
-         LEFT JOIN MaxMinWClose mmw ON p.p_code = mmw.p_code
-         LEFT JOIN LatestEquitiesSnapshot es ON es.eq_isin_code = p.p_code
-         LEFT JOIN LatestSecuritiesQuote sq ON sq.sq_isin_code = p.p_code;
+         LEFT JOIN recent_equities_snapshot es ON eq_isin_code = p_code
+         LEFT JOIN recent_securities_quote sq ON sq_isin_code = p_code
+         LEFT JOIN compare_52_week c52w ON c52w.isin_code = p_code
+         LEFT JOIN avg_5_day a5d ON a5d.isin_code = p_code
+		 LEFT JOIN avg_20_day a20d ON a20d.isin_code = p_code
 """;
         return super.jt.query(sql, (rs, rn) -> new Product(rs));
     }

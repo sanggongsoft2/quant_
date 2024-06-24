@@ -67,6 +67,12 @@ public class Product extends SG_model{
     @SG_column(dbField = "min_52_price")
     private BigDecimal min_52_price;
 
+    @SG_column(dbField = "avg_5_day")
+    private BigDecimal avg_5_day;
+
+    @SG_column(dbField = "avg_20_day")
+    private BigDecimal avg_20_day;
+
     private double currentPrice = 0;
     private double comparePriceRate = 0;
     private double highPrice = 0;

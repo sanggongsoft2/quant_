@@ -155,6 +155,8 @@ public class ProductService extends SocketService{
         data.put("open_price", prod.getOpenPrice());
         data.put("compare_price_rate", prod.getComparePriceRate());
         data.put("yesterday_price", prod.getYesterday_price());
+        data.put("avg_5_day", prod.getAvg_5_day());
+        data.put("avg_20_day", prod.getAvg_20_day());
         return data;
     }
 

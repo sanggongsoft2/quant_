@@ -158,6 +158,8 @@ public class EquitiesSnapshot extends SG_model {
         final Map<String, Object> response = new LinkedHashMap<>();
         response.put("max_52_price", prod.getMax_52_price());
         response.put("min_52_price", prod.getMin_52_price());
+        response.put("avg_5_day", prod.getMin_52_price());
+        response.put("avg_20_day", prod.getMin_52_price());
         response.put("yesterday_price", getYesterdayPrice());
         response.put("yesterday_trading_volume", prod.getYesterday_trading_count());
         response.put("face_value", prod.getFace_value());

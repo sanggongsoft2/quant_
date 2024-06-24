@@ -67,7 +67,6 @@ public class SocketLogService extends SocketService{
                     if(isBefore) securitiesQuoteService.dataHandler(new SecuritiesQuote(msg));
                     break;
                 case "B702S", "B703S", "B704S":
-
                     break;
                 case "A601S", "A602S", "A603S", "A604S", "A601Q", "A601X":
                     issueClosingService.dataHandler(new IssueClosing(msg));
