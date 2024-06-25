@@ -97,4 +97,8 @@ public class IssueClosing extends SG_model {
         this.trading_volume = prod.getTradingVolume();
         this.trading_value = prod.getYesterday_value();
     }
+
+    public boolean isRealBoard() {
+        return board_id != null && board_id.equals("G1");
+    }
 }

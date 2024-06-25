@@ -34,6 +34,7 @@ abstract public class SG_substring_model {
                         else if(type.equals(Double.class) || type.equals(double.class)) f.set(this, Double.parseDouble(value));
                         else f.set(this, value);
                     }
+                } catch (ArrayIndexOutOfBoundsException ignore) {
                 } catch (Exception e) {
                     log.error("LOG : {}", msg);
                     log.error("ERROR : {}", e);

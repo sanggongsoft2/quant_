@@ -86,8 +86,7 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("trading_time", tradingTimeToString());
         response.put("accu_trading_volume", accu_trading_volume);
         response.put("accu_trading_value", accu_trading_value);
-        response.put("avg_5_day", prod.getAvg_5_day());
-        response.put("avg_20_day", prod.getAvg_20_day());
+        response.putAll(prod.signalToMap());
         return response;
     }
 

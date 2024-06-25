@@ -146,6 +146,14 @@ public class ProductService extends SocketService{
                 .collect(Collectors.toList());
     }
 
+    public List<Map<String, Object>> fromIsinCodes(List<String> isinCodes) {
+        final List<Product> list = products.stream().filter(p -> isinCodes.contains(p.getCode())).toList();
+        return list.stream()
+                .sorted(Comparator.comparingLong(Product::getTodayTradingCount).reversed())
+                .map(this::getProduct1)
+                .collect(Collectors.toList());
+    }
+
     private Map<String, Object> getProduct1(Product prod) {
         final Map<String, Object> data = new LinkedHashMap<>();
         data.put("name", prod.getName_kr_abbr());
@@ -155,8 +163,7 @@ public class ProductService extends SocketService{
         data.put("open_price", prod.getOpenPrice());
         data.put("compare_price_rate", prod.getComparePriceRate());
         data.put("yesterday_price", prod.getYesterday_price());
-        data.put("avg_5_day", prod.getAvg_5_day());
-        data.put("avg_20_day", prod.getAvg_20_day());
+        data.putAll(prod.signalToMap());
         return data;
     }
 

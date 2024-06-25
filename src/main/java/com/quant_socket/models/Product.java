@@ -9,9 +9,12 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SG_table(name = "product")
@@ -47,7 +50,7 @@ public class Product extends SG_model{
     private Double face_value;
     @SG_column(dbField = "p_having_count")
     private Long having_count;
-    @SG_column(dbField = "p_yesterday_price")
+    @SG_column(dbField = "closing_price")
     private BigDecimal yesterday_price;
     @SG_column(dbField = "p_yesterday_value")
     private Float yesterday_value;
@@ -110,8 +113,6 @@ public class Product extends SG_model{
     public void refreshEveryday() {
         todayBidCount = 0;
         todayAskCount = 0;
-        todayTradingCount = 0;
-        todayTradingValue = 0;
     }
 
     public void update(EquitiesBatchData data) {
@@ -143,10 +144,10 @@ public class Product extends SG_model{
         synchronized (this) {
             if(data != null && data.isRealBoard()) {
                 if(data.getCurrent_price() != null) this.currentPrice = data.getCurrent_price().doubleValue();
-                if(data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
-                if(data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
-                if(data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
-                if(data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
+                if (data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
+                if (data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
+                if (data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
+                if (data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
                 if(data.getYesterdayPrice() != null) this.yesterday_price = data.getYesterdayPrice();
                 this.latestSnapshot = data;
             }
@@ -171,8 +172,8 @@ public class Product extends SG_model{
             } else {
                 this.orders.add(data);
             }
-            if(highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
-            if(lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
+            if(max_52_price != null && highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
+            if(min_52_price != null && lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
         }
     }
 
@@ -289,5 +290,78 @@ public class Product extends SG_model{
 
     public Double getTotalPrice() {
         return currentPrice * having_count;
+    }
+
+    public Double getSignal5DayMinPrice() {
+        if(avg_5_day == null) return null;
+        else return avg_5_day.doubleValue() * 0.98;
+    }
+
+    public Double getSignal5DayMaxPrice() {
+        if(avg_5_day == null) return null;
+        else return avg_5_day.doubleValue() * 1.02;
+    }
+
+    public String getSignal5DayText() {
+        try {
+            Double minPrice = getSignal5DayMinPrice();
+            Double maxPrice = getSignal5DayMaxPrice();
+            double avgPrice = avg_5_day.doubleValue();
+
+            if(avgPrice < currentPrice && maxPrice > currentPrice) {
+                return "매수";
+            } else if(minPrice * 0.98 < currentPrice && minPrice > currentPrice) {
+                return "매도";
+            } else if(minPrice > currentPrice) {
+                return "관망";
+            } else {
+                return "보유";
+            }
+        } catch (Exception e) {
+            return "보유";
+        }
+    }
+
+    public Double getSignal20DayMinPrice() {
+        if(avg_20_day == null) return null;
+        else return avg_20_day.doubleValue() * 0.98;
+    }
+
+    public Double getSignal20DayMaxPrice() {
+        if(avg_20_day == null) return null;
+        else return avg_20_day.doubleValue() * 1.02;
+    }
+
+    public String getSignal20DayText() {
+        try {
+            Double minPrice = getSignal20DayMinPrice();
+            Double maxPrice = getSignal20DayMaxPrice();
+            double avgPrice = avg_20_day.doubleValue();
+
+            if(avgPrice < currentPrice && maxPrice >= currentPrice) {
+                return "매수";
+            } else if(minPrice * 0.98 <= currentPrice && minPrice > currentPrice) {
+                return "매도";
+            } else if(minPrice > currentPrice) {
+                return "관망";
+            } else {
+                return "보유";
+            }
+        } catch (Exception e) {
+            return "보유";
+        }
+    }
+
+    public Map<String, Object> signalToMap() {
+        final Map<String, Object> response = new LinkedHashMap<>();
+        response.put("avg_5_day_price", getSignal5DayText());
+        response.put("signal_5_day_text", getSignal5DayText());
+        response.put("signal_5_day_min_price", getSignal5DayMinPrice());
+        response.put("signal_5_day_max_price", getSignal5DayMaxPrice());
+        response.put("avg_20_day_price", getSignal5DayText());
+        response.put("signal_20_day_text", getSignal20DayText());
+        response.put("signal_20_day_min_price", getSignal20DayMinPrice());
+        response.put("signal_20_day_max_price", getSignal20DayMaxPrice());
+        return response;
     }
 }

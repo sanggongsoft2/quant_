@@ -28,7 +28,7 @@ public class IssueClosingService extends SocketService{
 
     public void dataHandler(IssueClosing data) {
         synchronized (logs) {
-            if(data.getIsin_code() != null) {
+            if(data.getIsin_code() != null && data.isRealBoard()) {
                 final Product prod = productService.productFromIsinCode(data.getIsin_code());
                 if(prod != null) data.setFromProduct(prod);
                 logs.add(data);
