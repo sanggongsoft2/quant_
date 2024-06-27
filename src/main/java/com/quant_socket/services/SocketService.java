@@ -1,24 +1,13 @@
 package com.quant_socket.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quant_socket.annotations.SG_table;
-import com.quant_socket.models.SG_model;
-import com.quant_socket.repos.SG_repo;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
 import java.io.IOException;
-import java.net.URI;
-import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
@@ -26,20 +15,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public abstract class SocketService{
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, Set<WebSocketSession>> isinSessions = new ConcurrentHashMap<>();
+
     public void addSession(WebSocketSession ws, String... isinCodes) {
-        synchronized (isinSessions) {
-            for(String isinCode : isinCodes) {
-                isinSessions.computeIfAbsent(isinCode, k -> new HashSet<>());
-                isinSessions.get(isinCode).add(ws);
-            }
+        for(String isinCode : isinCodes) {
+            isinSessions.computeIfAbsent(isinCode, k -> new CopyOnWriteArraySet<>());
+            isinSessions.get(isinCode).add(ws);
         }
     }
     public <T> void sendMessage(T message, String... isinCodes){
-        synchronized (isinSessions) {
-            for(String isinCode : isinCodes) {
-                final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
-                if(sessions != null) sendMessage(message, sessions);
-            }
+        for(String isinCode : isinCodes) {
+            final Set<WebSocketSession> sessions = isinSessions.get(isinCode);
+            if(sessions != null) sendMessage(message, sessions);
         }
     }
 
@@ -63,24 +49,26 @@ public abstract class SocketService{
 
     private <T> void sendMessage(T message, Set<WebSocketSession> sessions){
         sessions.removeIf(ws -> {
-            if(ws.isOpen()) {
+            if (ws.isOpen()) {
                 try {
                     ws.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    return true; // Remove session if sending fails
                 }
                 return false;
             } else {
                 return true;
             }
         });
+
     }
 
     public <T> void sendMessage(T message, WebSocketSession session){
         try {
-            if(session.isOpen()) session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(mapper.writeValueAsString(message)));
+            }
+        } catch (Exception ignore) {
         }
     }
 }

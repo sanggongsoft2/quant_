@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.sql.PreparedStatement;
 import java.util.*;
@@ -56,12 +57,14 @@ public class ProductService extends SocketService{
 
     public void updateProductMinute() {
         synchronized (products) {
-            final List<ProductMinute> minutes = products.stream().map(ProductMinute::new).toList();
+            final List<ProductMinute> minutes = products.stream().map(Product::getCurrentPM).toList();
             repo.insertProductMinute(new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) {
                     final ProductMinute pm = minutes.get(i);
-                    if(pm.setPreparedStatement(ps)) products.get(i).refreshTradingVolumeFrom1Minute();
+                    if(pm.setPreparedStatement(ps)) {
+                        pm.resetVolume();
+                    }
                 }
 
                 @Override
@@ -169,21 +172,34 @@ public class ProductService extends SocketService{
 
     private List<Product> factoryProducts(String type) {
         List<Product> list = products;
-        if(type != null) list = products.stream().filter(prod->prod.getGubun().equals(type)).toList();
+        if(type != null) list = products.stream().filter(prod-> Objects.equals(prod.getGubun(), type)).toList();
         return list;
     }
 
-    private String insertSql(String[] cols) {
-        return "INSERT INTO product(" +
+    private String insertSql() {
+        final String[] cols = new String[] {
+                "p_code",
+                "p_short_code",
+                "p_name_kr",
+                "p_name_kr_abbr",
+                "p_name_en",
+                "p_class",
+                "p_seq_class",
+                "p_team",
+                "p_type",
+                "p_face_value",
+                "p_having_count",
+        };
+        return "INSERT IGNORE INTO product(" +
                 String.join(",", cols) + ")" +
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
     @Transactional
-    public <T> void insertLogs(String[] cols) {
+    public <T> void insertLogs() {
         synchronized (logs) {
             if(!logs.isEmpty()) {
-                final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
+                final int result = repo.insertMany(insertSql(), new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) {
                         final Product data = logs.get(i);
@@ -200,9 +216,22 @@ public class ProductService extends SocketService{
         }
     }
 
-    public void addLog(Product log) {
+    public void addLog(Product prod) {
         synchronized (logs) {
-            logs.add(log);
+            logs.add(prod);
         }
+    }
+
+    @Override
+    public void addSession(WebSocketSession ws, String... isinCodes) {
+        super.addSession(ws, isinCodes);
+    }
+
+    public List<Map<String, Object>> minuteChartFromCode(String isinCode) {
+        return repo.getMinuteCharts(isinCode);
+    }
+
+    public List<Map<String, Object>> dayChartFromCode(String isinCode) {
+        return repo.getDayChart(isinCode);
     }
 }

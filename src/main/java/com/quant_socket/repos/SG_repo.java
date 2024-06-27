@@ -32,7 +32,7 @@ public abstract class SG_repo<T> {
 
         setter.setData(data);
 
-        final StringBuilder sb = new StringBuilder("INSERT INTO ")
+        final StringBuilder sb = new StringBuilder("INSERT IGNORE INTO ")
                 .append(table)
                 .append("(")
                 .append(String.join(",", data.keySet()))

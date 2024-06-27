@@ -91,7 +91,7 @@ public class EquitiesSnapshotService extends SocketService{
 
         final List<String> columns = List.of(insertCols.split(","));
 
-        sb.append("INSERT INTO equities_snapshot(")
+        sb.append("INSERT IGNORE INTO equities_snapshot(")
                 .append(insertCols)
                 .append(")")
                 .append("\nVALUES(");

@@ -40,56 +40,65 @@ public class SocketLogService extends SocketService{
     @Autowired
     private IssueClosingService issueClosingService;
 
-    @Value("${save.log}")
-    private boolean saveLog;
-
     private final LocalTime hour3half = LocalTime.of(15, 31);
-    /*private final LocalTime hour3half = LocalTime.of(23, 31);*/
 
     public void esHandler(String msg) {
         final LocalTime now = LocalTime.now();
         final boolean isBefore = now.isBefore(hour3half);
 
         if(msg.length() >= 5) {
-            final String prodCode = msg.substring(0, 5);
-            switch (prodCode) {
-                case "A001S", "A002S", "A003S", "A004S", "A001Q", "A001X":
-                    final EquitiesBatchData data = new EquitiesBatchData(msg);
-                    equitiesBatchDataService.dataHandler(data);
-                    break;
-                case "A301S", "A301Q", "A301X":
-                    if(isBefore) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
-                    break;
-                case "B201X", "B201Q", "B201S", "B202S", "B203S", "B204S":
-                    if(isBefore) equities_snapshot_handler(msg);
-                    break;
-                case "B601S", "B601Q", "B601X":
-                    if(isBefore) securitiesQuoteService.dataHandler(new SecuritiesQuote(msg));
-                    break;
-                case "B702S", "B703S", "B704S":
-                    break;
-                case "A601S", "A602S", "A603S", "A604S", "A601Q", "A601X":
-                    issueClosingService.dataHandler(new IssueClosing(msg));
-                    break;
+            final String dataCategory = msg.substring(0, 2);
+            final String infoCategory = msg.substring(2, 5);
+            switch (infoCategory) {
+                case "01S", "01Q", "01X", "03S":
+                    switch (dataCategory) {
+                        case "A0":
+                            final EquitiesBatchData ebd = new EquitiesBatchData(msg);
+                            equitiesBatchDataService.dataHandler(ebd);
+                            break;
+                        case "A3":
+                            if(isBefore) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
+                            break;
+                        case "B2":
+                            if(isBefore) {
+                                final EquitiesSnapshot es;
+                                if(infoCategory.equals("03S")) {
+                                    es = new EquitiesSnapshot(msg, true);
+                                } else {
+                                    es = new EquitiesSnapshot(msg);
+                                }
+                                if(es.isRealBoard()) equitiesSnapshotService.dataHandler(es);
+                            }
+                            break;
+                        case "B6":
+                            if(isBefore) {
+                                final SecuritiesQuote sq = new SecuritiesQuote(msg);
+                                if(sq.isRealBoard()) securitiesQuoteService.dataHandler(sq);
+                            }
+                            break;
+                        case "B7":
+                            if(isBefore) {
+                                final SecuritiesQuote sq = new SecuritiesQuote(msg, true);
+                                if(sq.isRealBoard()) securitiesQuoteService.dataHandler(sq);
+                            }
+                            break;
+                        case "A6":
+                            issueClosingService.dataHandler(new IssueClosing(msg));
+
+                    }
             }
         }
     }
 
-    //증권 Snapshot (MM/LP호가 제외)
-    private void equities_snapshot_handler(String msg) {
-        final EquitiesSnapshot es = new EquitiesSnapshot(msg);
-        if(es.isRealBoard()) equitiesSnapshotService.dataHandler(new EquitiesSnapshot(msg));
-    }
-
     private String insertSql(String[] cols) {
-        return "INSERT INTO socket_log(" +
+        return "INSERT IGNORE INTO socket_log(" +
                 String.join(",", cols) + ")" +
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
     @Transactional
     public void insertLogs(String[] cols) {
-        if (!logs.isEmpty() && saveLog) {
+        if (!logs.isEmpty()) {
             final int result = repo.insertMany(insertSql(cols), new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) {
@@ -104,9 +113,5 @@ public class SocketLogService extends SocketService{
             });
             if (result > 0) logs.clear();
         }
-    }
-
-    public void addLog(SocketLog log) {
-        if(saveLog) logs.add(log);
     }
 }

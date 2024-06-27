@@ -121,6 +121,10 @@ public class EquitiesBatchData extends SG_substring_model {
     private Float yesterday_trading_value;
 
     public EquitiesBatchData(String msg) {
-        super(msg);
+        this(msg, false);
+    }
+
+    public EquitiesBatchData(String msg, boolean withLP) {
+        super(msg, withLP);
     }
 }

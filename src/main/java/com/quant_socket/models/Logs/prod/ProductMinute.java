@@ -4,6 +4,7 @@ import com.quant_socket.annotations.SG_column;
 import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
+import com.quant_socket.models.Logs.SecOrderFilled;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @SG_table(name = "product_minute")
 @Getter
@@ -32,47 +34,49 @@ public class ProductMinute extends SG_model {
     @SG_column(dbField = "p_code")
     private String isinCode;
     @SG_column(dbField = "m_close")
-    private Double close;
+    private double close = 0;
     @SG_column(dbField = "m_high")
-    private Double high;
+    private double high = 0;
     @SG_column(dbField = "m_low")
-    private Double low;
+    private double low = 0;
     @SG_column(dbField = "m_open")
-    private Double open;
+    private double open = 0;
     @SG_column(dbField = "m_volume")
-    private Long volume;
+    private long volume = 0;
     @SG_column(dbField = "m_pre_close")
-    private Double pre_close;
-
-    public ProductMinute(ResultSet rs) {
-        super(rs);
-    }
-
-    static public String[] insertCols() {
-        return new String[] {
-                "p_code",
-                "m_close",
-                "m_high",
-                "m_low",
-                "m_open",
-                "m_volume",
-                "m_pre_close",
-                "m_date",
-                "m_time",
-                "m_crdt",
-        };
-    }
+    private double pre_close = 0;
+    @SG_column(dbField = "m_date", useInsert = false)
+    private Date date;
+    @SG_column(dbField = "m_time", useInsert = false)
+    private Time time;
 
     public ProductMinute(Product prod) {
-        final ZoneId zoneId = ZoneId.of("Asia/Seoul");  // 원하는 시간대로 설정
-        final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+        synchronized (this) {
+            final double currentPrice = prod.getOpenPrice();
+            this.isinCode = prod.getCode();
+            this.close = currentPrice;
+            this.high = currentPrice;
+            this.low = currentPrice;
+            this.open = currentPrice;
+            this.pre_close = currentPrice;
+        }
+    }
 
-        this.isinCode = prod.getCode();
-        this.close = prod.getCurrentPrice();
-        this.high = prod.getHighPrice();
-        this.low = prod.getLowPrice();
-        this.open = prod.getOpenPrice();
-        this.volume = prod.getTradingVolume();
-        this.pre_close = prod.getCurrentPrice();
+    public void update(SecOrderFilled data) {
+        synchronized (this) {
+            final double trading_price = data.getTrading_price();
+            this.isinCode = data.getIsin_code();
+            this.close = trading_price;
+            if(trading_price >= this.high) this.high = trading_price;
+            if(trading_price <= this.low) this.low = trading_price;
+            this.open = data.getOpening_price();
+            this.volume += data.getTrading_volume();
+            this.pre_close = trading_price;
+        }
+    }
+
+    public void resetVolume() {
+        this.pre_close = close;
+        this.volume = 0;
     }
 }

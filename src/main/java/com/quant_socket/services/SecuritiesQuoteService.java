@@ -115,7 +115,7 @@ public class SecuritiesQuoteService extends SocketService{
 
         final List<String> columns = List.of(insertCols.split(","));
 
-        sb.append("INSERT INTO securities_quote(")
+        sb.append("INSERT IGNORE INTO securities_quote(")
                 .append(insertCols)
                 .append(")")
                 .append("\nVALUES(");

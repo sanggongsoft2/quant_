@@ -2,6 +2,7 @@ package com.quant_socket.models;
 
 import com.quant_socket.annotations.*;
 import com.quant_socket.models.Logs.*;
+import com.quant_socket.models.Logs.prod.ProductMinute;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 @ToString
 public class Product extends SG_model{
-
     @SG_idx
     @SG_column(dbField = "p_idx")
     private Integer idx;
@@ -50,30 +51,30 @@ public class Product extends SG_model{
     private Double face_value;
     @SG_column(dbField = "p_having_count")
     private Long having_count;
-    @SG_column(dbField = "closing_price")
+    @SG_column(dbField = "closing_price", useInsert = false)
     private BigDecimal yesterday_price;
-    @SG_column(dbField = "p_yesterday_value")
+    @SG_column(dbField = "p_yesterday_value", useInsert = false)
     private Float yesterday_value;
-    @SG_column(dbField = "p_yesterday_trading_count")
+    @SG_column(dbField = "trading_volume", useInsert = false)
     private Long yesterday_trading_count;
 
-    @SG_column(dbField = "p_status")
+    @SG_column(dbField = "p_status", useInsert = false)
     private String status;
 
     @SG_crdt
     @SG_column(dbField = "p_crdt")
     private Date createdAt;
 
-    @SG_column(dbField = "max_52_price")
+    @SG_column(dbField = "max_52_price", useInsert = false)
     private BigDecimal max_52_price;
 
-    @SG_column(dbField = "min_52_price")
+    @SG_column(dbField = "min_52_price", useInsert = false)
     private BigDecimal min_52_price;
 
-    @SG_column(dbField = "avg_5_day")
+    @SG_column(dbField = "avg_5_day", useInsert = false)
     private BigDecimal avg_5_day;
 
-    @SG_column(dbField = "avg_20_day")
+    @SG_column(dbField = "avg_20_day", useInsert = false)
     private BigDecimal avg_20_day;
 
     private double currentPrice = 0;
@@ -81,12 +82,13 @@ public class Product extends SG_model{
     private double highPrice = 0;
     private double lowPrice = 0;
     private double openPrice = 0;
-    private long tradingVolume = 0;
 
     private long todayBidCount = 0;
     private long todayAskCount = 0;
     private long todayTradingCount = 0;
     private float todayTradingValue = 0;
+
+    private ProductMinute currentPM;
 
     @SG_join(clazz = EquitiesSnapshot.class)
     private EquitiesSnapshot latestSnapshot;
@@ -95,6 +97,8 @@ public class Product extends SG_model{
     private SecuritiesQuote latestSecuritiesQuote;
 
     private List<SecOrderFilled> orders = new CopyOnWriteArrayList<>();
+
+    private int maxOrderSize = 20;
 
     private void updateTodayCount(String type, long count) {
         if(type != null) switch (type) {
@@ -106,10 +110,6 @@ public class Product extends SG_model{
         }
     }
 
-    public void refreshTradingVolumeFrom1Minute() {
-        tradingVolume = 0;
-    }
-
     public void refreshEveryday() {
         todayBidCount = 0;
         todayAskCount = 0;
@@ -119,8 +119,10 @@ public class Product extends SG_model{
         synchronized (this) {
             if(data.getIsin_code() != null) this.code = data.getIsin_code();
             if(data.getShort_code() != null) this.short_code = data.getShort_code();
-            if(data.getAbbr_issue_name_kr() != null) this.name_kr = data.getAbbr_issue_name_kr();
-            if(data.getAbbr_issue_name_kr() != null) this.name_kr_abbr = data.getAbbr_issue_name_kr();
+            if(data.getAbbr_issue_name_kr() != null) {
+                this.name_kr = data.getAbbr_issue_name_kr();
+                this.name_kr_abbr = data.getAbbr_issue_name_kr();
+            }
             if(data.getAbbr_issue_name_en() != null) this.name_en = data.getAbbr_issue_name_en();
             if(data.getInfo_category() != null) this.gubun = infoCategoryToClass(data.getInfo_category());
             if(data.getSec_group_id() != null) this.seq_gubun = groupIdToSeqClass(data.getSec_group_id());
@@ -144,7 +146,7 @@ public class Product extends SG_model{
         synchronized (this) {
             if(data != null && data.isRealBoard()) {
                 if(data.getCurrent_price() != null) this.currentPrice = data.getCurrent_price().doubleValue();
-                if (data.getComparePriceRate() != null) this.comparePriceRate = data.getComparePriceRate();
+                this.comparePriceRate = data.getComparePriceRate();
                 if (data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
                 if (data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
                 if (data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
@@ -162,18 +164,17 @@ public class Product extends SG_model{
             this.openPrice = data.getOpening_price();
             this.todayTradingCount = data.getTrading_volume();
             this.todayTradingValue = data.getAccu_trading_value();
-            this.tradingVolume += data.getTrading_volume();
             this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
             updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
-            if(data.getCompareRate() != null) comparePriceRate = data.getCompareRate();
-            if(orders.size() == 20) {
-                this.orders.remove(19);
-                this.orders.add(data);
-            } else {
-                this.orders.add(data);
+            comparePriceRate = data.getCompareRate();
+            if(orders.size() == maxOrderSize) {
+                this.orders.remove(0);
             }
+            this.orders.add(data);
             if(max_52_price != null && highPrice > max_52_price.doubleValue()) max_52_price = new BigDecimal(highPrice);
             if(min_52_price != null && lowPrice < min_52_price.doubleValue()) min_52_price = new BigDecimal(lowPrice);
+
+            currentPM.update(data);
         }
     }
 
@@ -181,13 +182,17 @@ public class Product extends SG_model{
         super(rs);
         update(new EquitiesSnapshot(rs));
         update(new SecuritiesQuote(rs));
+        currentPM = new ProductMinute(this);
     }
 
     public Product(EquitiesBatchData data) {
         try {
             if(data.getIsin_code() != null) this.code = data.getIsin_code();
             if(data.getShort_code() != null) this.short_code = data.getShort_code();
-            if(data.getAbbr_issue_name_kr() != null) this.name_kr = data.getAbbr_issue_name_kr();
+            if(data.getAbbr_issue_name_kr() != null) {
+                this.name_kr = data.getAbbr_issue_name_kr();
+                this.name_kr_abbr = data.getAbbr_issue_name_kr();
+            }
             if(data.getAbbr_issue_name_kr() != null) this.name_kr_abbr = data.getAbbr_issue_name_kr();
             if(data.getAbbr_issue_name_en() != null) this.name_en = data.getAbbr_issue_name_en();
             if(data.getInfo_category() != null) this.gubun = infoCategoryToClass(data.getInfo_category());
@@ -199,9 +204,7 @@ public class Product extends SG_model{
             if(data.getYesterday_closing_price() != null) this.yesterday_price = data.getYesterday_closing_price();
             if(data.getYesterday_trading_volume() != null) this.yesterday_trading_count = data.getYesterday_trading_volume();
             if(data.getYesterday_trading_value() != null) this.yesterday_value = data.getYesterday_trading_value();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignore) {}
     }
 
     private String infoCategoryToClass(String value) {
@@ -269,36 +272,19 @@ public class Product extends SG_model{
         };
     }
 
-    static public String[] insertCols() {
-        return new String[] {
-                "p_code",
-                "p_short_code",
-                "p_name_kr",
-                "p_name_kr_abbr",
-                "p_name_en",
-                "p_class",
-                "p_seq_class",
-                "p_team",
-                "p_type",
-                "p_face_value",
-                "p_having_count",
-                "p_yesterday_price",
-                "p_yesterday_value",
-                "p_yesterday_trading_count",
-        };
-    }
-
     public Double getTotalPrice() {
         return currentPrice * having_count;
     }
 
     public Double getSignal5DayMinPrice() {
         if(avg_5_day == null) return null;
+        else if(avg_5_day.doubleValue() == 0) return currentPrice * 0.98;
         else return avg_5_day.doubleValue() * 0.98;
     }
 
     public Double getSignal5DayMaxPrice() {
         if(avg_5_day == null) return null;
+        else if(avg_5_day.doubleValue() == 0) return currentPrice * 1.02;
         else return avg_5_day.doubleValue() * 1.02;
     }
 
@@ -324,11 +310,13 @@ public class Product extends SG_model{
 
     public Double getSignal20DayMinPrice() {
         if(avg_20_day == null) return null;
+        else if(avg_20_day.doubleValue() == 0) return currentPrice * 0.98;
         else return avg_20_day.doubleValue() * 0.98;
     }
 
     public Double getSignal20DayMaxPrice() {
         if(avg_20_day == null) return null;
+        else if(avg_20_day.doubleValue() == 0) return currentPrice * 1.02;
         else return avg_20_day.doubleValue() * 1.02;
     }
 
@@ -354,11 +342,11 @@ public class Product extends SG_model{
 
     public Map<String, Object> signalToMap() {
         final Map<String, Object> response = new LinkedHashMap<>();
-        response.put("avg_5_day_price", getSignal5DayText());
+        response.put("avg_5_day_price", avg_5_day);
         response.put("signal_5_day_text", getSignal5DayText());
         response.put("signal_5_day_min_price", getSignal5DayMinPrice());
         response.put("signal_5_day_max_price", getSignal5DayMaxPrice());
-        response.put("avg_20_day_price", getSignal5DayText());
+        response.put("avg_20_day_price", avg_20_day);
         response.put("signal_20_day_text", getSignal20DayText());
         response.put("signal_20_day_min_price", getSignal20DayMinPrice());
         response.put("signal_20_day_max_price", getSignal20DayMaxPrice());

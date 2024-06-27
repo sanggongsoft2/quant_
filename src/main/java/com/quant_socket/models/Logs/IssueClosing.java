@@ -88,14 +88,26 @@ public class IssueClosing extends SG_model {
     @SG_column(dbField = "ic_trading_value")
     private Float trading_value;
 
+    @SG_column(dbField = "ic_high_price")
+    private BigDecimal high_price;
+
+    @SG_column(dbField = "ic_low_price")
+    private BigDecimal low_price;
+
+    @SG_column(dbField = "ic_open_price")
+    private BigDecimal open_price;
+
     public IssueClosing(String msg) {
         super(msg);
     }
 
     public void setFromProduct(Product prod) {
         this.yesterday_price = prod.getYesterday_price();
-        this.trading_volume = prod.getTradingVolume();
-        this.trading_value = prod.getYesterday_value();
+        this.trading_volume = prod.getTodayTradingCount();
+        this.trading_value = prod.getTodayTradingValue();
+        this.high_price = BigDecimal.valueOf(prod.getHighPrice());
+        this.low_price = BigDecimal.valueOf(prod.getLowPrice());
+        this.open_price = BigDecimal.valueOf(prod.getOpenPrice());
     }
 
     public boolean isRealBoard() {

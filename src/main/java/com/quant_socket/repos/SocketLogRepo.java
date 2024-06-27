@@ -19,7 +19,7 @@ public class SocketLogRepo extends SG_repo<SocketLog> {
         });
     }
 
-    public synchronized void deleteLogsFrom3Days() {
+    public void deleteLogsFrom3Days() {
         final String sql = "DELETE FROM socket_log\n" +
                 "WHERE SL_crdt < DATE_SUB(CURDATE(), INTERVAL 3 DAY);";
         jt.update(sql);

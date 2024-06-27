@@ -58,7 +58,7 @@ public class SecOrderFilled extends SG_substring_model {
     }
 
     public SecOrderFilled(String msg) {
-        super(msg);
+        super(msg, false);
     }
     private double getTradingRate(Product prod) {
         double value = 0;
@@ -83,16 +83,16 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("low_price", todays_low);
         response.put("low_rate", getYesterdayCompareRate(todays_low));
         response.put("trading_type", bidTypeToString());
-        response.put("trading_time", tradingTimeToString());
+        response.put("trading_time", processing_time_of_trading_system);
         response.put("accu_trading_volume", accu_trading_volume);
         response.put("accu_trading_value", accu_trading_value);
         response.putAll(prod.signalToMap());
         return response;
     }
 
-    public Double getCompareRate() {
+    public double getCompareRate() {
         final double result = a_price_change_against_the_pre_day / trading_price*100;
-        if(Double.isNaN(result)) return null;
+        if(Double.isNaN(result) || Double.isInfinite(result)) return 0;
         return switch (price_change_against_previous_day) {
             case "4", "5" -> -result;
             default -> result;

@@ -1,14 +1,13 @@
 package com.quant_socket.repos;
 
-import com.quant_socket.models.Logs.prod.ProductMinute;
 import com.quant_socket.models.Product;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ProductRepo extends SG_repo<Product>{
@@ -22,7 +21,8 @@ public class ProductRepo extends SG_repo<Product>{
           a20d.closing_price avg_20_day,
           es.*,
           sq.*,
-          rcp.closing_price
+          rcp.closing_price,
+          rcp.trading_volume
    FROM product p
             LEFT JOIN recent_equities_snapshot es ON eq_isin_code = p_code
             LEFT JOIN recent_securities_quote sq ON sq_isin_code = p_code
@@ -49,14 +49,14 @@ public class ProductRepo extends SG_repo<Product>{
     }
 
     @Transactional
-    public synchronized void insertProductMinute(BatchPreparedStatementSetter setter) {
-        String productMinuteSql = "INSERT INTO product_minute (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close)\n" +
+    public void insertProductMinute(BatchPreparedStatementSetter setter) {
+        String productMinuteSql = "INSERT IGNORE INTO product_minute (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close)\n" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?)";
         jt.batchUpdate(productMinuteSql, setter);
     }
 
     public int insertProductDay() {
-        String productDaySql = "INSERT INTO product_day (p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date)\n" +
+        String productDaySql = "INSERT IGNORE INTO product_day (p_code, d_close, d_high, d_low, d_open, d_volume, d_pre_close, d_date)\n" +
                 "SELECT p_code, m_close, m_high, m_low, m_open, (SELECT SUM(product_minute.m_volume) FROM product_minute WHERE m_date = CURDATE() AND product_minute.p_code = pm.p_code), m_pre_close, m_date FROM product_minute pm\n" +
                 "WHERE (p_code, m_idx) IN (\n" +
                 "    SELECT p_code, MAX(m_idx)\n" +
@@ -66,9 +66,9 @@ public class ProductRepo extends SG_repo<Product>{
         return jt.update(productDaySql);
     }
 
-    public synchronized void insertProductWeek() {
+    public void insertProductWeek() {
         String productWeekSql = """
-                INSERT INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)
+                INSERT IGNORE INTO product_week (p_code, w_close, w_high, w_low, w_open, w_volume, w_pre_close, w_date)
                 SELECT p_code, d_close, d_high, d_low, d_open,
                        (SELECT SUM(pd.d_volume)
                         FROM product_day pd
@@ -85,8 +85,8 @@ public class ProductRepo extends SG_repo<Product>{
         jt.update(productWeekSql);
     }
 
-    public synchronized void insertProductMonth() {
-        String productMonthSql = "INSERT INTO product_month (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date)\n" +
+    public void insertProductMonth() {
+        String productMonthSql = "INSERT IGNORE INTO product_month (p_code, m_close, m_high, m_low, m_open, m_volume, m_pre_close, m_date)\n" +
                 "SELECT p_code, d_close, d_high, d_low, d_open,\n" +
                 "    (SELECT SUM(d_volume) FROM product_day pd\n" +
                 "        WHERE pd.p_code = product_day.p_code\n" +
@@ -99,9 +99,55 @@ public class ProductRepo extends SG_repo<Product>{
         jt.update(productMonthSql);
     }
 
-    public synchronized void deleteProductMinuteFrom3Month() {
+    public void deleteProductMinuteFrom3Month() {
         String deleteProductDaySql = "DELETE FROM product_day\n" +
                 "WHERE d_crdt < DATE_SUB(CURDATE(), INTERVAL 3 MONTH);";
         jt.update(deleteProductDaySql);
     }
+
+    public List<Map<String, Object>> getMinuteCharts(String isinCode) {
+        final String sql = """
+                SELECT
+                    UNIX_TIMESTAMP(CONCAT(m_date, ' ', m_time)) * 1000 datetime,
+                    m_close,
+                    m_high,
+                    m_low,
+                    m_open,
+                    m_volume,
+                    m_pre_close
+                FROM product_minute
+                WHERE p_code = ?
+                """;
+        return jt.query(sql, (rs, rn) -> {
+            final Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Date", rs.getLong("datetime"));
+            data.put("Adj Close", rs.getDouble("m_pre_close"));
+            data.put("Close", rs.getDouble("m_close"));
+            data.put("High", rs.getDouble("m_high"));
+            data.put("Low", rs.getDouble("m_low"));
+            data.put("Open", rs.getDouble("m_open"));
+            data.put("Volume", rs.getLong("m_volume"));
+            return data;
+        }, isinCode);
+    }
+
+    public List<Map<String, Object>> getDayChart(String code) {
+        final String sql = """
+                select *, UNIX_TIMESTAMP(ic_date) * 1000 datetime
+                from issue_closing
+                where ic_isin_code = ? order by ic_idx DESC
+                """;
+        return jt.query(sql, (rs, rn) -> {
+            final Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Date", rs.getLong("datetime"));
+            data.put("Adj Close", rs.getDouble("ic_closing_price_avg"));
+            data.put("Close", rs.getDouble("ic_closing_price"));
+            data.put("High", rs.getDouble("ic_high_price"));
+            data.put("Low", rs.getDouble("ic_low_price"));
+            data.put("Open", rs.getDouble("ic_open_price"));
+            data.put("Volume", rs.getLong("ic_trading_volume"));
+            return data;
+        }, code);
+    }
 }
+

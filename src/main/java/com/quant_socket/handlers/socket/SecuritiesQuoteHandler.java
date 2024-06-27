@@ -16,13 +16,11 @@ public class SecuritiesQuoteHandler extends TextWebSocketHandler {
 
     private final SecuritiesQuoteService service;
 
-    private String[] isinCode = new String[]{};
-
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
         final URI uri = ws.getUri();
         if(uri != null && uri.getQuery() != null) {
-            isinCode = service.getQueryValue(uri.getQuery(), "isin_code").split(",");
+            String[] isinCode = service.getQueryValue(uri.getQuery(), "isin_code").split(",");
             if(isinCode.length > 0) service.addSession(ws, isinCode);
         } else {
             ws.close();

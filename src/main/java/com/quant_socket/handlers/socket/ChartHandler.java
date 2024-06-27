@@ -1,6 +1,7 @@
 package com.quant_socket.handlers.socket;
 
-import com.quant_socket.services.EquitiesSnapshotService;
+import com.quant_socket.services.ProductService;
+import com.quant_socket.services.SecuritiesQuoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,9 +13,9 @@ import java.net.URI;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EquitiesSnapshotHandler extends TextWebSocketHandler {
+public class ChartHandler extends TextWebSocketHandler {
 
-    private final EquitiesSnapshotService service;
+    private final ProductService service;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession ws) throws Exception {
@@ -26,10 +27,4 @@ public class EquitiesSnapshotHandler extends TextWebSocketHandler {
             ws.close();
         }
     }
-
-    /*@Override
-    public void afterConnectionClosed(WebSocketSession ws, CloseStatus status) throws Exception {
-        final URI uri = ws.getUri();
-        if(uri != null && uri.getQuery() != null) service.removeSession(ws, isinCode);
-    }*/
 }

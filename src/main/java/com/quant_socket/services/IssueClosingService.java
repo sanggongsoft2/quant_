@@ -71,12 +71,15 @@ public class IssueClosingService extends SocketService{
                 ic_lower_limit_price,
                 ic_yesterday_price,
                 ic_trading_volume,
-                ic_trading_value
+                ic_trading_value,
+                ic_high_price,
+                ic_low_price,
+                ic_open_price
                 """;
 
         final List<String> columns = List.of(insertCols.split(","));
 
-        sb.append("INSERT INTO issue_closing(")
+        sb.append("INSERT IGNORE INTO issue_closing(")
                 .append(insertCols)
                 .append(")")
                 .append("\nVALUES(");

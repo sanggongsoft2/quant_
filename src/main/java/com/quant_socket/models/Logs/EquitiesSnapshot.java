@@ -3,12 +3,14 @@ package com.quant_socket.models.Logs;
 import com.quant_socket.annotations.SG_column;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_substring;
+import com.quant_socket.annotations.SG_substring_lp;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import com.quant_socket.models.SG_substring_model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,64 +20,84 @@ import java.util.Map;
 
 @Getter
 @ToString
+@Slf4j
 public class EquitiesSnapshot extends SG_model {
 
     @SG_substring(start = 5, end = 7)
+    @SG_substring_lp(start = 5, end = 7)
     @SG_column(dbField = "eq_board_id")
     private String board_id;
     @SG_substring(start = 9, end = 21)
+    @SG_substring_lp(start = 9, end = 21)
     @SG_column(dbField = "eq_isin_code")
     private String isin_code;
     @SG_substring(start = 27, end = 28)
+    @SG_substring_lp(start = 27, end = 28)
     @SG_column(dbField = "eq_price_change_against_previous_day")
     private String price_change_against_previous_day;
     @SG_substring(start = 28, end = 39)
+    @SG_substring_lp(start = 28, end = 39)
     @SG_column(dbField = "eq_price_change_against_the_previous_day")
     private BigDecimal price_change_against_the_previous_day;
     @SG_substring(start = 39, end = 50)
+    @SG_substring_lp(start = 39, end = 50)
     @SG_column(dbField = "eq_upper_limit_price")
     private BigDecimal upper_limit_price;
     @SG_substring(start = 50, end = 61)
+    @SG_substring_lp(start = 50, end = 61)
     @SG_column(dbField = "eq_lower_limit_price")
     private BigDecimal lower_limit_price;
     @SG_substring(start = 61, end = 72)
+    @SG_substring_lp(start = 61, end = 72)
     @SG_column(dbField = "eq_current_price")
     private BigDecimal current_price;
     @SG_substring(start = 72, end = 83)
+    @SG_substring_lp(start = 72, end = 83)
     @SG_column(dbField = "eq_opening_price")
     private BigDecimal opening_price;
     @SG_substring(start = 83, end = 94)
+    @SG_substring_lp(start = 83, end = 94)
     @SG_column(dbField = "eq_todays_high")
     private BigDecimal todays_high;
     @SG_substring(start = 94, end = 105)
+    @SG_substring_lp(start = 94, end = 105)
     @SG_column(dbField = "eq_todays_low")
     private BigDecimal todays_low;
     @SG_substring(start = 105, end = 117)
+    @SG_substring_lp(start = 105, end = 117)
     @SG_column(dbField = "eq_accumulated_trading_volume")
     private Long accumulated_trading_volume;
     @SG_substring(start = 117, end = 139)
+    @SG_substring_lp(start = 117, end = 139)
     @SG_column(dbField = "eq_accumulated_trading_value")
     private Float accumulated_trading_value;
     @SG_substring(start = 139, end = 140)
+    @SG_substring_lp(start = 139, end = 140)
     @SG_column(dbField = "eq_final_ask_bid_type_code")
     private String final_ask_bid_type_code;
 
     @SG_substring(start = 600, end = 612)
+    @SG_substring_lp(start = 840, end = 852)
     @SG_column(dbField = "eq_total_ask_volume")
     private Long total_ask_volume;
     @SG_substring(start = 612, end = 624)
+    @SG_substring_lp(start = 852, end = 864)
     @SG_column(dbField = "eq_total_bid_volume")
     private Long total_bid_volume;
     @SG_substring(start = 624, end = 635)
+    @SG_substring_lp(start = 864, end = 875)
     @SG_column(dbField = "eq_estimated_trading_price")
     private BigDecimal estimated_trading_price;
     @SG_substring(start = 635, end = 647)
+    @SG_substring_lp(start = 875, end = 887)
     @SG_column(dbField = "eq_estimated_trading_volume")
     private Long estimated_trading_volume;
     @SG_substring(start = 647, end = 648)
+    @SG_substring_lp(start = 887, end = 888)
     @SG_column(dbField = "eq_closing_price_type_code")
     private String closing_price_type_code;
     @SG_substring(start = 648, end = 649)
+    @SG_substring_lp(start = 888, end = 889)
     @SG_column(dbField = "eq_trading_halt")
     private String trading_halt;
 
@@ -84,7 +106,10 @@ public class EquitiesSnapshot extends SG_model {
     }
 
     public EquitiesSnapshot(String msg) {
-        super(msg);
+        this(msg, false);
+    }
+    public EquitiesSnapshot(String msg, boolean withLP) {
+        super(msg, withLP);
     }
 
     /*public EquitiesSnapshot(String msg) {
@@ -129,13 +154,13 @@ public class EquitiesSnapshot extends SG_model {
             default -> current_price.subtract(price_change_against_the_previous_day);
         };
     }
-    public Double getComparePriceRate() {
+    public double getComparePriceRate() {
         try {
-            final Double result = (current_price.doubleValue() - getYesterdayPrice().doubleValue()) / getYesterdayPrice().doubleValue() * 100;
-            if(result.isNaN()) return null;
+            final double result = (current_price.doubleValue() - getYesterdayPrice().doubleValue()) / getYesterdayPrice().doubleValue() * 100;
+            if(Double.isNaN(result) || Double.isInfinite(result)) return 0;
             else return result;
         } catch (Exception e) {
-            return null;
+            return 0;
         }
     }
     public Double getCompareYesterdayPrice() {
