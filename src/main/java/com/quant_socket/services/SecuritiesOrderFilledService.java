@@ -13,12 +13,14 @@ import org.springframework.web.socket.WebSocketSession;
 public class SecuritiesOrderFilledService extends SocketService{
     @Autowired
     private ProductService productService;
+
     public void dataHandler(SecOrderFilled data) {
         if(data.getIsin_code() != null) {
             final Product product = productService.productFromIsinCode(data.getIsin_code());
             if(product != null) {
                 product.update(data);
                 sendMessage(data.toSocket(product), data.getIsin_code());
+                productService.sendMessage(product.getCurrentPM().toSocket(), data.getIsin_code());
             }
         }
     }

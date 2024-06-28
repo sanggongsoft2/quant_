@@ -62,9 +62,7 @@ public class ProductService extends SocketService{
                 @Override
                 public void setValues(PreparedStatement ps, int i) {
                     final ProductMinute pm = minutes.get(i);
-                    if(pm.setPreparedStatement(ps)) {
-                        pm.resetVolume();
-                    }
+                    if(pm.setPreparedStatement(ps)) pm.resetVolume();
                 }
 
                 @Override

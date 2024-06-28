@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.swing.text.DateFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Time;
 import java.time.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -129,4 +130,21 @@ public class SecOrderFilled extends SG_substring_model {
         }
     }
 
+    public LocalDateTime getUnixTimestamp() {
+        if(processing_time_of_trading_system == null) return null;
+        String hour = processing_time_of_trading_system.substring(0, 2);
+        String minute = processing_time_of_trading_system.substring(2, 4);
+        String second = processing_time_of_trading_system.substring(4, 6);
+
+        final LocalDate now = LocalDate.now();
+
+        return LocalDateTime.of(
+                now.getYear(),
+                now.getMonth(),
+                now.getDayOfMonth(),
+                Integer.parseInt(hour),
+                Integer.parseInt(minute),
+                Integer.parseInt(second)
+        );
+    }
 }

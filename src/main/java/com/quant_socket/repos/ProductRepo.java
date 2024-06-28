@@ -108,24 +108,18 @@ public class ProductRepo extends SG_repo<Product>{
     public List<Map<String, Object>> getMinuteCharts(String isinCode) {
         final String sql = """
                 SELECT
-                    UNIX_TIMESTAMP(CONCAT(m_date, ' ', m_time)) * 1000 datetime,
-                    m_close,
-                    m_high,
-                    m_low,
-                    m_open,
-                    m_volume,
-                    m_pre_close
+                    *,
+                    UNIX_TIMESTAMP(CONCAT(m_date, ' ', m_time)) * 1000 datetime
                 FROM product_minute
                 WHERE p_code = ?
                 """;
         return jt.query(sql, (rs, rn) -> {
             final Map<String, Object> data = new LinkedHashMap<>();
             data.put("Date", rs.getLong("datetime"));
-            data.put("Adj Close", rs.getDouble("m_pre_close"));
             data.put("Close", rs.getDouble("m_close"));
             data.put("High", rs.getDouble("m_high"));
             data.put("Low", rs.getDouble("m_low"));
-            data.put("Open", rs.getDouble("m_open"));
+            data.put("Open", rs.getDouble("m_pre_close"));
             data.put("Volume", rs.getLong("m_volume"));
             return data;
         }, isinCode);
@@ -140,7 +134,6 @@ public class ProductRepo extends SG_repo<Product>{
         return jt.query(sql, (rs, rn) -> {
             final Map<String, Object> data = new LinkedHashMap<>();
             data.put("Date", rs.getLong("datetime"));
-            data.put("Adj Close", rs.getDouble("ic_closing_price_avg"));
             data.put("Close", rs.getDouble("ic_closing_price"));
             data.put("High", rs.getDouble("ic_high_price"));
             data.put("Low", rs.getDouble("ic_low_price"));

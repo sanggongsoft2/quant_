@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @SG_table(name = "product_minute")
 @Getter
@@ -51,32 +53,48 @@ public class ProductMinute extends SG_model {
     private Time time;
 
     public ProductMinute(Product prod) {
-        synchronized (this) {
-            final double currentPrice = prod.getOpenPrice();
-            this.isinCode = prod.getCode();
-            this.close = currentPrice;
-            this.high = currentPrice;
-            this.low = currentPrice;
-            this.open = currentPrice;
-            this.pre_close = currentPrice;
-        }
+        final LocalDateTime now = LocalDateTime.now();
+        final double currentPrice = prod.getOpenPrice();
+        this.isinCode = prod.getCode();
+        this.close = currentPrice;
+        this.high = currentPrice;
+        this.low = currentPrice;
+        this.open = currentPrice;
+        this.pre_close = currentPrice;
+        this.date = Date.valueOf(now.toLocalDate());
+        this.time = Time.valueOf(now.toLocalTime());
     }
 
     public void update(SecOrderFilled data) {
-        synchronized (this) {
-            final double trading_price = data.getTrading_price();
-            this.isinCode = data.getIsin_code();
+        final double trading_price = data.getTrading_price();
+        final LocalDateTime now = LocalDateTime.now();
+        this.isinCode = data.getIsin_code();
+        if(trading_price > 0) {
             this.close = trading_price;
             if(trading_price >= this.high) this.high = trading_price;
             if(trading_price <= this.low) this.low = trading_price;
             this.open = data.getOpening_price();
             this.volume += data.getTrading_volume();
-            this.pre_close = trading_price;
+            this.date = Date.valueOf(now.toLocalDate());
+            this.time = Time.valueOf(now.toLocalTime());
         }
     }
 
     public void resetVolume() {
         this.pre_close = close;
         this.volume = 0;
+        this.high = this.close;
+        this.low = this.close;
+    }
+
+    public Map<String, Object> toSocket() {
+        final Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Date", date.getTime() + time.getTime());
+        data.put("Close", close);
+        data.put("High", high);
+        data.put("Low", low);
+        data.put("Open", pre_close);
+        data.put("Volume", volume);
+        return data;
     }
 }
