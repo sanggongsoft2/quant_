@@ -50,7 +50,7 @@ public class ScheduledComponent {
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * MON-FRI")
-    public void everyWeekday() {
+    public synchronized void everyWeekday() {
         productService.updateProducts();
         equitiesSnapshotRepo.deleteLogsFrom3Days();
         securitiesQuoteRepo.deleteBefore1Day();
@@ -58,20 +58,20 @@ public class ScheduledComponent {
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * *")
-    public void everyday() {
+    public synchronized void everyday() {
         productRepo.deleteProductMinuteFrom3Month();
         productService.refreshProducts();
     }
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * SAT")
-    public void everyFriday() {
+    public synchronized void everyFriday() {
         productRepo.insertProductWeek();
     }
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 1 * ?")
-    public void everyMonth() {
+    public synchronized void everyMonth() {
         productRepo.insertProductMonth();
     }
 }

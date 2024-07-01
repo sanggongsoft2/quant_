@@ -162,7 +162,7 @@ public class Product extends SG_model{
             this.highPrice = data.getTodays_high();
             this.lowPrice = data.getTodays_low();
             this.openPrice = data.getOpening_price();
-            this.todayTradingCount = data.getTrading_volume();
+            this.todayTradingCount = data.getAccu_trading_volume();
             this.todayTradingValue = data.getAccu_trading_value();
             this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
             updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());

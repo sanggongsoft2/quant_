@@ -38,7 +38,7 @@ public class SecOrderFilled extends SG_substring_model {
     @SG_substring(start = 102, end = 113)
     private double todays_low;
     @SG_substring(start = 113, end = 125)
-    private double accu_trading_volume;
+    private long accu_trading_volume;
     @SG_substring(start = 125, end = 147)
     private float accu_trading_value;
     @SG_substring(start = 147, end = 148)

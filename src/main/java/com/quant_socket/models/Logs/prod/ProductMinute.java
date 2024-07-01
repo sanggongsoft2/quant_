@@ -67,7 +67,7 @@ public class ProductMinute extends SG_model {
 
     public void update(SecOrderFilled data) {
         final double trading_price = data.getTrading_price();
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = data.getUnixTimestamp();
         this.isinCode = data.getIsin_code();
         if(trading_price > 0) {
             this.close = trading_price;

@@ -13,7 +13,6 @@ public class EquitiesBatchDataService{
     private ProductService productService;
 
     public void dataHandler(EquitiesBatchData data) {
-        /*super.addLog(data);*/
         if(data.getIsin_code() != null) {
             final Product product = productService.productFromIsinCode(data.getIsin_code());
             if(product != null) {

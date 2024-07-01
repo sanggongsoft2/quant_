@@ -62,7 +62,10 @@ public class ProductService extends SocketService{
                 @Override
                 public void setValues(PreparedStatement ps, int i) {
                     final ProductMinute pm = minutes.get(i);
-                    if(pm.setPreparedStatement(ps)) pm.resetVolume();
+                    if(pm.setPreparedStatement(ps)) {
+                        pm.resetVolume();
+                        sendMessage(pm.toSocket(), pm.getIsinCode());
+                    }
                 }
 
                 @Override
@@ -71,11 +74,6 @@ public class ProductService extends SocketService{
                 }
             });
         }
-    }
-
-    @Transactional
-    public void updateProductDay() {
-        repo.insertProductDay();
     }
 
     public void update(EquitiesBatchData data) {
