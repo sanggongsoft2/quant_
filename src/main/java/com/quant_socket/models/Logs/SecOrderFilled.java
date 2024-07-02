@@ -78,11 +78,11 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("compare_rate", getCompareRate());
         response.put("trading_count", trading_volume);
         response.put("opening_price", opening_price);
-        response.put("opening_rate", getYesterdayCompareRate(opening_price));
+        response.put("opening_rate", getCompareRate(prod.getYesterday_price(), new BigDecimal(opening_price)));
         response.put("high_price", todays_high);
-        response.put("high_rate", getYesterdayCompareRate(todays_high));
+        response.put("high_rate", getCompareRate(prod.getYesterday_price(), new BigDecimal(todays_high)));
         response.put("low_price", todays_low);
-        response.put("low_rate", getYesterdayCompareRate(todays_low));
+        response.put("low_rate", getCompareRate(prod.getYesterday_price(), new BigDecimal(todays_low)));
         response.put("trading_type", bidTypeToString());
         response.put("trading_time", processing_time_of_trading_system);
         response.put("accu_trading_volume", accu_trading_volume);
@@ -100,9 +100,24 @@ public class SecOrderFilled extends SG_substring_model {
         };
     }
 
-    private double getYesterdayCompareRate(double price) {
-        if(price == 0 || a_price_change_against_the_pre_day == 0) return 0;
-        return a_price_change_against_the_pre_day/price*100;
+    public double getCompareRate(BigDecimal yesterday_price, BigDecimal price) {
+
+        if(price == null ||  yesterday_price == null) return 0;
+        if (yesterday_price.compareTo(BigDecimal.ZERO) == 0) return 0;
+        // (B - A) / A * 100
+        BigDecimal increase = price.subtract(yesterday_price); // B - A
+        BigDecimal percentageIncrease = increase.divide(yesterday_price, 4, RoundingMode.HALF_UP) // (B - A) / A
+                .multiply(new BigDecimal("100")); // ((B - A) / A) * 100
+
+        return percentageIncrease.doubleValue();
+
+        /*try {
+            double value = 0;
+            if(yesterday_price != null && yesterday_price.doubleValue() != 0) value = (yesterday_price.doubleValue() - price.doubleValue()) / yesterday_price.doubleValue() * 100;
+            return value;
+        } catch (Exception e) {
+            return 0;
+        }*/
     }
 
     private String bidTypeToString() {

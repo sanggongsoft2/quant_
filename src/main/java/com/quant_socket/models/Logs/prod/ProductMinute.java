@@ -1,7 +1,6 @@
 package com.quant_socket.models.Logs.prod;
 
 import com.quant_socket.annotations.SG_column;
-import com.quant_socket.annotations.SG_crdt;
 import com.quant_socket.annotations.SG_idx;
 import com.quant_socket.annotations.SG_table;
 import com.quant_socket.models.Logs.SecOrderFilled;
@@ -13,14 +12,8 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -80,11 +73,12 @@ public class ProductMinute extends SG_model {
         }
     }
 
-    public void resetVolume() {
+    public void reset() {
         this.pre_close = close;
         this.volume = 0;
         this.high = this.close;
         this.low = this.close;
+        this.open = this.close;
     }
 
     public Map<String, Object> toSocket() {

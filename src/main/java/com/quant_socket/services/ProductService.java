@@ -63,7 +63,7 @@ public class ProductService extends SocketService{
                 public void setValues(PreparedStatement ps, int i) {
                     final ProductMinute pm = minutes.get(i);
                     if(pm.setPreparedStatement(ps)) {
-                        pm.resetVolume();
+                        pm.reset();
                         sendMessage(pm.toSocket(), pm.getIsinCode());
                     }
                 }
@@ -229,5 +229,13 @@ public class ProductService extends SocketService{
 
     public List<Map<String, Object>> dayChartFromCode(String isinCode) {
         return repo.getDayChart(isinCode);
+    }
+
+    public List<Map<String, Object>> weekChartFromCode(String isinCode) {
+        return repo.getWeekChart(isinCode);
+    }
+
+    public List<Map<String, Object>> monthChartFromCode(String isinCode) {
+        return repo.getMonthChart(isinCode);
     }
 }

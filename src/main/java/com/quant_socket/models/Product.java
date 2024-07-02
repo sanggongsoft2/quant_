@@ -149,8 +149,14 @@ public class Product extends SG_model{
                 this.comparePriceRate = data.getComparePriceRate();
                 if (data.getTodays_high() != null) this.highPrice = data.getTodays_high().doubleValue();
                 if (data.getTodays_low() != null) this.lowPrice = data.getTodays_low().doubleValue();
-                if (data.getOpening_price() != null) this.openPrice = data.getOpening_price().doubleValue();
+                if (data.getOpening_price() != null) {
+                    this.openPrice = data.getOpening_price().doubleValue();
+                    if(avg_5_day == null) avg_5_day = data.getOpening_price();
+                    if(avg_20_day == null) avg_20_day = data.getOpening_price();
+                }
                 if(data.getYesterdayPrice() != null) this.yesterday_price = data.getYesterdayPrice();
+                if(data.getAccumulated_trading_volume() != null) this.todayTradingCount = data.getAccumulated_trading_volume();
+                if(data.getAccumulated_trading_value() != null) this.todayTradingValue = data.getAccumulated_trading_value();
                 this.latestSnapshot = data;
             }
         }
@@ -162,6 +168,8 @@ public class Product extends SG_model{
             this.highPrice = data.getTodays_high();
             this.lowPrice = data.getTodays_low();
             this.openPrice = data.getOpening_price();
+            if(avg_5_day == null) avg_5_day = new BigDecimal(openPrice);
+            if(avg_20_day == null) avg_20_day = new BigDecimal(openPrice);
             this.todayTradingCount = data.getAccu_trading_volume();
             this.todayTradingValue = data.getAccu_trading_value();
             this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
