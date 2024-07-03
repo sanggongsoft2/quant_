@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -33,6 +34,7 @@ public class ScheduledComponent {
     private final EquitiesSnapshotRepo equitiesSnapshotRepo;
 
     @Scheduled(cron = "0 * * * * ?")
+    @Transactional
     public void everyMinute() {
         socketLogService.insertLogs(SocketLog.insertCols());
         productService.insertLogs();
@@ -42,6 +44,7 @@ public class ScheduledComponent {
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 * 9-14 * * MON-FRI")
     @Scheduled(cron = "0 0-31 15 * * MON-FRI")
+    @Transactional
     public void everyMinuteFrom9To15() {
         productService.updateProductMinute();
         equitiesSnapshotService.insertLogs();
@@ -50,6 +53,7 @@ public class ScheduledComponent {
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * MON-FRI")
+    @Transactional
     public synchronized void everyWeekday() {
         productService.updateProducts();
         equitiesSnapshotRepo.deleteLogsFrom3Days();
@@ -58,6 +62,7 @@ public class ScheduledComponent {
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
     public synchronized void everyday() {
         productRepo.deleteProductMinuteFrom3Month();
         productService.refreshProducts();
@@ -65,12 +70,14 @@ public class ScheduledComponent {
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * SAT")
+    @Transactional
     public synchronized void everyFriday() {
         productRepo.insertProductWeek();
     }
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 1 * ?")
+    @Transactional
     public synchronized void everyMonth() {
         productRepo.insertProductMonth();
     }

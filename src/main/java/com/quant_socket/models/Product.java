@@ -111,8 +111,10 @@ public class Product extends SG_model{
     }
 
     public void refreshEveryday() {
-        todayBidCount = 0;
-        todayAskCount = 0;
+        synchronized (this) {
+            todayBidCount = 0;
+            todayAskCount = 0;
+        }
     }
 
     public void update(EquitiesBatchData data) {

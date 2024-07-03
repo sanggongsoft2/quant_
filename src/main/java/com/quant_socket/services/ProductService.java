@@ -46,12 +46,11 @@ public class ProductService extends SocketService{
         return prod;
     }
 
-    @Transactional
     public void updateProducts() {
         synchronized (products) {
-            for(final Product prod: products) {
+            products.forEach(prod -> {
                 if(repo.update(prod)) prod.refreshEveryday();
-            }
+            });
         }
     }
 
@@ -191,7 +190,6 @@ public class ProductService extends SocketService{
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
-    @Transactional
     public <T> void insertLogs() {
         synchronized (logs) {
             if(!logs.isEmpty()) {
