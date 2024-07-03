@@ -145,19 +145,34 @@ public class ProductRepo extends SG_repo<Product>{
 
     public List<Map<String, Object>> getWeekChart(String code) {
         final String sql = """
-               SELECT UNIX_TIMESTAMP(max_date) * 1000 datetime, week_number, ic_closing_price, high_price, low_price, ic_open_price, volume FROM issue_closing ic
-                        JOIN (
-                   SELECT ic_isin_code,
-                          WEEK(ic_date, 1) AS week_number,
-                          MAX(ic_date) AS max_date,
-                          MAX(ic_high_price) high_price,
-                          MIN(ic_low_price) low_price,
-                          SUM(ic_trading_volume) volume
-                   FROM issue_closing
-                   WHERE ic_isin_code = ?
-                   GROUP BY ic_isin_code, week_number
-               ) sub ON ic.ic_isin_code = sub.ic_isin_code AND ic.ic_date = sub.max_date
-               WHERE ic.ic_isin_code = ?
+               
+SELECT UNIX_TIMESTAMP(max_date) * 1000 AS datetime,
+           ic_date,
+           week_number,
+           ic_closing_price,
+           high_price,
+           low_price,
+           first_ic_open_price AS ic_open_price,
+           volume
+    FROM issue_closing ic
+             JOIN (
+        SELECT ic_isin_code,
+               WEEK(ic_date, 1) AS week_number,
+               MAX(ic_date) AS max_date,
+               MAX(ic_high_price) AS high_price,
+               MIN(ic_low_price) AS low_price,
+               SUM(ic_trading_volume) AS volume,
+               MIN(ic_date) AS min_date
+        FROM issue_closing
+        WHERE ic_isin_code = ?
+        GROUP BY ic_isin_code, week_number
+    ) sub ON ic.ic_isin_code = sub.ic_isin_code AND ic.ic_date = sub.max_date
+             JOIN (
+        SELECT ic_isin_code, ic_date AS first_date, ic_open_price AS first_ic_open_price
+        FROM issue_closing
+    ) first_day ON sub.ic_isin_code = first_day.ic_isin_code AND sub.min_date = first_day.first_date
+    WHERE ic.ic_isin_code = ?;
+                                        
                 """;
         return jt.query(sql, (rs, rn) -> {
             final Map<String, Object> data = new LinkedHashMap<>();
@@ -167,26 +182,38 @@ public class ProductRepo extends SG_repo<Product>{
             data.put("Low", rs.getDouble("low_price"));
             data.put("Open", rs.getDouble("ic_open_price"));
             data.put("Volume", rs.getLong("volume"));
-            data.put("week_number", rs.getInt("week_number"));
             return data;
         }, code, code);
     }
 
     public List<Map<String, Object>> getMonthChart(String code) {
         final String sql = """
-               SELECT UNIX_TIMESTAMP(max_date) * 1000 datetime, month_number, ic_closing_price, high_price, low_price, ic_open_price, volume FROM issue_closing ic
-                        JOIN (
-                   SELECT ic_isin_code,
-                          MONTH(ic_date) AS month_number,
-                          MAX(ic_date) AS max_date,
-                          MAX(ic_high_price) high_price,
-                          MIN(ic_low_price) low_price,
-                          SUM(ic_trading_volume) volume
-                   FROM issue_closing
-                   WHERE ic_isin_code = ?
-                   GROUP BY ic_isin_code, month_number
-               ) sub ON ic.ic_isin_code = sub.ic_isin_code AND ic.ic_date = sub.max_date
-               WHERE ic.ic_isin_code = ?
+               
+SELECT UNIX_TIMESTAMP(max_date) * 1000 AS datetime,
+       ic_date,
+       ic_closing_price,
+       high_price,
+       low_price,
+       first_ic_open_price AS ic_open_price,
+       volume
+FROM issue_closing ic
+         JOIN (
+    SELECT ic_isin_code,
+           MONTH(ic_date) AS month_number,
+           MAX(ic_date) AS max_date,
+           MAX(ic_high_price) AS high_price,
+           MIN(ic_low_price) AS low_price,
+           SUM(ic_trading_volume) AS volume,
+           MIN(ic_date) AS min_date
+    FROM issue_closing
+    WHERE ic_isin_code = ?
+    GROUP BY ic_isin_code, month_number
+) sub ON ic.ic_isin_code = sub.ic_isin_code AND ic.ic_date = sub.max_date
+         JOIN (
+    SELECT ic_isin_code, ic_date AS first_date, ic_open_price AS first_ic_open_price
+    FROM issue_closing
+) first_day ON sub.ic_isin_code = first_day.ic_isin_code AND sub.min_date = first_day.first_date
+WHERE ic.ic_isin_code = ?;
                 """;
         return jt.query(sql, (rs, rn) -> {
             final Map<String, Object> data = new LinkedHashMap<>();
@@ -196,7 +223,6 @@ public class ProductRepo extends SG_repo<Product>{
             data.put("Low", rs.getDouble("low_price"));
             data.put("Open", rs.getDouble("ic_open_price"));
             data.put("Volume", rs.getLong("volume"));
-            data.put("month_number", rs.getLong("month_number"));
             return data;
         }, code, code);
     }

@@ -117,20 +117,24 @@ public class APIController {
         res.setMessage("주 차트를 조회했습니다.");
 
         final List<Map<String, Object>> list = productService.weekChartFromCode(code);
-        /*final boolean contains = list.stream().anyMatch(map -> map.get("Date").equals(getNowMillisecond()));
-        if(!contains) {
+
+        if(!list.isEmpty()) {
             final Product prod = productService.productFromIsinCode(code);
-            if(prod != null) {
-                final Map<String, Object> data = new LinkedHashMap<>();
-                data.put("Date", getNowMillisecond());
-                data.put("Close", prod.getCurrentPrice());
-                data.put("High", prod.getHighPrice());
-                data.put("Low", prod.getLowPrice());
-                data.put("Open", prod.getYesterday_price());
-                data.put("Volume", prod.getTodayTradingCount());
-                list.add(data);
-            }
-        }*/
+            final Map<String, Object> data = list.get(list.size() - 1);
+            list.forEach(row -> {
+                final double high_price = (double) row.get("High");
+                final double low_price = (double) row.get("Low");
+                final long volume = (long) row.get("Volume");
+
+                if(row.equals(data)) {
+                    row.put("Date", getNowMillisecond());
+                    row.put("High", Math.max(high_price, prod.getHighPrice()));
+                    row.put("Low", Math.min(low_price, prod.getLowPrice()));
+                    row.put("Close", Math.min(low_price, prod.getCurrentPrice()));
+                    row.put("Volume", volume+prod.getTodayTradingCount());
+                }
+            });
+        }
 
         res.setData(list);
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -142,24 +146,24 @@ public class APIController {
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("월 차트를 조회했습니다.");
 
-        final int weekNumber = getWeekNumber(LocalDate.now());
-
         final List<Map<String, Object>> list = productService.monthChartFromCode(code);
-        /*final boolean contains = list.stream().anyMatch(map -> map.get("week_number").equals(weekNumber));
-        if(!contains) {
+        if(!list.isEmpty()) {
             final Product prod = productService.productFromIsinCode(code);
-            if(prod != null) {
-                final Map<String, Object> data = new LinkedHashMap<>();
-                data.put("Date", getNowMillisecond());
-                data.put("Close", prod.getCurrentPrice());
-                data.put("High", prod.getHighPrice());
-                data.put("Low", prod.getLowPrice());
-                data.put("Open", prod.getYesterday_price());
-                data.put("Volume", prod.getTodayTradingCount());
-                data.put("week_number", weekNumber);
-                list.add(data);
-            }
-        }*/
+            final Map<String, Object> data = list.get(list.size() - 1);
+            list.forEach(row -> {
+                final double high_price = (double) row.get("High");
+                final double low_price = (double) row.get("Low");
+                final long volume = (long) row.get("Volume");
+
+                if(row.equals(data)) {
+                    row.put("Date", getNowMillisecond());
+                    row.put("High", Math.max(high_price, prod.getHighPrice()));
+                    row.put("Low", Math.min(low_price, prod.getLowPrice()));
+                    row.put("Close", prod.getCurrentPrice());
+                    row.put("Volume", volume+prod.getTodayTradingCount());
+                }
+            });
+        }
 
         res.setData(list);
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -181,11 +185,5 @@ public class APIController {
         // Instant를 밀리초로 변환
         return instant.toEpochMilli();
 
-    }
-
-    public int getWeekNumber(LocalDate date) {
-        // 주 필드를 정의 (기본 로케일 사용)
-        final WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        return date.get(weekFields.weekOfWeekBasedYear());
     }
 }
