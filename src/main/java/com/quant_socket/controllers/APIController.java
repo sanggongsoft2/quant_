@@ -117,16 +117,15 @@ public class APIController {
         res.setMessage("주 차트를 조회했습니다.");
 
         final List<Map<String, Object>> list = productService.weekChartFromCode(code);
+        final Product prod = productService.productFromIsinCode(code);
 
         if(!list.isEmpty()) {
-            final Product prod = productService.productFromIsinCode(code);
             final Map<String, Object> data = list.get(list.size() - 1);
             list.forEach(row -> {
-                final double high_price = (double) row.get("High");
-                final double low_price = (double) row.get("Low");
-                final long volume = (long) row.get("Volume");
-
                 if(row.equals(data)) {
+                    final double high_price = (double) row.get("High");
+                    final double low_price = (double) row.get("Low");
+                    final long volume = (long) row.get("Volume");
                     row.put("Date", getNowMillisecond());
                     row.put("High", Math.max(high_price, prod.getHighPrice()));
                     row.put("Low", Math.min(low_price, prod.getLowPrice()));
@@ -134,6 +133,15 @@ public class APIController {
                     row.put("Volume", volume+prod.getTodayTradingCount());
                 }
             });
+        } else {
+            final Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Date", getNowMillisecond());
+            data.put("High", prod.getHighPrice());
+            data.put("Low", prod.getLowPrice());
+            data.put("Close", prod.getCurrentPrice());
+            data.put("Open", prod.getOpenPrice());
+            data.put("Volume", prod.getTodayTradingCount());
+            list.add(data);
         }
 
         res.setData(list);
@@ -147,15 +155,14 @@ public class APIController {
         res.setMessage("월 차트를 조회했습니다.");
 
         final List<Map<String, Object>> list = productService.monthChartFromCode(code);
+        final Product prod = productService.productFromIsinCode(code);
         if(!list.isEmpty()) {
-            final Product prod = productService.productFromIsinCode(code);
             final Map<String, Object> data = list.get(list.size() - 1);
             list.forEach(row -> {
-                final double high_price = (double) row.get("High");
-                final double low_price = (double) row.get("Low");
-                final long volume = (long) row.get("Volume");
-
                 if(row.equals(data)) {
+                    final double high_price = (double) row.get("High");
+                    final double low_price = (double) row.get("Low");
+                    final long volume = (long) row.get("Volume");
                     row.put("Date", getNowMillisecond());
                     row.put("High", Math.max(high_price, prod.getHighPrice()));
                     row.put("Low", Math.min(low_price, prod.getLowPrice()));
@@ -163,6 +170,15 @@ public class APIController {
                     row.put("Volume", volume+prod.getTodayTradingCount());
                 }
             });
+        } else {
+            final Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Date", getNowMillisecond());
+            data.put("High", prod.getHighPrice());
+            data.put("Low", prod.getLowPrice());
+            data.put("Close", prod.getCurrentPrice());
+            data.put("Open", prod.getOpenPrice());
+            data.put("Volume", prod.getTodayTradingCount());
+            list.add(data);
         }
 
         res.setData(list);

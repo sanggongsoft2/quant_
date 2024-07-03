@@ -79,6 +79,7 @@ public class ProductMinute extends SG_model {
         this.high = this.close;
         this.low = this.close;
         this.open = this.close;
+        setNowDate();
     }
 
     public Map<String, Object> toSocket() {
@@ -90,5 +91,11 @@ public class ProductMinute extends SG_model {
         data.put("Open", pre_close);
         data.put("Volume", volume);
         return data;
+    }
+
+    private void setNowDate() {
+        final LocalDateTime now = LocalDateTime.now();
+        date = Date.valueOf(now.toLocalDate());
+        time = Time.valueOf(now.toLocalTime());
     }
 }
