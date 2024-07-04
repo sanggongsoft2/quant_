@@ -190,6 +190,7 @@ public class ProductService extends SocketService{
                 "VALUES(" + String.join(",", Arrays.stream(cols).map(col -> "?").toList()) + ")";
     }
 
+    @Transactional
     public <T> void insertLogs() {
         synchronized (logs) {
             if(!logs.isEmpty()) {

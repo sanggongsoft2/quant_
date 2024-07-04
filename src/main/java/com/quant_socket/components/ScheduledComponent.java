@@ -36,8 +36,8 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void everyMinute() {
-        socketLogService.insertLogs(SocketLog.insertCols());
-        productService.insertLogs();
+        /*socketLogService.insertLogs(SocketLog.insertCols());
+        productService.insertLogs();*/
         issueClosingService.insertLogs();
     }
 
@@ -47,7 +47,7 @@ public class ScheduledComponent {
     @Transactional
     public void everyMinuteFrom9To15() {
         productService.updateProductMinute();
-        equitiesSnapshotService.insertLogs();
+        /*equitiesSnapshotService.insertLogs();*/
         securitiesQuoteService.insertLogs();
     }
 
