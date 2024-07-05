@@ -2,6 +2,7 @@ package com.quant_socket.services;
 
 import com.quant_socket.models.Logs.SecOrderFilled;
 import com.quant_socket.models.Product;
+import com.quant_socket.models.Signal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,15 @@ import org.springframework.web.socket.WebSocketSession;
 public class SecuritiesOrderFilledService extends SocketService{
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SignalService signalService;
 
     public void dataHandler(SecOrderFilled data) {
         if(data.getIsin_code() != null) {
             final Product product = productService.productFromIsinCode(data.getIsin_code());
             if(product != null) {
                 product.update(data);
-                sendMessage(data.toSocket(product), data.getIsin_code());
+                sendMessage(data.toSocket(product, signalService.getSignal()), data.getIsin_code());
                 productService.sendMessage(product.getCurrentPM().toSocket(), data.getIsin_code());
             }
         }
@@ -31,7 +34,7 @@ public class SecuritiesOrderFilledService extends SocketService{
         for(String isinCode : isinCodes) {
             final Product prod = productService.productFromIsinCode(isinCode);
             if(prod != null) {
-                for(SecOrderFilled sof : prod.getOrders()) sendMessage(sof.toSocket(prod), ws);
+                for(SecOrderFilled sof : prod.getOrders()) sendMessage(sof.toSocket(prod, signalService.getSignal()), ws);
             }
         }
     }

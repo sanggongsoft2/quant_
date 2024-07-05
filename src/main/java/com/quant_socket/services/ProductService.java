@@ -24,6 +24,9 @@ public class ProductService extends SocketService{
     @Autowired
     private ProductRepo repo;
 
+    @Autowired
+    private SignalService signalService;
+
     private final List<Product> logs = new CopyOnWriteArrayList<>();
     @Getter
     private final List<Product> products = new CopyOnWriteArrayList<>();
@@ -161,7 +164,7 @@ public class ProductService extends SocketService{
         data.put("open_price", prod.getOpenPrice());
         data.put("compare_price_rate", prod.getComparePriceRate());
         data.put("yesterday_price", prod.getYesterday_price());
-        data.putAll(prod.signalToMap());
+        data.putAll(prod.signalToMap(signalService.getSignal()));
         return data;
     }
 

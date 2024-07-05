@@ -176,7 +176,7 @@ public class Product extends SG_model{
             this.todayTradingValue = data.getAccu_trading_value();
             this.yesterday_price = BigDecimal.valueOf(data.getYesterdayPrice());
             updateTodayCount(data.getFinal_askbid_type_code(), data.getTrading_volume());
-            comparePriceRate = data.getCompareRate();
+            comparePriceRate = data.getCompareRate(yesterday_price, new BigDecimal(currentPrice));
             if(orders.size() == maxOrderSize) {
                 this.orders.remove(0);
             }
@@ -286,27 +286,30 @@ public class Product extends SG_model{
         return currentPrice * having_count;
     }
 
-    public Double getSignal5DayMinPrice() {
+    public Double getSignal5DayMinPrice(Signal signal) {
+        final double value = (100 + signal.getLow_value().doubleValue())/100;
         if(avg_5_day == null) return null;
-        else if(avg_5_day.doubleValue() == 0) return currentPrice * 0.98;
-        else return avg_5_day.doubleValue() * 0.98;
+        else if(avg_5_day.doubleValue() == 0) return currentPrice * value;
+        else return avg_5_day.doubleValue() * value;
     }
 
-    public Double getSignal5DayMaxPrice() {
+    public Double getSignal5DayMaxPrice(Signal signal) {
+        final double value = (100 + signal.getHigh_value().doubleValue())/100;
         if(avg_5_day == null) return null;
-        else if(avg_5_day.doubleValue() == 0) return currentPrice * 1.02;
-        else return avg_5_day.doubleValue() * 1.02;
+        else if(avg_5_day.doubleValue() == 0) return currentPrice * value;
+        else return avg_5_day.doubleValue() * value;
     }
 
-    public String getSignal5DayText() {
+    public String getSignal5DayText(Signal signal) {
         try {
-            Double minPrice = getSignal5DayMinPrice();
-            Double maxPrice = getSignal5DayMaxPrice();
+            Double minPrice = getSignal5DayMinPrice(signal);
+            Double maxPrice = getSignal5DayMaxPrice(signal);
             double avgPrice = avg_5_day.doubleValue();
+            final double value = (100 + signal.getLow_value().doubleValue())/100;
 
             if(avgPrice < currentPrice && maxPrice > currentPrice) {
                 return "매수";
-            } else if(minPrice * 0.98 < currentPrice && minPrice > currentPrice) {
+            } else if(minPrice * value < currentPrice && minPrice > currentPrice) {
                 return "매도";
             } else if(minPrice > currentPrice) {
                 return "관망";
@@ -318,27 +321,30 @@ public class Product extends SG_model{
         }
     }
 
-    public Double getSignal20DayMinPrice() {
+    public Double getSignal20DayMinPrice(Signal signal) {
+        final double value = (100 + signal.getLow_value().doubleValue())/100;
         if(avg_20_day == null) return null;
-        else if(avg_20_day.doubleValue() == 0) return currentPrice * 0.98;
-        else return avg_20_day.doubleValue() * 0.98;
+        else if(avg_20_day.doubleValue() == 0) return currentPrice * value;
+        else return avg_20_day.doubleValue() * value;
     }
 
-    public Double getSignal20DayMaxPrice() {
+    public Double getSignal20DayMaxPrice(Signal signal) {
+        final double value = (100 + signal.getHigh_value().doubleValue())/100;
         if(avg_20_day == null) return null;
-        else if(avg_20_day.doubleValue() == 0) return currentPrice * 1.02;
-        else return avg_20_day.doubleValue() * 1.02;
+        else if(avg_20_day.doubleValue() == 0) return currentPrice * value;
+        else return avg_20_day.doubleValue() * value;
     }
 
-    public String getSignal20DayText() {
+    public String getSignal20DayText(Signal signal) {
         try {
-            Double minPrice = getSignal20DayMinPrice();
-            Double maxPrice = getSignal20DayMaxPrice();
+            Double minPrice = getSignal20DayMinPrice(signal);
+            Double maxPrice = getSignal20DayMaxPrice(signal);
             double avgPrice = avg_20_day.doubleValue();
+            final double value = (100 - signal.getLow_value().doubleValue())/100;
 
             if(avgPrice < currentPrice && maxPrice >= currentPrice) {
                 return "매수";
-            } else if(minPrice * 0.98 <= currentPrice && minPrice > currentPrice) {
+            } else if(minPrice * value <= currentPrice && minPrice > currentPrice) {
                 return "매도";
             } else if(minPrice > currentPrice) {
                 return "관망";
@@ -350,16 +356,16 @@ public class Product extends SG_model{
         }
     }
 
-    public Map<String, Object> signalToMap() {
+    public Map<String, Object> signalToMap(Signal signal) {
         final Map<String, Object> response = new LinkedHashMap<>();
         response.put("avg_5_day_price", avg_5_day);
-        response.put("signal_5_day_text", getSignal5DayText());
-        response.put("signal_5_day_min_price", getSignal5DayMinPrice());
-        response.put("signal_5_day_max_price", getSignal5DayMaxPrice());
+        response.put("signal_5_day_text", getSignal5DayText(signal));
+        response.put("signal_5_day_min_price", getSignal5DayMinPrice(signal));
+        response.put("signal_5_day_max_price", getSignal5DayMaxPrice(signal));
         response.put("avg_20_day_price", avg_20_day);
-        response.put("signal_20_day_text", getSignal20DayText());
-        response.put("signal_20_day_min_price", getSignal20DayMinPrice());
-        response.put("signal_20_day_max_price", getSignal20DayMaxPrice());
+        response.put("signal_20_day_text", getSignal20DayText(signal));
+        response.put("signal_20_day_min_price", getSignal20DayMinPrice(signal));
+        response.put("signal_20_day_max_price", getSignal20DayMaxPrice(signal));
         return response;
     }
 }

@@ -24,13 +24,16 @@ public class EquitiesSnapshotService extends SocketService{
     private EquitiesSnapshotRepo repo;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SignalService signalService;
+
     public void dataHandler(EquitiesSnapshot data) {
         if(data.getIsin_code() != null) {
             logs.add(data);
             final Product product = productService.productFromIsinCode(data.getIsin_code());
             if(product != null && data.isRealBoard()) {
                 productService.update(data);
-                sendMessage(data.toSocket(product), data.getIsin_code());
+                sendMessage(data.toSocket(product, signalService.getSignal()), data.getIsin_code());
             }
         }
     }
@@ -42,7 +45,7 @@ public class EquitiesSnapshotService extends SocketService{
             final Product prod = productService.productFromIsinCode(isinCode);
             if(prod != null) {
                 final EquitiesSnapshot initData = prod.getLatestSnapshot();
-                if(initData != null) sendMessage(initData.toSocket(prod), ws);
+                if(initData != null) sendMessage(initData.toSocket(prod, signalService.getSignal()), ws);
             }
         }
     }

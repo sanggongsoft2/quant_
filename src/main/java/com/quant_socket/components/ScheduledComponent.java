@@ -28,6 +28,7 @@ public class ScheduledComponent {
     private final EquitiesSnapshotService equitiesSnapshotService;
     private final SecuritiesQuoteService securitiesQuoteService;
     private final IssueClosingService issueClosingService;
+    private final SignalService signalService;
 
     private final SecuritiesQuoteRepo securitiesQuoteRepo;
     private final ProductRepo productRepo;
@@ -36,9 +37,10 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void everyMinute() {
-        /*socketLogService.insertLogs(SocketLog.insertCols());
-        productService.insertLogs();*/
+        socketLogService.insertLogs(SocketLog.insertCols());
+        productService.insertLogs();
         issueClosingService.insertLogs();
+        signalService.refresh();
     }
 
     @Profile({"prod", "dev"})
@@ -47,7 +49,7 @@ public class ScheduledComponent {
     @Transactional
     public void everyMinuteFrom9To15() {
         productService.updateProductMinute();
-        /*equitiesSnapshotService.insertLogs();*/
+        equitiesSnapshotService.insertLogs();
         securitiesQuoteService.insertLogs();
     }
 

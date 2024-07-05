@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,13 +23,20 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private final SocketLogService socketLogService;
 
+    private int port;
+    private String remote_url;
+    private String msg;
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        /*String filePath = "/Users/sanggong/Documents/data.txt";
+        /*String filePath = "/Users/sanggong/Documents/test.txt";
         String content = Files.readString(Paths.get(filePath), StandardCharsets.UTF_8);
         for (String logMessage : content.split("�")) {
             socketLogService.esHandler(logMessage.trim());
         }*/
+        final InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().localAddress();
+        port = socketAddress.getPort();
+        remote_url = socketAddress.getHostName();
         super.channelActive(ctx);
     }
 
@@ -37,8 +45,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         final ByteBuf buf = (ByteBuf) msg;
 
         try {
-            final String message = buf.toString(Charset.forName("EUC-KR"));
-            for (String logMessage : message.split("�")) {
+            this.msg = buf.toString(Charset.forName("EUC-KR"));
+            for (String logMessage : this.msg.split("�")) {
                 socketLogService.esHandler(logMessage.trim());
             }
         } finally {
@@ -48,7 +56,12 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error(cause.getMessage(), cause);
+        final SocketLog socketLog = new SocketLog();
+        socketLog.setPort(port);
+        socketLog.setRemote_url(remote_url);
+        socketLog.setLog(msg);
+        socketLog.setError(cause.getMessage());
+        socketLogService.addLog(socketLog);
         ctx.close();
     }
 }

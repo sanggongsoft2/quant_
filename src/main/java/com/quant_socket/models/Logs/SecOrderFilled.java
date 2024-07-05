@@ -3,6 +3,7 @@ package com.quant_socket.models.Logs;
 import com.quant_socket.annotations.SG_substring;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_substring_model;
+import com.quant_socket.models.Signal;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class SecOrderFilled extends SG_substring_model {
         return value;
     }
 
-    public Map<String, Object> toSocket(Product prod) {
+    public Map<String, Object> toSocket(Product prod, Signal signal) {
         final Map<String, Object> response = new LinkedHashMap<>();
         response.put("market_total_price", prod.getHaving_count() * trading_price);
         response.put("trading_rate", getTradingRate(prod));
@@ -75,7 +76,7 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("compare_type", price_change_against_previous_day);
         response.put("isin_code", isin_code);
         response.put("compare_price", a_price_change_against_the_pre_day);
-        response.put("compare_rate", getCompareRate());
+        response.put("compare_rate", getCompareRate(new BigDecimal(getYesterdayPrice()), new BigDecimal(trading_price)));
         response.put("trading_count", trading_volume);
         response.put("opening_price", opening_price);
         response.put("opening_rate", getCompareRate(prod.getYesterday_price(), new BigDecimal(opening_price)));
@@ -87,17 +88,8 @@ public class SecOrderFilled extends SG_substring_model {
         response.put("trading_time", processing_time_of_trading_system);
         response.put("accu_trading_volume", accu_trading_volume);
         response.put("accu_trading_value", accu_trading_value);
-        response.putAll(prod.signalToMap());
+        response.putAll(prod.signalToMap(signal));
         return response;
-    }
-
-    public double getCompareRate() {
-        final double result = a_price_change_against_the_pre_day / trading_price*100;
-        if(Double.isNaN(result) || Double.isInfinite(result)) return 0;
-        return switch (price_change_against_previous_day) {
-            case "4", "5" -> -result;
-            default -> result;
-        };
     }
 
     public double getCompareRate(BigDecimal yesterday_price, BigDecimal price) {

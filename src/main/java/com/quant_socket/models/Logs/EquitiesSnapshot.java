@@ -7,6 +7,7 @@ import com.quant_socket.annotations.SG_substring_lp;
 import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import com.quant_socket.models.SG_substring_model;
+import com.quant_socket.models.Signal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -179,11 +180,11 @@ public class EquitiesSnapshot extends SG_model {
         else return 0;
     }
 
-    public Map<String, Object> toSocket(Product prod) {
+    public Map<String, Object> toSocket(Product prod, Signal signal) {
         final Map<String, Object> response = new LinkedHashMap<>();
+        response.putAll(prod.signalToMap(signal));
         response.put("max_52_price", prod.getMax_52_price());
         response.put("min_52_price", prod.getMin_52_price());
-        response.putAll(prod.signalToMap());
         response.put("yesterday_price", getYesterdayPrice());
         response.put("yesterday_trading_volume", prod.getYesterday_trading_count());
         response.put("face_value", prod.getFace_value());
@@ -226,3 +227,102 @@ public class EquitiesSnapshot extends SG_model {
         return board_id != null && board_id.equals("G1");
     }
 }
+
+/*
+{
+        "market_total_price": 5.16386190575E14,
+        "trading_rate": 136.79317459515778,
+        "trading_price": 86500.0,
+        "compare_type": "2",
+        "isin_code": "KR7005930003",
+        "compare_price": 1900.0,
+        "compare_rate": 2.1965317919075145,
+        "trading_count": 13,
+        "opening_price": 85600.0,
+        "opening_rate": 1.18,
+        "high_price": 86500.0,
+        "high_rate": 2.25,
+        "low_price": 85200.0,
+        "low_rate": 0.71,
+        "trading_type": "매수",
+        "trading_time": "125642493777",
+        "accu_trading_volume": 27812442,
+        "accu_trading_value": 2.39067359E12,
+        "avg_5_day_price": 82300.0000,
+        "signal_5_day_text": "보유",
+        "signal_5_day_min_price": 81065.5,
+        "signal_5_day_max_price": 83534.49999999999,
+        "avg_20_day_price": 81688.8889,
+        "signal_20_day_text": "보유",
+        "signal_20_day_min_price": 80463.5555665,
+        "signal_20_day_max_price": 82914.2222335
+        }
+
+        {
+        "isin_code": "KR7005930003",
+        "ask_level_1_volume": 1576983,
+        "ask_level_2_volume": 439617,
+        "ask_level_3_volume": 393770,
+        "ask_level_4_volume": 410278,
+        "ask_level_5_volume": 667837,
+        "ask_level_6_volume": 1777866,
+        "ask_level_7_volume": 156652,
+        "ask_level_8_volume": 160582,
+        "ask_level_9_volume": 187732,
+        "ask_level_10_volume": 138181,
+        "ask_level_1_price": 86500,
+        "ask_level_2_price": 86600,
+        "ask_level_3_price": 86700,
+        "ask_level_4_price": 86800,
+        "ask_level_5_price": 86900,
+        "ask_level_6_price": 87000,
+        "ask_level_7_price": 87100,
+        "ask_level_8_price": 87200,
+        "ask_level_9_price": 87300,
+        "ask_level_10_price": 87400,
+        "ask_level_1_rate": 2.25,
+        "ask_level_2_rate": 2.36,
+        "ask_level_3_rate": 2.48,
+        "ask_level_4_rate": 2.6,
+        "ask_level_5_rate": 2.72,
+        "ask_level_6_rate": 2.84,
+        "ask_level_7_rate": 2.96,
+        "ask_level_8_rate": 3.07,
+        "ask_level_9_rate": 3.19,
+        "ask_level_10_rate": 3.31,
+        "bid_level_1_volume": 196013,
+        "bid_level_2_volume": 446103,
+        "bid_level_3_volume": 238634,
+        "bid_level_4_volume": 236754,
+        "bid_level_5_volume": 284125,
+        "bid_level_6_volume": 1132162,
+        "bid_level_7_volume": 137577,
+        "bid_level_8_volume": 174798,
+        "bid_level_9_volume": 485381,
+        "bid_level_10_volume": 280844,
+        "bid_level_1_price": 86400,
+        "bid_level_2_price": 86300,
+        "bid_level_3_price": 86200,
+        "bid_level_4_price": 86100,
+        "bid_level_5_price": 86000,
+        "bid_level_6_price": 85900,
+        "bid_level_7_price": 85800,
+        "bid_level_8_price": 85700,
+        "bid_level_9_price": 85600,
+        "bid_level_10_price": 85500,
+        "bid_level_1_rate": 2.13,
+        "bid_level_2_rate": 2.01,
+        "bid_level_3_rate": 1.89,
+        "bid_level_4_rate": 1.77,
+        "bid_level_5_rate": 1.65,
+        "bid_level_6_rate": 1.54,
+        "bid_level_7_rate": 1.42,
+        "bid_level_8_rate": 1.3,
+        "bid_level_9_rate": 1.18,
+        "bid_level_10_rate": 1.06,
+        "ask_total_count": 5909498,
+        "bid_total_count": 3612391,
+        "estimated_trading_price": 3612391,
+        "estimated_trading_volume": 0,
+        "yesterday_price": 84600.0
+        }*/

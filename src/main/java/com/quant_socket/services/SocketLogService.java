@@ -5,6 +5,7 @@ import com.quant_socket.repos.SocketLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
@@ -41,10 +42,11 @@ public class SocketLogService extends SocketService{
     private IssueClosingService issueClosingService;
 
     private final LocalTime hour3half = LocalTime.of(15, 31);
+    private final LocalTime hour9 = LocalTime.of(9, 0);
 
     public void esHandler(String msg) {
         final LocalTime now = LocalTime.now();
-        final boolean isBefore = now.isBefore(hour3half);
+        final boolean isCompare = now.isBefore(hour3half) && now.isAfter(hour9);
 
         if(msg.length() >= 5) {
             final String dataCategory = msg.substring(0, 2);
@@ -57,10 +59,10 @@ public class SocketLogService extends SocketService{
                             equitiesBatchDataService.dataHandler(ebd);
                             break;
                         case "A3":
-                            if(isBefore) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
+                            if(isCompare) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
                             break;
                         case "B2":
-                            if(isBefore) {
+                            if(isCompare) {
                                 final EquitiesSnapshot es;
                                 if(infoCategory.equals("03S")) {
                                     es = new EquitiesSnapshot(msg, true);
@@ -71,20 +73,24 @@ public class SocketLogService extends SocketService{
                             }
                             break;
                         case "B6":
-                            if(isBefore) {
+                            if(isCompare) {
                                 final SecuritiesQuote sq = new SecuritiesQuote(msg);
                                 if(sq.isRealBoard()) securitiesQuoteService.dataHandler(sq);
                             }
                             break;
                         case "B7":
-                            if(isBefore) {
+                            if(isCompare) {
                                 final SecuritiesQuote sq = new SecuritiesQuote(msg, true);
                                 if(sq.isRealBoard()) securitiesQuoteService.dataHandler(sq);
                             }
                             break;
                         case "A6":
+                            final SocketLog sl = new SocketLog();
+                            sl.setLog(msg);
+                            sl.setPort(8080);
+                            sl.setRemote_url("127.0.0.1");
+                            addLog(sl);
                             issueClosingService.dataHandler(new IssueClosing(msg));
-
                     }
             }
         }
@@ -113,5 +119,9 @@ public class SocketLogService extends SocketService{
             });
             if (result > 0) logs.clear();
         }
+    }
+
+    public void addLog(SocketLog sl) {
+        logs.add(sl);
     }
 }
