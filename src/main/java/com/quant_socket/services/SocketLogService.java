@@ -90,7 +90,8 @@ public class SocketLogService extends SocketService{
                             sl.setPort(8080);
                             sl.setRemote_url("127.0.0.1");
                             addLog(sl);
-                            issueClosingService.dataHandler(new IssueClosing(msg));
+                            final IssueClosing ic = new IssueClosing(msg);
+                            if(ic.isRealBoard()) issueClosingService.dataHandler(ic);
                     }
             }
         }
