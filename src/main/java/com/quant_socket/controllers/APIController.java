@@ -26,41 +26,41 @@ public class APIController {
     private ProductService productService;
 
     @PostMapping("/issue/higher")
-    public ResponseEntity<Response> getHigher(@RequestParam(required = false) String type) {
+    public ResponseEntity<Response> getHigher(@RequestParam(required = false) String type, @RequestParam(required = false, defaultValue = "N") String typeetf) {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("상승상위 증권을 불러왔습니다.");
-        res.setData(productService.orderHigher(type));
+        res.setData(productService.orderHigher(type, typeetf));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/issue/lower")
-    public ResponseEntity<Response> getLower(@RequestParam(required = false) String type) {
+    public ResponseEntity<Response> getLower(@RequestParam(required = false) String type, @RequestParam(required = false, defaultValue = "N") String typeetf) {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("하락상위 증권을 불러왔습니다.");
-        res.setData(productService.orderLower(type));
+        res.setData(productService.orderLower(type, typeetf));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/issue/total-price")
-    public ResponseEntity<Response> getHavingCount(@RequestParam(required = false) String type) {
+    public ResponseEntity<Response> getHavingCount(@RequestParam(required = false) String type, @RequestParam(required = false, defaultValue = "N") String typeetf) {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("시총상위 증권을 불러왔습니다.");
-        res.setData(productService.orderHavingCount(type));
+        res.setData(productService.orderHavingCount(type, typeetf));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/issue/trading-count")
-    public ResponseEntity<Response> getTradingCount(@RequestParam(required = false) String type) {
+    public ResponseEntity<Response> getTradingCount(@RequestParam(required = false) String type, @RequestParam(required = false, defaultValue = "N") String typeetf) {
         final Response res = new Response();
         res.setStatusCode(HttpStatus.OK);
         res.setMessage("거래상위 증권을 불러왔습니다.");
-        res.setData(productService.orderTradingCount(type));
+        res.setData(productService.orderTradingCount(type, typeetf));
 
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }

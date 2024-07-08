@@ -89,6 +89,17 @@ public class ProductService extends SocketService{
         }
     }
 
+    public void update(EquitiesChangesOfBatchData data) {
+        synchronized (products) {
+            for(Product prod : products) {
+                if(prod.getCode().equals(data.getIsin_code())) {
+                    prod.update(data);
+                    break;
+                }
+            }
+        }
+    }
+
     public void update(SecuritiesQuote data) {
         synchronized (products) {
             for(Product prod : products) {
@@ -111,8 +122,8 @@ public class ProductService extends SocketService{
         }
     }
 
-    public List<Map<String, Object>> orderHigher(String type) {
-        final List<Product> list = factoryProducts(type);
+    public List<Map<String, Object>> orderHigher(String type, String typeetf) {
+        final List<Product> list = factoryProducts(type, typeetf);
         return list.stream()
                 .sorted(Comparator.comparingDouble(Product::getComparePriceRate).reversed())
                 .limit(10)
@@ -120,8 +131,8 @@ public class ProductService extends SocketService{
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> orderLower(String type) {
-        final List<Product> list = factoryProducts(type);
+    public List<Map<String, Object>> orderLower(String type, String typeetf) {
+        final List<Product> list = factoryProducts(type, typeetf);
         return list.stream()
                 .sorted(Comparator.comparingDouble(Product::getComparePriceRate))
                 .limit(10)
@@ -129,8 +140,8 @@ public class ProductService extends SocketService{
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> orderHavingCount(String type) {
-        final List<Product> list = factoryProducts(type);
+    public List<Map<String, Object>> orderHavingCount(String type, String typeetf) {
+        final List<Product> list = factoryProducts(type, typeetf);
         return list.stream()
                 .sorted(Comparator.comparingDouble((Product prod) -> prod.getHaving_count() * prod.getCurrentPrice()).reversed())
                 .limit(10)
@@ -138,8 +149,8 @@ public class ProductService extends SocketService{
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> orderTradingCount(String type) {
-        final List<Product> list = factoryProducts(type);
+    public List<Map<String, Object>> orderTradingCount(String type, String typeetf) {
+        final List<Product> list = factoryProducts(type, typeetf);
         return list.stream()
                 .sorted(Comparator.comparingLong(Product::getTodayTradingCount).reversed())
                 .limit(10)
@@ -168,9 +179,9 @@ public class ProductService extends SocketService{
         return data;
     }
 
-    private List<Product> factoryProducts(String type) {
+    private List<Product> factoryProducts(String type, String typeetf) {
         List<Product> list = products;
-        if(type != null) list = products.stream().filter(prod-> Objects.equals(prod.getGubun(), type)).toList();
+        if(type != null) list = products.stream().filter(prod -> Objects.equals(prod.getGubun(), type) || (typeetf.equals("Y") && prod.getGubun().equals("ETF"))).toList();
         return list;
     }
 

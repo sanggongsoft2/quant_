@@ -41,6 +41,9 @@ public class SocketLogService extends SocketService{
     @Autowired
     private IssueClosingService issueClosingService;
 
+    @Autowired
+    private ProductService productService;
+
     private final LocalTime hour3half = LocalTime.of(15, 31);
     private final LocalTime hour9 = LocalTime.of(9, 0);
 
@@ -92,6 +95,11 @@ public class SocketLogService extends SocketService{
                             addLog(sl);
                             final IssueClosing ic = new IssueClosing(msg);
                             if(ic.isRealBoard()) issueClosingService.dataHandler(ic);
+                            break;
+                        case "A8":
+                            final EquitiesChangesOfBatchData ecobd = new EquitiesChangesOfBatchData(msg);
+                            if(ecobd.isRealBoard()) productService.update(ecobd);
+
                     }
             }
         }

@@ -138,6 +138,19 @@ public class Product extends SG_model{
         }
     }
 
+    public void update(EquitiesChangesOfBatchData data) {
+        synchronized (this) {
+            if(data.getBase_price() != null) openPrice = data.getBase_price();
+            if(latestSnapshot != null) {
+                if(data.getUpper_limit_price() != null) latestSnapshot.setUpper_limit_price(data.getUpper_limit_price());
+                if(data.getLower_limit_price() != null) latestSnapshot.setLower_limit_price(data.getLower_limit_price());
+            }
+            if(data.getHigh_order_price() != null) highPrice = data.getHigh_order_price();
+            if(data.getLow_order_price() != null) lowPrice = data.getLow_order_price();
+            if(data.getHaving_count() != null) having_count = data.getHaving_count();
+        }
+    }
+
     public void update(SecuritiesQuote data) {
         synchronized (this) {
             if(data != null) this.latestSecuritiesQuote = data;
@@ -305,17 +318,13 @@ public class Product extends SG_model{
             Double minPrice = getSignal5DayMinPrice(signal);
             Double maxPrice = getSignal5DayMaxPrice(signal);
             double avgPrice = avg_5_day.doubleValue();
-            final double value = (100 + signal.getLow_value().doubleValue())/100;
 
-            if(avgPrice < currentPrice && maxPrice > currentPrice) {
-                return "매수";
-            } else if(minPrice * value < currentPrice && minPrice > currentPrice) {
-                return "매도";
-            } else if(minPrice > currentPrice) {
-                return "관망";
-            } else {
-                return "보유";
+            if(avgPrice < currentPrice && maxPrice > currentPrice) return "매수";
+            else if(avgPrice > currentPrice) {
+                if(minPrice <= currentPrice) return "매도";
+                else return "관망";
             }
+            else return "보유";
         } catch (Exception e) {
             return "보유";
         }
@@ -340,17 +349,12 @@ public class Product extends SG_model{
             Double minPrice = getSignal20DayMinPrice(signal);
             Double maxPrice = getSignal20DayMaxPrice(signal);
             double avgPrice = avg_20_day.doubleValue();
-            final double value = (100 - signal.getLow_value().doubleValue())/100;
-
-            if(avgPrice < currentPrice && maxPrice >= currentPrice) {
-                return "매수";
-            } else if(minPrice * value <= currentPrice && minPrice > currentPrice) {
-                return "매도";
-            } else if(minPrice > currentPrice) {
-                return "관망";
-            } else {
-                return "보유";
+            if(avgPrice < currentPrice && maxPrice > currentPrice) return "매수";
+            else if(avgPrice > currentPrice) {
+                if(minPrice <= currentPrice) return "매도";
+                else return "관망";
             }
+            else return "보유";
         } catch (Exception e) {
             return "보유";
         }

@@ -7,6 +7,7 @@ import com.quant_socket.models.Product;
 import com.quant_socket.models.SG_model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;

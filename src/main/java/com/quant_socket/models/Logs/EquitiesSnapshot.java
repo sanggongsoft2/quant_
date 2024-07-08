@@ -10,6 +10,7 @@ import com.quant_socket.models.SG_substring_model;
 import com.quant_socket.models.Signal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
+@Setter
 @ToString
 @Slf4j
 public class EquitiesSnapshot extends SG_model {
