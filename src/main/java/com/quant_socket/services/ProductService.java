@@ -49,6 +49,7 @@ public class ProductService extends SocketService{
         return prod;
     }
 
+    @Transactional
     public void updateProducts() {
         synchronized (products) {
             products.forEach(prod -> {
@@ -57,6 +58,7 @@ public class ProductService extends SocketService{
         }
     }
 
+    @Transactional
     public void updateProductMinute() {
         synchronized (products) {
             final List<ProductMinute> minutes = products.stream().map(Product::getCurrentPM).toList();
