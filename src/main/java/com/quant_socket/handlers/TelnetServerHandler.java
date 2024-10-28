@@ -43,8 +43,6 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             for (String logMessage : this.msg.split("�")) {
                 socketLogService.esHandler(logMessage.trim());
             }
-        } catch (Exception ignored) {
-
         } finally {
             buf.release();
         }
