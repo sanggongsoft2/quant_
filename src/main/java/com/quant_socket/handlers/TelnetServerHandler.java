@@ -5,17 +5,11 @@ import com.quant_socket.services.SocketLogService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.util.AttributeKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,6 +43,8 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             for (String logMessage : this.msg.split("�")) {
                 socketLogService.esHandler(logMessage.trim());
             }
+        } catch (Exception ignored) {
+
         } finally {
             buf.release();
         }
