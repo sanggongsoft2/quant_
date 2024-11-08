@@ -20,6 +20,8 @@ import java.util.Map;
 @ToString
 @Slf4j
 public class SecOrderFilled extends SG_substring_model {
+    @SG_substring(start = 13, end = 15)
+    private String board_id;
     @SG_substring(start = 17, end = 29)
     private String isin_code;
     @SG_substring(start = 35, end = 47)
@@ -153,5 +155,9 @@ public class SecOrderFilled extends SG_substring_model {
                 Integer.parseInt(minute),
                 Integer.parseInt(second)
         );
+    }
+
+    public boolean isRealBoard() {
+        return board_id != null && board_id.equals("G1");
     }
 }

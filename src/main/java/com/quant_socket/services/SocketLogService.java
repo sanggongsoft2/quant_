@@ -62,7 +62,10 @@ public class SocketLogService extends SocketService{
                             equitiesBatchDataService.dataHandler(ebd);
                             break;
                         case "A3":
-                            if(isCompare) securitiesOrderFilledService.dataHandler(new SecOrderFilled(msg));
+                            if(isCompare) {
+                                final SecOrderFilled scq = new SecOrderFilled(msg);
+                                if(scq.isRealBoard()) securitiesOrderFilledService.dataHandler(scq);
+                            }
                             break;
                         case "B2":
                             if(isCompare) {
