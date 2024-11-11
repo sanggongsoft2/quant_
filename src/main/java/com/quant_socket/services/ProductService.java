@@ -183,7 +183,7 @@ public class ProductService extends SocketService{
 
     private List<Product> factoryProducts(String type, String typeetf) {
         List<Product> list = products;
-        if(type != null) list = list.stream().filter(prod -> prod.getGubun().startsWith(type)).toList();
+        if(type != null) list = list.stream().filter(prod -> Objects.equals(prod.getGubun(), type)).toList();
         if(typeetf.equals("N")) list = list.stream().filter(prod -> !Objects.equals(prod.getGubun(), "ETF")).toList();
         return list;
     }
