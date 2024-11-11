@@ -74,13 +74,13 @@ public class ScheduledComponent {
     @Scheduled(cron = "0 0 0 * * SAT")
     @Transactional
     public synchronized void everyFriday() {
-        productRepo.insertProductWeek();
+        /*productRepo.insertProductWeek();*/
     }
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 1 * ?")
     @Transactional
     public synchronized void everyMonth() {
-        productRepo.insertProductMonth();
+        /*productRepo.insertProductMonth();*/
     }
 }
