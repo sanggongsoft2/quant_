@@ -39,8 +39,10 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         final ByteBuf buf = (ByteBuf) msg;
 
         try {
+//            this.msg = buf.toString(Charset.forName("EUC-KR"));
             this.msg = buf.toString(Charset.forName("EUC-KR"));
-            for (String logMessage : this.msg.split("�")) {
+            log.info(this.msg);
+            for (String logMessage : this.msg.split("%HFF")) {
                 socketLogService.esHandler(logMessage.trim());
             }
         } finally {
