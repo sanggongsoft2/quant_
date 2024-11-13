@@ -43,7 +43,7 @@ public class ScheduledComponent {
         signalService.refresh();
     }
 
-    @Profile({"prod", "dev"})
+    /*@Profile({"prod", "dev"})
     @Scheduled(cron = "0 * 9-14 * * MON-FRI")
     @Scheduled(cron = "0 0-31 15 * * MON-FRI")
     @Transactional
@@ -51,7 +51,7 @@ public class ScheduledComponent {
         productService.updateProductMinute();
         equitiesSnapshotService.insertLogs();
         securitiesQuoteService.insertLogs();
-    }
+    }*/
 
     @Profile({"prod", "dev"})
     @Scheduled(cron = "0 0 0 * * MON-FRI")

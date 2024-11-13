@@ -1,10 +1,8 @@
 package com.quant_socket.components;
 
 import com.quant_socket.handlers.TelnetServerHandler;
-import com.quant_socket.repos.*;
 import com.quant_socket.services.*;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -14,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +28,7 @@ public class TelnetServer implements CommandLineRunner {
     private final int[] ports = new int[]{22103, 22102, 22104, 22105, 23103, 23102, 23104, 24103, 24102, 24104};
     @Override
     public void run(String... args) throws Exception {
+        log.info("SERVER CHARSET : {}", Charset.defaultCharset());
         signalService.refresh();
         if(productService.refreshProducts()) {
             log.info("STARTED TELNET SERVER!!");
@@ -38,8 +37,9 @@ public class TelnetServer implements CommandLineRunner {
     }
 
     private void setPorts() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+//        EventLoopGroup workerGroup = new NioEventLoopGroup(ports.length);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(32);
 
         try {
             ServerBootstrap b = new ServerBootstrap();

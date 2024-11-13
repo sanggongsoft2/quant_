@@ -10,12 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RequiredArgsConstructor
 public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private final SocketLogService socketLogService;
+
+    private static final String ENCODE_TYPE = "EUC-KR";
 
     private int port;
     private String remote_url;
@@ -39,16 +42,27 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         final ByteBuf buf = (ByteBuf) msg;
 
         try {
-//            this.msg = buf.toString(Charset.forName("EUC-KR"));
-            this.msg = buf.toString(Charset.forName("EUC-KR"));
-            log.info(this.msg);
-            for (String logMessage : this.msg.split("%HFF")) {
+
+            final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
+            final byte[] bytes = sb.toString().getBytes(Charset.forName(ENCODE_TYPE));
+            final int length = sb.length();
+
+            for(int index = 0; index < length; index++) {
+                final byte b = bytes[index];
+                if(b == (byte) 0xFF) sb.setCharAt(index, '\n');
+            }
+
+            this.msg = sb.toString();
+
+            for (String logMessage : this.msg.split("\n")) {
                 socketLogService.esHandler(logMessage.trim());
             }
         } finally {
             buf.release();
         }
     }
+
+//    sudo java -Dspring.profiles.active=prod -jar /home/sanggong/quant_socket.jar
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -59,5 +73,6 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         socketLog.setError(cause.getMessage());
         socketLogService.addLog(socketLog);
         ctx.close();
+        log.info(cause.getMessage());
     }
 }
