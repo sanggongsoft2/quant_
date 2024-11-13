@@ -44,15 +44,16 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         try {
 
             final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
-            final byte[] bytes = sb.toString().getBytes(Charset.forName(ENCODE_TYPE));
-            final int length = sb.length();
+            final int byte_length = buf.readableBytes();
 
-            for(int index = 0; index < length; index++) {
-                final byte b = bytes[index];
-                if(b == (byte) 0xFF) sb.setCharAt(index, '\n');
+            for (int index = 0; index < byte_length; index++) {
+                byte b = buf.getByte(index);
+                if (b == (byte) 0xFF) sb.setCharAt(index, '\n');
             }
 
             this.msg = sb.toString();
+
+            log.info(this.msg);
 
             for (String logMessage : this.msg.split("\n")) {
                 socketLogService.esHandler(logMessage.trim());
