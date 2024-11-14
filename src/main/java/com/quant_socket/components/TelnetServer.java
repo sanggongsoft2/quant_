@@ -37,9 +37,9 @@ public class TelnetServer implements CommandLineRunner {
     }
 
     private void setPorts() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
 //        EventLoopGroup workerGroup = new NioEventLoopGroup(ports.length);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(32);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             ServerBootstrap b = new ServerBootstrap();
