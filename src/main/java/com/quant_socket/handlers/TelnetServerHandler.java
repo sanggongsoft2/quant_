@@ -54,7 +54,6 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
             }
         }
 
-
         try {
 //            final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
             /*final int byte_length = buf.readableBytes();
