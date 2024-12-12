@@ -41,9 +41,22 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
         final ByteBuf buf = (ByteBuf) msg;
 
-        try {
+        final StringBuilder sb = new StringBuilder();
 
-            final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
+        for (int i = 0; i < buf.readableBytes(); i++) {
+            final String hexString = String.format("%02X", buf.getByte(i));
+            if(!hexString.equals("FF")) {
+                final byte[] originalBytes = new byte[]{buf.getByte(i)};
+                final String originalText = new String(originalBytes, Charset.forName("EUC-KR"));
+                sb.append(originalText);
+            } else {
+                sb.append("\n");
+            }
+        }
+
+
+        try {
+//            final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
             /*final int byte_length = buf.readableBytes();
 
             for (int index = 0; index < byte_length; index++) {
@@ -73,4 +86,27 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
         socketLogService.addLog(socketLog);
         ctx.close();
     }
+
+    public static String hexToEucKrString(String hexString) throws Exception {
+        // HEX 문자열 -> 바이트 배열 변환
+        byte[] bytes = hexStringToByteArray(hexString);
+
+        // 바이트 배열 -> EUC-KR 문자열 변환
+        return new String(bytes, Charset.forName("EUC-KR"));
+    }
+
+    private static byte[] hexStringToByteArray(String hexString) throws Exception {
+        int length = hexString.length();
+        if (length % 2 != 0) {
+            throw new Exception("Invalid HEX string length");
+        }
+
+        byte[] bytes = new byte[length / 2];
+        for (int i = 0; i < length; i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return bytes;
+    }
+
 }
