@@ -15,7 +15,7 @@ public class SignalService {
     @Getter
     private Signal signal;
 
-    public synchronized void refresh() {
+    public void refresh() {
         signal = repo.findLastestSignal();
     }
 }

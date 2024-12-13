@@ -28,7 +28,6 @@ public class TelnetServer implements CommandLineRunner {
     private final int[] ports = new int[]{22103, 22102, 22104, 22105, 23103, 23102, 23104, 24103, 24102, 24104};
     @Override
     public void run(String... args) throws Exception {
-        log.info("SERVER CHARSET : {}", Charset.defaultCharset());
         signalService.refresh();
         if(productService.refreshProducts()) {
             log.info("STARTED TELNET SERVER!!");

@@ -8,6 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +19,7 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
 
     private final SocketLogService socketLogService;
 
-    private static final String ENCODE_TYPE = "EUC-KR";
+    private static final Charset ENCODE_TYPE = Charset.forName("EUC-KR");
 
     private int port;
     private String remote_url;
@@ -38,30 +39,40 @@ public class TelnetServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NumberFormatException, UnsupportedEncodingException {
         final ByteBuf buf = (ByteBuf) msg;
 
         final StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < buf.readableBytes(); i++) {
-            final String hexString = String.format("%02X", buf.getByte(i));
-            if(!hexString.equals("FF")) {
-                final byte[] originalBytes = new byte[]{buf.getByte(i)};
-                final String originalText = new String(originalBytes, Charset.forName("EUC-KR"));
-                sb.append(originalText);
+// 1. 모든 바이트 데이터를 한 번에 가져오기
+        byte[] bytes = new byte[buf.readableBytes()];
+        buf.getBytes(0, bytes); // Netty ByteBuf에서 모든 데이터를 읽음
+
+// 2. 바이트 배열을 순회하며 처리
+        for (int i = 0; i < bytes.length; i++) {
+            int currentByte = bytes[i] & 0xFF; // unsigned 처리
+
+            // 0xFF인 경우
+            if (currentByte == 0xFF) {
+                sb.append("\n"); // 원하는 형식으로 변환
             } else {
-                sb.append("\n");
+                // 한글 포함된 데이터를 처리하기 위해 다음 바이트도 확인
+                int nextByte = (i + 1 < bytes.length) ? (bytes[i + 1] & 0xFF) : -1;
+
+                // 한글일 가능성이 있는 경우 처리
+                if (nextByte >= 0xA1 && nextByte <= 0xFE && currentByte >= 0xA1) {
+                    byte[] multiBytes = new byte[]{(byte) currentByte, (byte) nextByte};
+                    sb.append(new String(multiBytes, ENCODE_TYPE)); // 멀티바이트로 변환
+                    i++; // 다음 바이트를 이미 처리했으므로 건너뜀
+                } else {
+                    // 일반 바이트 처리
+                    sb.append(new String(new byte[]{(byte) currentByte}, ENCODE_TYPE));
+                }
             }
         }
 
-        try {
-//            final StringBuilder sb = new StringBuilder(buf.toString(Charset.forName(ENCODE_TYPE)));
-            /*final int byte_length = buf.readableBytes();
 
-            for (int index = 0; index < byte_length; index++) {
-                byte b = buf.getByte(index);
-                if (b == (byte) 0xFF) sb.setCharAt(index, '\n');
-            }*/
+        try {
 
             this.msg = sb.toString();
 
